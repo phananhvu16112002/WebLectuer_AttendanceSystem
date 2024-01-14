@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.0-102.0.dev <4.0.0'
+  sdk: '>=2.19.4 <4.0.0' ##'>=3.3.0-102.0.dev <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -41,7 +41,9 @@ dependencies:
   google_maps_flutter: ^2.5.3
   geolocator: ^10.1.0
   geocoding: ^2.1.1
+  geocode: ^1.0.3
   intl: ^0.18.1
+  http: ^1.1.2
 
 
 dev_dependencies:
@@ -70,7 +72,6 @@ flutter:
   assets:
     - assets/
     - assets/images/
-    - assets/fonts/
     - assets/icons/
   #   - images/a_dot_ham.jpeg
 

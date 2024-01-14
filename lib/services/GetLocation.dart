@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geocode/geocode.dart';
+import 'package:http/http.dart' as http;
 
 class GetLocation {
   double? latitude;
@@ -35,14 +39,22 @@ class GetLocation {
   }
 
   Future<String?> getAddressFromLatLong(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    var temp =
-        '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
-    address = processAddress(temp);
-    print('address $address');
-    return address;
+    try {
+      // List<Placemark> placemark =
+      //     await placemarkFromCoordinates(position.latitude, position.longitude);
+      // Placemark place = placemark[0];
+      // var temp =
+      //     '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
+      // address = processAddress(temp);
+      // print('address $address');
+      var temp =
+          await GeoCode(apiKey: 'AIzaSyAj53xWW9TWMq2obphJulyMKZjQlKapcYI')
+              .reverseGeocoding(
+                  latitude: position.latitude, longitude: position.longitude);
+      print(temp.streetAddress);
+    } catch (e) {
+      print(e);
+    }
   }
 
   String processAddress(String address) {

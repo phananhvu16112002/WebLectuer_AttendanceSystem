@@ -34,6 +34,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   bool checkPushNotification = false;
   double radius = 0;
   LatLng? _currentLocation;
+  String myLocation = '';
   late GoogleMapController googleMapController;
   Set<Marker> markers = {};
   DateTime date = DateTime.now();
@@ -44,7 +45,15 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     Position position = await GetLocation().determinePosition();
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
+      print('Latitude: ${position.latitude}');
+      print('Longtitude: ${position.longitude}');
     });
+  }
+
+  Future<String?> getMyAddress() async {
+    Position position = await GetLocation().determinePosition();
+    var address = await GetLocation().getAddressFromLatLong(position);
+    return address;
   }
 
   Future<void> selectTimeStart(BuildContext context) async {
@@ -64,6 +73,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (time != null && time != timeStart) {
       setState(() {
         timeStart = time;
+        print('TimeStart: ${formatTimeOfDate(timeStart!)}');
       });
     }
   }
@@ -85,6 +95,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (time != null && time != timeEnd) {
       setState(() {
         timeEnd = time;
+
+        print('TimeEnd: ${formatTimeOfDate(timeEnd!)}');
       });
     }
   }
@@ -93,6 +105,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   void initState() {
     super.initState();
     getLocation();
+    getMyAddress();
   }
 
   @override
@@ -481,7 +494,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                               customTextField(
                                   150,
                                   40,
-                                  false,
+                                  true,
                                   startTimeController,
                                   TextInputType.datetime,
                                   IconButton(
@@ -515,7 +528,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                               customTextField(
                                   150,
                                   40,
-                                  false,
+                                  true,
                                   startTimeController,
                                   TextInputType.datetime,
                                   IconButton(
