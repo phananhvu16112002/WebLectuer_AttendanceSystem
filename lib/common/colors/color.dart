@@ -8,6 +8,9 @@ class AppColors {
 
   static const Color colorHeader = Color(0xffe2f0fd);
 
+  static const Color colorInformation = Color(0xff5cc0df);
+  static const Color colorNumberInformation = Color(0xffDCA093);
+
   //Primary Text
   static const Color primaryText = Colors.black;
 

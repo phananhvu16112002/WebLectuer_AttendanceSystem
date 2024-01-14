@@ -29,7 +29,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
+      mouseCursor: SystemMouseCursors.click,
       onTap: function,
       child: Container(
         height: height,

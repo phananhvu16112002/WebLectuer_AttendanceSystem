@@ -4,27 +4,25 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class DetailPage extends StatefulWidget {
+  const DetailPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<DetailPage> createState() => _DetailPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _DetailPageState extends State<DetailPage> {
   TextEditingController searchController = TextEditingController();
   bool checkHome = true;
   bool checkNotification = false;
   bool checkReport = false;
-  bool checkRepository = false;
-  bool checkCalendar = false;
-  bool checkSettings = false;
+  bool checkForm = false;
+  bool checkAttendaceForm = false;
 
   OverlayEntry? overlayEntry;
   List<Class> classList = [
@@ -203,21 +201,19 @@ class _HomePageState extends State<HomePage> {
           checkHome = false;
           checkNotification = false;
           checkReport = false;
-          checkRepository = false;
-          checkCalendar = false;
-          checkSettings = false;
+          checkForm = false;
+          checkAttendaceForm = false;
+
           if (title == 'Home') {
             checkHome = true;
           } else if (title == 'Notifications') {
             checkNotification = true;
           } else if (title == 'Reports') {
             checkReport = true;
-          } else if (title == 'Repository Class') {
-            checkRepository = true;
-          } else if (title == 'Calendar') {
-            checkCalendar = true;
-          } else if (title == 'Settings') {
-            checkSettings = true;
+          } else if (title == 'Forms') {
+            checkForm = true;
+          } else if (title == 'AttendanceForm') {
+            checkAttendaceForm = true;
           }
         });
       },
@@ -264,168 +260,59 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
+              height: 10,
+            ),
+            const CustomText(
+                message: 'Class Detail',
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText),
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
+              child: CustomButton(
+                buttonName: 'Create Form Attendance',
+                backgroundColorButton: Colors.transparent,
+                borderColor: Colors.black,
+                textColor: AppColors.textName,
+                function: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) =>
+                              const CreateAttendanceFormPage()));
+                },
+                height: 40,
+                width: 200,
+                fontSize: 12,
+                colorShadow: Colors.transparent,
+                borderRadius: 5,
+              ),
+            ),
+            const SizedBox(
               height: 5,
             ),
             const CustomText(
-                message: 'Main',
+                message: 'Analyze',
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondaryText),
-            itemHeader('Home', const Icon(Icons.home_outlined), checkHome),
+            itemHeader('Dashboard', const Icon(Icons.home_outlined), checkHome),
             const CustomText(
-                message: 'Analyze',
+                message: 'Manage',
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondaryText),
             itemHeader('Notifications',
                 const Icon(Icons.notifications_outlined), checkNotification),
             itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
-            const CustomText(
-                message: 'Manage',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Repository Class',
-                const Icon(Icons.cloud_download_outlined), checkRepository),
-            itemHeader('Calendar', const Icon(Icons.calendar_month_outlined),
-                checkCalendar),
-            const CustomText(
-                message: 'Personal',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
             itemHeader(
-                'Settings', const Icon(Icons.settings_outlined), checkSettings),
+                'Forms', const Icon(Icons.edit_document), checkAttendaceForm),
           ],
         ),
       ),
     );
-  }
-
-  Widget customClass(
-      String className, String schedule, String room, String imgPath) {
-    return Container(
-        width: 380,
-        height: 200,
-        child: Card(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: 380,
-                  height: 100,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    child: Image.asset(
-                      imgPath,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                                message: className,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            CustomText(
-                                message: schedule,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            CustomText(
-                                message: 'Room: $room',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white)
-                          ],
-                        ),
-                      ),
-                      PopupMenuButton(
-                        iconColor: Colors.white,
-                        onSelected: (value) {},
-                        itemBuilder: (BuildContext bc) {
-                          return const [
-                            PopupMenuItem(
-                              value: '/repository',
-                              child: Text("Repository"),
-                            ),
-                            PopupMenuItem(
-                              value: '/delete',
-                              child: Text("Delete"),
-                            ),
-                          ];
-                        },
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 225, right: 10),
-              child: Row(
-                children: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.person_2_outlined)),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.document_scanner_outlined))
-                ],
-              ),
-            )
-          ],
-        )));
-  }
-
-  void _showPopupMenu(BuildContext context) {
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: 40,
-        left: 1150,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            color: Colors.white,
-            child: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PopupMenuItem(
-                  child: Text("My Profile"),
-                ),
-                PopupMenuItem(
-                  child: Text("Log Out"),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    Overlay.of(context).insert(overlayEntry!);
-  }
-
-  void _removePopupMenu() {
-    overlayEntry?.remove();
   }
 
   Widget selectedPage() {
@@ -435,12 +322,10 @@ class _HomePageState extends State<HomePage> {
       return const NotificationPage();
     } else if (checkReport) {
       return const ReportPage();
-    } else if (checkRepository) {
-      return const RepositoryClassPage();
-    } else if (checkCalendar) {
-      return const CalendarPage();
-    } else if (checkSettings) {
-      return const SettingPage();
+    } else if (checkForm) {
+      return const FormPage();
+    } else if (checkAttendaceForm) {
+      return const CreateAttendanceFormPage();
     } else {
       return containerHome();
     }
@@ -450,41 +335,21 @@ class _HomePageState extends State<HomePage> {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
+      child: const Padding(
+        padding: EdgeInsets.only(left: 20, right: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
-            const CustomText(
-                message: 'Home',
+            CustomText(
+                message: 'Dashboard',
                 fontSize: 25,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primaryText),
-            const SizedBox(
+            SizedBox(
               height: 10,
-            ),
-            Expanded(
-              child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 2.1,
-                      mainAxisSpacing: 10),
-                  itemCount: classList.length,
-                  itemBuilder: (context, index) {
-                    Class data = classList[index];
-                    return InkWell(
-                      onTap: () {},
-                      mouseCursor: SystemMouseCursors.click,
-                      child: Container(
-                        child: customClass(data.nameClass, data.schedule,
-                            data.room, data.imgPath),
-                      ),
-                    );
-                  }),
             ),
           ],
         ),
