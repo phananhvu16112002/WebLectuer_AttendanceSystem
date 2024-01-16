@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geocode/geocode.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class GetLocation {
   double? latitude;
@@ -40,21 +40,24 @@ class GetLocation {
 
   Future<String?> getAddressFromLatLong(Position position) async {
     try {
-      // List<Placemark> placemark =
-      //     await placemarkFromCoordinates(position.latitude, position.longitude);
-      // Placemark place = placemark[0];
-      // var temp =
-      //     '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
-      // address = processAddress(temp);
-      // print('address $address');
-      var temp =
-          await GeoCode(apiKey: 'AIzaSyAj53xWW9TWMq2obphJulyMKZjQlKapcYI')
-              .reverseGeocoding(
-                  latitude: position.latitude, longitude: position.longitude);
-      print(temp.streetAddress);
+      String apiurl =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=AIzaSyAj53xWW9TWMq2obphJulyMKZjQlKapcYI";
+
+      Response response = await http.get(Uri.parse(apiurl));
+      if (response.statusCode == 200) {
+        Map data = json.decode(response.body);
+        if (data['status'] == 'OK') {
+          Map firstResult = data['results'][0];
+          address = firstResult['formatted_address'];
+          return address;
+        }
+      } else {
+        print('Error');
+      }
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   String processAddress(String address) {

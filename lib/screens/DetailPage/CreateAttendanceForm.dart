@@ -28,7 +28,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   bool checkForm = false;
   bool checkAttendaceForm = false;
   OverlayEntry? overlayEntry;
-  TextEditingController classController = TextEditingController();
+  TextEditingController typeAttendanceController = TextEditingController();
   TextEditingController startTimeController = TextEditingController();
   TextEditingController endTimeController = TextEditingController();
   bool checkPushNotification = false;
@@ -40,20 +40,23 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   DateTime date = DateTime.now();
   TimeOfDay? timeStart;
   TimeOfDay? timeEnd;
+  var items = [
+    'Scan face',
+    'Check in class',
+  ];
+  String dropdownvalue = 'Scan face';
 
   void getLocation() async {
     Position position = await GetLocation().determinePosition();
+    String? tempAddress = await GetLocation().getAddressFromLatLong(position);
+
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
+      myLocation = tempAddress!;
       print('Latitude: ${position.latitude}');
       print('Longtitude: ${position.longitude}');
+      print('Address:$myLocation');
     });
-  }
-
-  Future<String?> getMyAddress() async {
-    Position position = await GetLocation().determinePosition();
-    var address = await GetLocation().getAddressFromLatLong(position);
-    return address;
   }
 
   Future<void> selectTimeStart(BuildContext context) async {
@@ -105,7 +108,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   void initState() {
     super.initState();
     getLocation();
-    getMyAddress();
   }
 
   @override
@@ -124,7 +126,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 ],
               ),
             )
-          : Center(
+          : const Center(
               child: CircularProgressIndicator(),
             ),
     );
@@ -410,7 +412,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                           560,
                           40,
                           true,
-                          classController,
+                          typeAttendanceController,
                           TextInputType.none,
                           IconButton(onPressed: () {}, icon: const Icon(null)),
                           'Cross-platform Programming,Tuesday ,Shift: 3, Room: A0401',
@@ -426,17 +428,48 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                       const SizedBox(
                         height: 5,
                       ),
-                      customTextField(
-                          560,
-                          40,
-                          true,
-                          classController,
-                          TextInputType.none,
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.expand_more)),
-                          'Scan your face',
-                          false),
+                      Container(
+                        width: 560,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                              width: 1,
+                              color: AppColors.primaryText.withOpacity(0.2)),
+                        ),
+                        child: DropdownButton(
+                          underline: Container(),
+                          value: dropdownvalue,
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: AppColors.primaryText.withOpacity(0.5),
+                          ),
+                          items: items.map((String items) {
+                            return DropdownMenuItem(
+                                value: items,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20),
+                                  child: Container(
+                                    width: 380,
+                                    child: Text(
+                                      items,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                  ),
+                                ));
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownvalue = newValue!;
+                            });
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 5),
                       CustomText(
                           message: 'Date',
@@ -448,7 +481,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                           560,
                           40,
                           true,
-                          classController,
+                          typeAttendanceController,
                           TextInputType.none,
                           IconButton(
                               onPressed: () {},
