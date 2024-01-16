@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
@@ -9,6 +8,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,56 +27,7 @@ class _HomePageState extends State<HomePage> {
   bool checkSettings = false;
 
   OverlayEntry? overlayEntry;
-  List<Class> classList = [
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -467,24 +418,43 @@ class _HomePageState extends State<HomePage> {
               height: 10,
             ),
             Expanded(
-              child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 2.1,
-                      mainAxisSpacing: 10),
-                  itemCount: classList.length,
-                  itemBuilder: (context, index) {
-                    Class data = classList[index];
-                    return InkWell(
-                      onTap: () {},
-                      mouseCursor: SystemMouseCursors.click,
-                      child: Container(
-                        child: customClass(data.nameClass, data.schedule,
-                            data.room, data.imgPath),
-                      ),
-                    );
-                  }),
+              child: FutureBuilder(
+                future: API().getClassForTeacher('222h333'),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data != null) {
+                      List<Class>? classes = snapshot.data;
+                      return GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 10,
+                                  childAspectRatio: 2.1,
+                                  mainAxisSpacing: 10),
+                          itemCount: classes!.length,
+                          itemBuilder: (context, index) {
+                            Class data = classes[index];
+                            return InkWell(
+                              onTap: () {},
+                              mouseCursor: SystemMouseCursors.click,
+                              child: Container(
+                                child: customClass(
+                                    data.course.courseName,
+                                    data.classType,
+                                    data.roomNumber,
+                                    'assets/images/banner1.jpg'),
+                              ),
+                            );
+                          });
+                    }
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                  return Text('Data is not available');
+                },
+              ),
             ),
           ],
         ),

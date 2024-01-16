@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
@@ -42,7 +41,6 @@ class GetLocation {
     try {
       String apiurl =
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=AIzaSyAj53xWW9TWMq2obphJulyMKZjQlKapcYI";
-
       Response response = await http.get(Uri.parse(apiurl));
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);

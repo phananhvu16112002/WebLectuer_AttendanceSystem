@@ -25,56 +25,7 @@ class _DetailPageState extends State<DetailPage> {
   bool checkAttendaceForm = false;
 
   OverlayEntry? overlayEntry;
-  List<Class> classList = [
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-      nameClass: 'Cross-Platform Programming',
-      schedule: 'Tuesday, Shift: 2',
-      room: 'A0503',
-      imgPath: 'assets/images/banner1.jpg',
-    ),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-        nameClass: 'Introduction to Networking',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/banner2.jpg'),
-    Class(
-        nameClass: 'Data Mining',
-        schedule: 'Monday, Shift: 3',
-        room: 'A0395',
-        imgPath: 'assets/images/image_card.jpeg'),
-  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
