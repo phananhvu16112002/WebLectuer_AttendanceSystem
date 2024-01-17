@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
@@ -253,8 +255,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget customClass(
-      String className, String schedule, String room, String imgPath) {
+  Widget customClass(String className, String typeClass, String group,
+      String subGroup, int shiftNumber, String room, String imgPath) {
     return Container(
         width: 380,
         height: 200,
@@ -293,19 +295,38 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(
                               height: 5,
                             ),
-                            CustomText(
-                                message: schedule,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
+                            Row(
+                              children: [
+                                CustomText(
+                                    message:
+                                        'Group: $group - Sub: $subGroup | ',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                                CustomText(
+                                    message: 'Type: $typeClass',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                              ],
+                            ),
                             const SizedBox(
                               height: 5,
                             ),
-                            CustomText(
-                                message: 'Room: $room',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white)
+                            Row(
+                              children: [
+                                CustomText(
+                                    message: 'Shift: $shiftNumber | ',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                                CustomText(
+                                    message: 'Room: $room',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -434,6 +455,8 @@ class _HomePageState extends State<HomePage> {
                           itemCount: classes!.length,
                           itemBuilder: (context, index) {
                             Class data = classes[index];
+                            var randomBanner = Random().nextInt(3);
+
                             return InkWell(
                               onTap: () {},
                               mouseCursor: SystemMouseCursors.click,
@@ -441,18 +464,24 @@ class _HomePageState extends State<HomePage> {
                                 child: customClass(
                                     data.course.courseName,
                                     data.classType,
+                                    data.group,
+                                    data.subGroup,
+                                    data.shiftNumber,
                                     data.roomNumber,
-                                    'assets/images/banner1.jpg'),
+                                    'assets/images/banner$randomBanner.jpg'),
                               ),
                             );
                           });
                     }
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
-                    return CircularProgressIndicator();
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      value: 5,
+                    ));
                   }
-                  return Text('Data is not available');
+                  return const Center(child: Text('Data is not available'));
                 },
               ),
             ),
