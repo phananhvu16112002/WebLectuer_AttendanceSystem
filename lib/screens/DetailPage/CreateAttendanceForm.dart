@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/GetLocation.dart';
 
 class CreateAttendanceFormPage extends StatefulWidget {
@@ -35,6 +39,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   double radius = 0;
   LatLng? _currentLocation;
   String myLocation = '';
+  double latitude = 0;
+  double longtitude = 0;
   late GoogleMapController googleMapController;
   Set<Marker> markers = {};
   DateTime date = DateTime.now();
@@ -45,6 +51,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     'Check in class',
   ];
   String dropdownvalue = 'Scan face';
+  int selectedIndex = 0;
 
   void getLocation() async {
     Position position = await GetLocation().determinePosition();
@@ -53,6 +60,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
       myLocation = tempAddress!;
+      latitude = position.latitude;
+      longtitude = position.longitude;
       print('Latitude: ${position.latitude}');
       print('Longtitude: ${position.longitude}');
       print('Address:$myLocation');
@@ -98,7 +107,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (time != null && time != timeEnd) {
       setState(() {
         timeEnd = time;
-
         print('TimeEnd: ${formatTimeOfDate(timeEnd!)}');
       });
     }
@@ -107,11 +115,21 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      var socketServerProvider =
+          Provider.of<SocketServerProvider>(context, listen: false);
+      socketServerProvider.connectToSocketServer('5202111_09_t000');
+    });
     getLocation();
   }
 
   @override
   Widget build(BuildContext context) {
+    final attendanceFormDataProvider =
+        Provider.of<AttendanceFormDataProvider>(context, listen: false);
+    final socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: _currentLocation != null
@@ -121,7 +139,11 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 children: [
                   header(),
                   Row(
-                    children: [leftHeader(), selectedPage()],
+                    children: [
+                      leftHeader(),
+                      selectedPage(
+                          attendanceFormDataProvider, socketServerProvider)
+                    ],
                   )
                 ],
               ),
@@ -352,9 +374,10 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     );
   }
 
-  Widget selectedPage() {
+  Widget selectedPage(AttendanceFormDataProvider attendanceFormDataProvider,
+      SocketServerProvider socketServerProvider) {
     if (checkHome) {
-      return containerHome();
+      return containerHome(attendanceFormDataProvider, socketServerProvider);
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -364,11 +387,12 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     } else if (checkAttendaceForm) {
       return const CreateAttendanceFormPage();
     } else {
-      return containerHome();
+      return containerHome(attendanceFormDataProvider, socketServerProvider);
     }
   }
 
-  Container containerHome() {
+  Container containerHome(AttendanceFormDataProvider attendanceFormDataProvider,
+      SocketServerProvider socketServerProvider) {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -465,8 +489,9 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
-                              dropdownvalue = newValue!;
+                              selectedIndex = items.indexOf(newValue!);
                             });
+                            print("Selected index: $selectedIndex");
                           },
                         ),
                       ),
@@ -613,7 +638,28 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                             backgroundColorButton: AppColors.primaryButton,
                             borderColor: Colors.white,
                             textColor: Colors.white,
-                            function: () {},
+                            function: () async {
+                              AttendanceForm? attendanceForm = await API()
+                                  .createFormAttendance(
+                                      '5202111_09_t000',
+                                      formatTimeOfDate(timeStart!).toString(),
+                                      formatTimeOfDate(timeEnd!).toString(),
+                                      selectedIndex,
+                                      myLocation,
+                                      latitude,
+                                      longtitude,
+                                      radius);
+                              if (attendanceForm != null) {
+                                attendanceFormDataProvider
+                                    .setAttendanceFormData(attendanceForm);
+                                socketServerProvider
+                                    .sendAttendanceForm(attendanceForm);
+                                //QR View have properties data so add data from provider and display QR Code on screen
+                                print('Success');
+                              } else {
+                                print('Failed');
+                              }
+                            },
                             height: 50,
                             width: 350,
                             fontSize: 20,
@@ -636,7 +682,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                         markerId: const MarkerId('currentLocation'),
                         position: _currentLocation!,
                         draggable: true,
-                        infoWindow: const InfoWindow(title: 'Your Location'),
+                        infoWindow: const InfoWindow(title: 'My Location'),
                       ),
                     },
                     zoomControlsEnabled: false,
@@ -669,7 +715,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
       TextEditingController controller,
       TextInputType textInputType,
       IconButton iconSuffix,
-      String labelText,
+      String hintText,
       bool enabled) {
     return Container(
       width: width,
@@ -695,8 +741,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(20),
             suffixIcon: iconSuffix,
-            labelText: labelText,
-            labelStyle:
+            hintText: hintText,
+            hintStyle:
                 TextStyle(fontSize: 12, color: Colors.black.withOpacity(0.5)),
             enabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),

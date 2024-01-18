@@ -3,7 +3,6 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';

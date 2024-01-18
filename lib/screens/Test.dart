@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class TestApp extends StatefulWidget {

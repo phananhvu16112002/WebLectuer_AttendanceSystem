@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Test.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
+    ChangeNotifierProvider(create: (_) => SocketServerProvider())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
         useMaterial3: true,
       ),
-      home: const CreateAttendanceFormPage(),
+      home: const DetailPage(),
     );
   }
 }
