@@ -32,18 +32,6 @@ class SocketServerProvider with ChangeNotifier {
     _socket.emit('joinClassRoom', jsonString);
   }
 
-  void getAttendanceForm(classRoom) {
-    _socket.on('getAttendanceForm', (data) {
-      var temp = jsonDecode(data);
-      var temp1 = temp['classes'];
-      if (temp1 == classRoom) {
-        print('Attendance Form Detail:' + data);
-      } else {
-        print('Error ClassRoom not feat');
-      }
-    });
-  }
-
   void sendAttendanceForm(AttendanceForm attendanceForm) {
     var jsonData = {
       "formID": attendanceForm.formID,

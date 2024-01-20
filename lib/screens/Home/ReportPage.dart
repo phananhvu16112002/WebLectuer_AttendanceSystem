@@ -3,7 +3,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomRichText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/StudentClasses.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/TestStudentClasses.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -15,33 +15,43 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   String text =
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit maiores, perferendis suscipit veniam ratione fuga cumque incidunt quam deleniti vitae maxime totam omnis quidem quo consectetur ad? Veniam, harum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit maiores, perferendis suscipit veniam ratione fuga cumque incidunt quam deleniti vitae maxime totam omnis quidem quo consectetur ad? Veniam, harum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit m';
-  List<StudentClasses> studentList = [
-    StudentClasses(
+  List<TestStudentClasses> studentList = [
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '520H0696',
         name: 'Phan Anh Vu',
         nameClass: 'Cross-Platform Programming'),
-    StudentClasses(
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '520H0693',
         name: 'Phan Anh Vu3',
         nameClass: 'Phát triển hệ thống thông tin doanh nghiệp'),
-    StudentClasses(
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '522H222',
         name: 'Phan Anh Vu1',
         nameClass: 'Nhập môn mạng máy tính'),
-    StudentClasses(
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '522H222',
         name: 'Phan Anh Vu1',
         nameClass: 'Nhập môn mạng máy tính'),
-    StudentClasses(
+    TestStudentClasses(
+        imgPath: 'assets/images/avatar.png',
+        studentID: '520H0696',
+        name: 'Phan Anh Vu',
+        nameClass: 'Cross-Platform Programming'),
+    TestStudentClasses(
+        imgPath: 'assets/images/avatar.png',
+        studentID: '520H0693',
+        name: 'Phan Anh Vu3',
+        nameClass: 'Phát triển hệ thống thông tin doanh nghiệp'),
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '522H222',
         name: 'Phan Anh Vu1',
         nameClass: 'Nhập môn mạng máy tính'),
-    StudentClasses(
+    TestStudentClasses(
         imgPath: 'assets/images/avatar.png',
         studentID: '522H222',
         name: 'Phan Anh Vu1',
@@ -105,8 +115,8 @@ class _ReportPageState extends State<ReportPage> {
                                 2: FixedColumnWidth(70),
                                 3: FixedColumnWidth(90),
                               },
-                              border:
-                                  TableBorder.all(color: AppColors.secondaryText),
+                              border: TableBorder.all(
+                                  color: AppColors.secondaryText),
                               children: [
                                 TableRow(
                                   children: [
@@ -241,7 +251,8 @@ class _ReportPageState extends State<ReportPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const CustomText(
                                       message: 'Details',
@@ -252,13 +263,14 @@ class _ReportPageState extends State<ReportPage> {
                                     width: 65,
                                     height: 20,
                                     decoration: const BoxDecoration(
-                                        color: Color.fromARGB(113, 190, 188, 188),
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(5))),
+                                        color:
+                                            Color.fromARGB(113, 190, 188, 188),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
                                     child: const Center(
                                       child: CustomText(
                                           message: 'ID:123456',
-                                          fontSize: 11,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.normal,
                                           color: AppColors.primaryText),
                                     ),
@@ -272,11 +284,11 @@ class _ReportPageState extends State<ReportPage> {
                             width: 390,
                             color: const Color(0xfff6f9ff),
                             child: const Padding(
-                              padding:
-                                  EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 20),
                               child: CustomText(
                                   message: 'Basic Details',
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primaryText),
                             ),
@@ -290,8 +302,12 @@ class _ReportPageState extends State<ReportPage> {
                               children: [
                                 Container(
                                   width: 260,
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(20),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                        top: 20,
+                                        bottom: 20),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -301,11 +317,13 @@ class _ReportPageState extends State<ReportPage> {
                                           message: 'Phan Anh',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
@@ -313,23 +331,28 @@ class _ReportPageState extends State<ReportPage> {
                                           message: '520H0696',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
                                           title: 'Mail: ',
-                                          message: '520H0696@student.tdtu.edu.vn',
+                                          message:
+                                              '520H0696@student.tdtu.edu.vn',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
@@ -337,11 +360,13 @@ class _ReportPageState extends State<ReportPage> {
                                           message: 'Introduction to Networking',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
@@ -349,17 +374,20 @@ class _ReportPageState extends State<ReportPage> {
                                           message: '3 - A0503',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         )
                                       ],
                                     ),
                                   ),
                                 ),
                                 Container(
-                                  child: const Padding(
-                                    padding: EdgeInsets.only(top: 20, right: 20),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 20, right: 20),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -369,11 +397,13 @@ class _ReportPageState extends State<ReportPage> {
                                           message: 'Vu',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
@@ -381,11 +411,13 @@ class _ReportPageState extends State<ReportPage> {
                                           message: 'Male',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         customRichText(
@@ -393,9 +425,11 @@ class _ReportPageState extends State<ReportPage> {
                                           message: '24',
                                           fontWeightTitle: FontWeight.w600,
                                           fontWeightMessage: FontWeight.normal,
-                                          colorText: AppColors.secondaryText,
-                                          fontSize: 13,
-                                          colorTextMessage: AppColors.primaryText,
+                                          colorText: AppColors.primaryText
+                                              .withOpacity(0.3),
+                                          fontSize: 12,
+                                          colorTextMessage:
+                                              AppColors.primaryText,
                                         ),
                                       ],
                                     ),
@@ -409,11 +443,11 @@ class _ReportPageState extends State<ReportPage> {
                             width: 390,
                             color: const Color(0xfff6f9ff),
                             child: const Padding(
-                              padding:
-                                  EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 20),
                               child: CustomText(
                                   message: 'About Report',
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primaryText),
                             ),
@@ -447,8 +481,8 @@ class _ReportPageState extends State<ReportPage> {
                                                     const BorderRadius.all(
                                                         Radius.circular(5)),
                                                 border: Border.all(
-                                                    color:
-                                                        AppColors.secondaryText)),
+                                                    color: AppColors
+                                                        .secondaryText)),
                                             child: SingleChildScrollView(
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
@@ -456,8 +490,10 @@ class _ReportPageState extends State<ReportPage> {
                                                 child: CustomText(
                                                     message: text,
                                                     fontSize: 12,
-                                                    fontWeight: FontWeight.normal,
-                                                    color: AppColors.primaryText),
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color:
+                                                        AppColors.primaryText),
                                               ),
                                             ),
                                           ),
@@ -475,7 +511,8 @@ class _ReportPageState extends State<ReportPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           const CustomText(
-                                              message: 'Evidence of the problem',
+                                              message:
+                                                  'Evidence of the problem',
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
                                               color: AppColors.primaryText),
@@ -520,13 +557,15 @@ class _ReportPageState extends State<ReportPage> {
                                     child: TextFormField(
                                       readOnly: true,
                                       enabled: false,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           filled: true,
-                                          fillColor:
-                                              Color.fromARGB(53, 226, 240, 253),
-                                          disabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.transparent)),
+                                          fillColor: const Color.fromARGB(
+                                              53, 226, 240, 253),
+                                          disabledBorder:
+                                              const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          Colors.transparent)),
                                           label: customRichText(
                                               title: 'To: ',
                                               message: "Phan Anh Vu",
@@ -534,11 +573,12 @@ class _ReportPageState extends State<ReportPage> {
                                                   FontWeight.normal,
                                               fontWeightMessage:
                                                   FontWeight.normal,
-                                              colorText:
-                                                  AppColors.secondaryText,
+                                              colorText: AppColors.primaryText
+                                                  .withOpacity(0.5),
                                               fontSize: 12,
-                                              colorTextMessage:
-                                                  AppColors.primaryText)),
+                                              colorTextMessage: AppColors
+                                                  .primaryText
+                                                  .withOpacity(0.5))),
                                     ),
                                   ),
                                   const SizedBox(
@@ -556,22 +596,13 @@ class _ReportPageState extends State<ReportPage> {
                                         maxLines: null,
                                         decoration: const InputDecoration(
                                             border: InputBorder.none,
-                                            labelStyle: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal,
-                                                color: AppColors.primaryText),
                                             filled: true,
                                             fillColor: Color.fromARGB(
                                                 53, 226, 240, 253),
                                             disabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color: Colors.transparent)),
-                                            label: CustomText(
-                                                message: 'Topic',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal,
-                                                color:
-                                                    AppColors.secondaryText)),
+                                            hintText: 'Topic'),
                                       ),
                                     ),
                                   ),
@@ -632,13 +663,7 @@ class _ReportPageState extends State<ReportPage> {
                                         controller: messageController,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
-                                          label: Text(
-                                            'Message',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal,
-                                                color: AppColors.secondaryText),
-                                          ),
+                                          hintText: 'Message',
                                         ),
                                       ),
                                     ),
@@ -656,8 +681,9 @@ class _ReportPageState extends State<ReportPage> {
                                       height: 35,
                                       width: 260,
                                       fontSize: 15,
-                                      colorShadow: AppColors.primaryButton,
-                                      borderRadius: 10)
+                                      colorShadow: AppColors.primaryButton
+                                          .withOpacity(0.5),
+                                      borderRadius: 5)
                                 ],
                               ),
                             )),
@@ -722,7 +748,8 @@ class _ReportPageState extends State<ReportPage> {
                                           child: Text(
                                             'Confirm',
                                             style: TextStyle(
-                                                color: Colors.white, fontSize: 8),
+                                                color: Colors.white,
+                                                fontSize: 8),
                                           ),
                                         ),
                                       )
@@ -752,7 +779,8 @@ class _ReportPageState extends State<ReportPage> {
                                           child: Text(
                                             'Denied',
                                             style: TextStyle(
-                                                color: Colors.white, fontSize: 8),
+                                                color: Colors.white,
+                                                fontSize: 8),
                                           ),
                                         ),
                                       )

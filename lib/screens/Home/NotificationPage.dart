@@ -10,7 +10,6 @@ class NotificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isHovered = false;
     List<NotificationDetail> notificationList = [
       NotificationDetail(
           title:

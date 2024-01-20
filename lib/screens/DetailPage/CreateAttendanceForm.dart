@@ -5,14 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
-import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/GetLocation.dart';
 
@@ -30,7 +27,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   bool checkNotification = false;
   bool checkReport = false;
   bool checkForm = false;
-  bool checkAttendaceForm = false;
   OverlayEntry? overlayEntry;
   TextEditingController typeAttendanceController = TextEditingController();
   TextEditingController startTimeController = TextEditingController();
@@ -129,270 +125,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final socketServerProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
-
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: _currentLocation != null
-          ? SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  header(),
-                  Row(
-                    children: [
-                      leftHeader(),
-                      selectedPage(
-                          attendanceFormDataProvider, socketServerProvider)
-                    ],
-                  )
-                ],
-              ),
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
-    );
-  }
-
-  Widget header() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      color: AppColors.colorHeader,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                InkWell(
-                  onTap: () {},
-                  mouseCursor: SystemMouseCursors.click,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-                const SizedBox(width: 180),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.menu,
-                      size: 25,
-                      color: AppColors.textName,
-                    ))
-              ],
-            ),
-            Row(
-              children: [
-                CustomTextField(
-                    controller: searchController,
-                    textInputType: TextInputType.text,
-                    obscureText: false,
-                    suffixIcon: IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
-                    hintText: 'Search',
-                    prefixIcon: const Icon(null),
-                    readOnly: false),
-                const SizedBox(
-                  width: 60,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.notifications_none_outlined)),
-                const SizedBox(
-                  width: 10,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.messenger_outline_sharp)),
-                const SizedBox(
-                  width: 10,
-                ),
-                MouseRegion(
-                  onHover: (event) => showMenu(
-                    color: Colors.white,
-                    context: context,
-                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
-                    items: [
-                      const PopupMenuItem(
-                        child: Text("My Profile"),
-                      ),
-                      const PopupMenuItem(
-                        child: Text("Log Out"),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    child: const Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          backgroundImage:
-                              AssetImage('assets/images/avatar.png'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        CustomText(
-                            message: 'Anh Vu',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textName)
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget itemHeader(String title, Icon icon, bool check) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          checkHome = false;
-          checkNotification = false;
-          checkReport = false;
-          checkForm = false;
-          checkAttendaceForm = false;
-
-          if (title == 'Home') {
-            checkHome = true;
-          } else if (title == 'Notifications') {
-            checkNotification = true;
-          } else if (title == 'Reports') {
-            checkReport = true;
-          } else if (title == 'Forms') {
-            checkForm = true;
-          } else if (title == 'AttendanceForm') {
-            checkAttendaceForm = true;
-          }
-        });
-      },
-      child: Container(
-        height: 40,
-        width: 220,
-        decoration: BoxDecoration(
-            color: check
-                ? const Color.fromARGB(62, 226, 240, 253)
-                : Colors.transparent,
-            border: Border.all(color: Colors.transparent, width: 1),
-            borderRadius: const BorderRadius.all(Radius.circular(10))),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Row(
-            children: [
-              icon,
-              const SizedBox(
-                width: 5,
-              ),
-              CustomText(
-                  message: title,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textName)
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget leftHeader() {
-    return Container(
-      width: 250,
-      height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(5), bottomRight: Radius.circular(5))),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomText(
-                message: 'Class Detail',
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 10,
-            ),
-            Center(
-              child: CustomButton(
-                buttonName: 'Create Form Attendance',
-                backgroundColorButton: Colors.transparent,
-                borderColor: Colors.black,
-                textColor: AppColors.textName,
-                function: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (builder) =>
-                              const CreateAttendanceFormPage()));
-                },
-                height: 40,
-                width: 200,
-                fontSize: 12,
-                colorShadow: Colors.transparent,
-                borderRadius: 5,
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            const CustomText(
-                message: 'Analyze',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Dashboard', const Icon(Icons.home_outlined), checkHome),
-            const CustomText(
-                message: 'Manage',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Notifications',
-                const Icon(Icons.notifications_outlined), checkNotification),
-            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
-            itemHeader(
-                'Forms', const Icon(Icons.edit_document), checkAttendaceForm),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget selectedPage(AttendanceFormDataProvider attendanceFormDataProvider,
-      SocketServerProvider socketServerProvider) {
-    if (checkHome) {
-      return containerHome(attendanceFormDataProvider, socketServerProvider);
-    } else if (checkNotification) {
-      return const NotificationPage();
-    } else if (checkReport) {
-      return const ReportPage();
-    } else if (checkForm) {
-      return const FormPage();
-    } else if (checkAttendaceForm) {
-      return const CreateAttendanceFormPage();
-    } else {
-      return containerHome(attendanceFormDataProvider, socketServerProvider);
-    }
-  }
-
-  Container containerHome(AttendanceFormDataProvider attendanceFormDataProvider,
-      SocketServerProvider socketServerProvider) {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -403,309 +135,318 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
-                height: 550,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Center(
-                        child: CustomText(
-                            message: 'Attendance Form',
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryButton),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      CustomText(
-                          message: 'Class',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryText.withOpacity(0.7)),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      customTextField(
-                          560,
-                          40,
-                          true,
-                          typeAttendanceController,
-                          TextInputType.none,
-                          IconButton(onPressed: () {}, icon: const Icon(null)),
-                          'Cross-platform Programming,Tuesday ,Shift: 3, Room: A0401',
-                          false),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      CustomText(
-                          message: 'Type',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryText.withOpacity(0.7)),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Container(
-                        width: 560,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                              width: 1,
-                              color: AppColors.primaryText.withOpacity(0.2)),
-                        ),
-                        child: DropdownButton(
-                          underline: Container(),
-                          value: dropdownvalue,
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: AppColors.primaryText.withOpacity(0.5),
-                          ),
-                          items: items.map((String items) {
-                            return DropdownMenuItem(
-                                value: items,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
-                                  child: Container(
-                                    width: 380,
-                                    child: Text(
-                                      items,
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.primaryText
-                                              .withOpacity(0.5),
-                                          fontWeight: FontWeight.normal),
-                                    ),
-                                  ),
-                                ));
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedIndex = items.indexOf(newValue!);
-                            });
-                            print("Selected index: $selectedIndex");
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      CustomText(
-                          message: 'Date',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryText.withOpacity(0.7)),
-                      const SizedBox(height: 5),
-                      customTextField(
-                          560,
-                          40,
-                          true,
-                          typeAttendanceController,
-                          TextInputType.none,
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.calendar_month_rounded)),
-                          formatDate(date.toString()),
-                          false),
-                      const SizedBox(height: 5),
-                      CustomText(
-                          message: 'Distance: ${radius.ceil()}m',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryText.withOpacity(0.7)),
-                      const SizedBox(height: 5),
-                      Slider(
-                          thumbColor: AppColors.primaryButton.withOpacity(0.5),
-                          activeColor: AppColors.primaryButton.withOpacity(0.2),
-                          label: 'Distance',
-                          value: radius,
-                          min: 0,
-                          max: 100,
-                          onChanged: (value) {
-                            setState(() {
-                              radius = value;
-                            });
-                          }),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                  message: "Start Time ",
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color:
-                                      AppColors.primaryText.withOpacity(0.7)),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              customTextField(
-                                  150,
-                                  40,
-                                  true,
-                                  startTimeController,
-                                  TextInputType.datetime,
-                                  IconButton(
-                                      onPressed: () => selectTimeStart(context),
-                                      icon: const Icon(
-                                          Icons.watch_later_outlined)),
-                                  timeStart != null
-                                      ? formatTime(formatTimeOfDate(timeStart!)
-                                          .toString())
-                                      : formatTime(
-                                          formatTimeOfDate(TimeOfDay.now())
-                                              .toString()),
-                                  true),
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 50,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                  message: "End Time ",
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color:
-                                      AppColors.primaryText.withOpacity(0.7)),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              customTextField(
-                                  150,
-                                  40,
-                                  true,
-                                  startTimeController,
-                                  TextInputType.datetime,
-                                  IconButton(
-                                      onPressed: () => selectTimeEnd(context),
-                                      icon: const Icon(
-                                          Icons.watch_later_outlined)),
-                                  timeEnd != null
-                                      ? formatTime(
-                                          formatTimeOfDate(timeEnd!).toString())
-                                      : formatTime(
-                                          formatTimeOfDate(TimeOfDay.now())
-                                              .toString()),
-                                  true),
-                            ],
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          CustomText(
-                              message: 'Push Notification to everyone',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.primaryText.withOpacity(0.7)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Switch(
-                              activeColor: Colors.green,
-                              activeTrackColor: Colors.black.withOpacity(0.05),
-                              splashRadius: 10,
-                              value: checkPushNotification,
-                              onChanged: (value) {
-                                setState(() {
-                                  checkPushNotification = value;
-                                });
-                              })
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                        child: CustomButton(
-                            buttonName: "Create",
-                            backgroundColorButton: AppColors.primaryButton,
-                            borderColor: Colors.white,
-                            textColor: Colors.white,
-                            function: () async {
-                              AttendanceForm? attendanceForm = await API()
-                                  .createFormAttendance(
-                                      '5202111_09_t000',
-                                      formatTimeOfDate(timeStart!).toString(),
-                                      formatTimeOfDate(timeEnd!).toString(),
-                                      selectedIndex,
-                                      myLocation,
-                                      latitude,
-                                      longtitude,
-                                      radius);
-                              if (attendanceForm != null) {
-                                attendanceFormDataProvider
-                                    .setAttendanceFormData(attendanceForm);
-                                socketServerProvider
-                                    .sendAttendanceForm(attendanceForm);
-                                //QR View have properties data so add data from provider and display QR Code on screen
-                                print('Success');
-                              } else {
-                                print('Failed');
-                              }
-                            },
-                            height: 50,
-                            width: 350,
-                            fontSize: 20,
-                            colorShadow: Colors.white,
-                            borderRadius: 10),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                  width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
-                  height: 550,
-                  child: GoogleMap(
-                    initialCameraPosition:
-                        CameraPosition(target: _currentLocation!, zoom: 18),
-                    markers: {
-                      Marker(
-                        icon: BitmapDescriptor.defaultMarker,
-                        markerId: const MarkerId('currentLocation'),
-                        position: _currentLocation!,
-                        draggable: true,
-                        infoWindow: const InfoWindow(title: 'My Location'),
-                      ),
-                    },
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: true,
-                    mapToolbarEnabled: true,
-                    myLocationEnabled: true,
-                    mapType: MapType.normal,
-                    onMapCreated: (controller) {
-                      googleMapController = controller;
-                    },
-                    circles: {
-                      Circle(
-                          circleId: const CircleId('ID1'),
-                          radius: radius,
-                          fillColor: AppColors.primaryButton.withOpacity(0.2),
-                          strokeColor: AppColors.primaryButton.withOpacity(0.1),
-                          strokeWidth: 5,
-                          center: _currentLocation!)
-                    },
-                  ))
+              infoForm(
+                  context, attendanceFormDataProvider, socketServerProvider),
+              googleMaps(context)
             ],
           )),
     );
+  }
+
+  Widget infoForm(
+      BuildContext context,
+      AttendanceFormDataProvider attendanceFormDataProvider,
+      SocketServerProvider socketServerProvider) {
+    return Container(
+      width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
+      height: 550,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: CustomText(
+                  message: 'Attendance Form',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryButton),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            CustomText(
+                message: 'Class',
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.primaryText.withOpacity(0.7)),
+            const SizedBox(
+              height: 5,
+            ),
+            customTextField(
+                560,
+                40,
+                true,
+                typeAttendanceController,
+                TextInputType.none,
+                IconButton(onPressed: () {}, icon: const Icon(null)),
+                'Cross-platform Programming,Tuesday ,Shift: 3, Room: A0401',
+                false),
+            const SizedBox(
+              height: 5,
+            ),
+            CustomText(
+                message: 'Type',
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.primaryText.withOpacity(0.7)),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: 560,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                    width: 1, color: AppColors.primaryText.withOpacity(0.2)),
+              ),
+              child: DropdownButton(
+                underline: Container(),
+                value: dropdownvalue,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: AppColors.primaryText.withOpacity(0.5),
+                ),
+                items: items.map((String items) {
+                  return DropdownMenuItem(
+                      value: items,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Container(
+                          width: 380,
+                          child: Text(
+                            items,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.primaryText.withOpacity(0.5),
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                      ));
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedIndex = items.indexOf(newValue!);
+                  });
+                  print("Selected index: $selectedIndex");
+                },
+              ),
+            ),
+            const SizedBox(height: 5),
+            CustomText(
+                message: 'Date',
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.primaryText.withOpacity(0.7)),
+            const SizedBox(height: 5),
+            customTextField(
+                560,
+                40,
+                true,
+                typeAttendanceController,
+                TextInputType.none,
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.calendar_month_rounded)),
+                formatDate(date.toString()),
+                false),
+            const SizedBox(height: 5),
+            CustomText(
+                message: 'Distance: ${radius.ceil()}m',
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: AppColors.primaryText.withOpacity(0.7)),
+            const SizedBox(height: 5),
+            Slider(
+                thumbColor: AppColors.primaryButton.withOpacity(0.5),
+                activeColor: AppColors.primaryButton.withOpacity(0.2),
+                label: 'Distance',
+                value: radius,
+                min: 0,
+                max: 100,
+                onChanged: (value) {
+                  setState(() {
+                    radius = value;
+                  });
+                }),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomText(
+                        message: "Start Time ",
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primaryText.withOpacity(0.7)),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customTextField(
+                        150,
+                        40,
+                        true,
+                        startTimeController,
+                        TextInputType.datetime,
+                        IconButton(
+                            onPressed: () => selectTimeStart(context),
+                            icon: const Icon(Icons.watch_later_outlined)),
+                        timeStart != null
+                            ? formatTime(
+                                formatTimeOfDate(timeStart!).toString())
+                            : formatTime(
+                                formatTimeOfDate(TimeOfDay.now()).toString()),
+                        true),
+                  ],
+                ),
+                const SizedBox(
+                  width: 50,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomText(
+                        message: "End Time ",
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primaryText.withOpacity(0.7)),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customTextField(
+                        150,
+                        40,
+                        true,
+                        startTimeController,
+                        TextInputType.datetime,
+                        IconButton(
+                            onPressed: () => selectTimeEnd(context),
+                            icon: const Icon(Icons.watch_later_outlined)),
+                        timeEnd != null
+                            ? formatTime(formatTimeOfDate(timeEnd!).toString())
+                            : formatTime(
+                                formatTimeOfDate(TimeOfDay.now()).toString()),
+                        true),
+                  ],
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                CustomText(
+                    message: 'Push Notification to everyone',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.primaryText.withOpacity(0.7)),
+                const SizedBox(
+                  width: 10,
+                ),
+                Switch(
+                    activeColor: Colors.green,
+                    activeTrackColor: Colors.black.withOpacity(0.05),
+                    splashRadius: 10,
+                    value: checkPushNotification,
+                    onChanged: (value) {
+                      setState(() {
+                        checkPushNotification = value;
+                      });
+                    })
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
+              child: CustomButton(
+                  buttonName: "Create",
+                  backgroundColorButton: AppColors.primaryButton,
+                  borderColor: Colors.white,
+                  textColor: Colors.white,
+                  function: () async {
+                    AttendanceForm? attendanceForm = await API()
+                        .createFormAttendance(
+                            '5202111_09_t000',
+                            formatTimeOfDate(timeStart!).toString(),
+                            formatTimeOfDate(timeEnd!).toString(),
+                            selectedIndex,
+                            myLocation,
+                            latitude,
+                            longtitude,
+                            radius);
+                    if (attendanceForm != null) {
+                      final currentContext = context;
+                      attendanceFormDataProvider
+                          .setAttendanceFormData(attendanceForm);
+                      socketServerProvider.sendAttendanceForm(attendanceForm);
+                      //QR View have properties data so add data from provider and display QR Code on screen
+                      Future.delayed(Duration.zero, () {
+                        Navigator.pushReplacement(
+                            currentContext,
+                            MaterialPageRoute(
+                                builder: (builder) =>
+                                    AfterCreateAttendanceForm()));
+                      });
+                      print('Success');
+                    } else {
+                      print('Failed');
+                    }
+                  },
+                  height: 50,
+                  width: 350,
+                  fontSize: 20,
+                  colorShadow: Colors.white,
+                  borderRadius: 10),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget googleMaps(BuildContext context) {
+    return Container(
+        width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
+        height: 550,
+        child: GoogleMap(
+          initialCameraPosition:
+              CameraPosition(target: _currentLocation!, zoom: 18),
+          markers: {
+            Marker(
+              icon: BitmapDescriptor.defaultMarker,
+              markerId: const MarkerId('currentLocation'),
+              position: _currentLocation!,
+              draggable: true,
+              infoWindow: const InfoWindow(title: 'My Location'),
+            ),
+          },
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: true,
+          mapToolbarEnabled: true,
+          myLocationEnabled: true,
+          mapType: MapType.normal,
+          onMapCreated: (controller) {
+            googleMapController = controller;
+          },
+          circles: {
+            Circle(
+                circleId: const CircleId('ID1'),
+                radius: radius,
+                fillColor: AppColors.primaryButton.withOpacity(0.2),
+                strokeColor: AppColors.primaryButton.withOpacity(0.1),
+                strokeWidth: 5,
+                center: _currentLocation!)
+          },
+        ));
   }
 
   Widget customTextField(

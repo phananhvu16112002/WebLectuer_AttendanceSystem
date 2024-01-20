@@ -4,6 +4,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 void main() {
   runApp(MultiProvider(providers: [

@@ -1,5 +1,3 @@
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
-
 class AttendanceForm {
   String formID;
   String classes;
@@ -41,5 +39,46 @@ class AttendanceForm {
         latitude: json['latitude'],
         longtitude: json['longtitude'],
         radius: json['radius']);
+  }
+
+  static List<AttendanceForm> getData() {
+    return [
+      AttendanceForm(
+          formID: 'FormID14',
+          classes: '520H3333333',
+          startTime: '12:30 PM',
+          endTime: '15:30 PM',
+          dateOpen: '17/01/2024',
+          status: true,
+          typeAttendance: 0,
+          location: '19 Nguyen Huu Tho, District 7, HCMC',
+          latitude: 10.0000002,
+          longtitude: 10.0000002,
+          radius: 50),
+      AttendanceForm(
+          formID: 'FormID13',
+          classes: '520H3333333ádsad',
+          startTime: '12:30 PM',
+          endTime: '15:30 PM',
+          dateOpen: '17/01/2024',
+          status: true,
+          typeAttendance: 0,
+          location: '19 Nguyen Huu Tho, District 7, HCMC',
+          latitude: 10.0000002,
+          longtitude: 10.0000002,
+          radius: 50),
+      AttendanceForm(
+          formID: 'FormID12',
+          classes: '520H3333333123asd',
+          startTime: '12:30 PM',
+          endTime: '15:30 PM',
+          dateOpen: '17/01/2024',
+          status: true,
+          typeAttendance: 1,
+          location: '19 Nguyen Huu Tho, District 7, HCMC',
+          latitude: 10.0000002,
+          longtitude: 10.0000002,
+          radius: 50)
+    ];
   }
 }
