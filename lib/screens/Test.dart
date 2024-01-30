@@ -18,21 +18,11 @@ class _TestAppState extends State<TestApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-          future: API().getClassForTeacher('222h333'),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              print(snapshot.error);
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              if (snapshot.data != null) {
-                return Text('Have data: ${snapshot.data!.first.shiftNumber}');
-              }
-            }
-            return Text('Data is not available');
-          }),
+      body: Container(
+        width: 300,
+        height: 300,
+        child: Image.network('https://i.imgur.com/K1xq8mw.png'),
+      ),
     );
   }
 }

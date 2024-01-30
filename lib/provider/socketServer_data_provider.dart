@@ -33,6 +33,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void sendAttendanceForm(AttendanceForm attendanceForm) {
+    print('Attendance Form Model: ${attendanceForm.toString()}');
     var jsonData = {
       "formID": attendanceForm.formID,
       "classes": attendanceForm.classes,
@@ -46,7 +47,13 @@ class SocketServerProvider with ChangeNotifier {
       "longtitude": attendanceForm.longtitude,
       "radius": attendanceForm.radius
     };
+
     var jsonString = jsonEncode(jsonData);
+    print("FormID Socket: ${attendanceForm.formID}");
+    print("Classes Socket: ${attendanceForm.classes}");
+    print("DateOpen Socket: ${attendanceForm.dateOpen}");
+    print("Latitude Socket ${attendanceForm.latitude}");
+    print("Longitude Socket: ${attendanceForm.longtitude}");
     print('---jsonString: $jsonString');
     _socket.emit('sendAttendanceForm', jsonString);
   }

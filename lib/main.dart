@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Test.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
@@ -13,20 +16,26 @@ void main() {
   ], child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Attendance System',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
-        useMaterial3: true,
-      ),
-      home: const DetailPage(),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Attendance System',
+        theme: ThemeData(
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
+          useMaterial3: true,
+        ),
+        home: const HomePage());
   }
 }

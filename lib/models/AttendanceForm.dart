@@ -1,15 +1,15 @@
 class AttendanceForm {
-  String formID;
-  String classes;
-  String? startTime;
-  String? endTime;
-  String? dateOpen;
-  bool status;
-  int typeAttendance;
-  String location;
-  double latitude;
-  double longtitude;
-  double radius;
+  final String formID;
+  final String classes;
+  final String? startTime;
+  final String? endTime;
+  final String? dateOpen;
+  final bool status;
+  final int typeAttendance;
+  final String location;
+  final double latitude;
+  final double longtitude;
+  final double radius;
 
   AttendanceForm({
     required this.formID,
@@ -25,20 +25,24 @@ class AttendanceForm {
     required this.radius,
   });
 
+  String toString() {
+    return 'FormID: ${formID}, Classes: $classes, startTime: $startTime, endTime: $endTime, dateOpen: $dateOpen, status: $status, typeAttendance: $typeAttendance, location: $location, latitude: $latitude, longitude: $longtitude, radius: $radius';
+  }
+
   factory AttendanceForm.fromJson(Map<String, dynamic> json) {
     print('AttendanceForm.fromJson: $json');
     return AttendanceForm(
-        formID: json['formID'],
-        classes: json['classes'],
-        startTime: json['startTime'],
-        endTime: json['endTime'],
-        dateOpen: json['dateOpen'],
-        status: json['status'],
-        typeAttendance: json['type'],
-        location: json['location'],
-        latitude: json['latitude'],
-        longtitude: json['longtitude'],
-        radius: json['radius']);
+        formID: json['formID'] ?? '',
+        classes: json['classes'] ?? '',
+        startTime: json['startTime'] ?? '',
+        endTime: json['endTime'] ?? '',
+        dateOpen: json['dateOpen'] ?? '',
+        status: json['status'] ?? false,
+        typeAttendance: json['type'] ?? 0,
+        location: json['location'] ?? '',
+        latitude: json['latitude'] ?? 0.0,
+        longtitude: double.tryParse(json['longitude'].toString()) ?? 0.0,
+        radius: json['radius'] ?? 0.0);
   }
 
   static List<AttendanceForm> getData() {

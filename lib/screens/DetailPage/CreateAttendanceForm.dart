@@ -23,15 +23,12 @@ class CreateAttendanceFormPage extends StatefulWidget {
 
 class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   TextEditingController searchController = TextEditingController();
-  bool checkHome = true;
-  bool checkNotification = false;
-  bool checkReport = false;
-  bool checkForm = false;
   OverlayEntry? overlayEntry;
   TextEditingController typeAttendanceController = TextEditingController();
   TextEditingController startTimeController = TextEditingController();
   TextEditingController endTimeController = TextEditingController();
   bool checkPushNotification = false;
+  bool formCreated = false;
   double radius = 0;
   LatLng? _currentLocation;
   String myLocation = '';
@@ -48,6 +45,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   ];
   String dropdownvalue = 'Scan face';
   int selectedIndex = 0;
+  bool isStartTimeSelected = false;
+  bool isEndTimeSelected = false;
 
   void getLocation() async {
     Position position = await GetLocation().determinePosition();
@@ -81,7 +80,9 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (time != null && time != timeStart) {
       setState(() {
         timeStart = time;
+        isStartTimeSelected = true;
         print('TimeStart: ${formatTimeOfDate(timeStart!)}');
+        checkDuplicateTime();
       });
     }
   }
@@ -103,9 +104,40 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (time != null && time != timeEnd) {
       setState(() {
         timeEnd = time;
+        isEndTimeSelected = true;
         print('TimeEnd: ${formatTimeOfDate(timeEnd!)}');
+        checkDuplicateTime();
       });
     }
+  }
+
+  bool checkDuplicateTime() {
+    if (isStartTimeSelected && isEndTimeSelected) {
+      if (timeStart!.hour > timeEnd!.hour ||
+          (timeStart!.hour == timeEnd!.hour &&
+              timeStart!.minute >= timeEnd!.minute)) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Text('Error'),
+              content: const Text('Start Time must be before End Time.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -231,6 +263,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedIndex = items.indexOf(newValue!);
+                    dropdownvalue = newValue;
                   });
                   print("Selected index: $selectedIndex");
                 },
@@ -373,32 +406,58 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                   borderColor: Colors.white,
                   textColor: Colors.white,
                   function: () async {
-                    AttendanceForm? attendanceForm = await API()
-                        .createFormAttendance(
-                            '5202111_09_t000',
-                            formatTimeOfDate(timeStart!).toString(),
-                            formatTimeOfDate(timeEnd!).toString(),
-                            selectedIndex,
-                            myLocation,
-                            latitude,
-                            longtitude,
-                            radius);
-                    if (attendanceForm != null) {
+                    bool check = checkDuplicateTime();
+                    if (check) {
+                      print('Longtitude: $longtitude');
+                      AttendanceForm? attendanceForm = await API()
+                          .createFormAttendance(
+                              '5202111_09_t000',
+                              formatTimeOfDate(timeStart!).toString(),
+                              formatTimeOfDate(timeEnd!).toString(),
+                              selectedIndex,
+                              myLocation,
+                              latitude,
+                              longtitude,
+                              radius);
+                      List<AttendanceForm> temp = [];
+                      temp.add(attendanceForm!);
+
                       final currentContext = context;
-                      attendanceFormDataProvider
-                          .setAttendanceFormData(attendanceForm);
-                      socketServerProvider.sendAttendanceForm(attendanceForm);
-                      //QR View have properties data so add data from provider and display QR Code on screen
                       Future.delayed(Duration.zero, () {
+                        attendanceFormDataProvider.setAttendanceFormData(temp);
+                        socketServerProvider.sendAttendanceForm(attendanceForm);
+                      });
+                      //QR View have properties data so add data from provider and display QR Code on screen
+                      if (mounted) {
                         Navigator.pushReplacement(
                             currentContext,
                             MaterialPageRoute(
-                                builder: (builder) =>
-                                    AfterCreateAttendanceForm()));
-                      });
+                                builder: (builder) => AfterCreateAttendanceForm(
+                                      attendanceForm: attendanceForm,
+                                    )));
+                      }
+
                       print('Success');
                     } else {
-                      print('Failed');
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: const Text('Error'),
+                            content: const Text(
+                                'Please check startTime and endTime'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     }
                   },
                   height: 50,
@@ -414,39 +473,46 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   }
 
   Widget googleMaps(BuildContext context) {
-    return Container(
-        width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
-        height: 550,
-        child: GoogleMap(
-          initialCameraPosition:
-              CameraPosition(target: _currentLocation!, zoom: 18),
-          markers: {
-            Marker(
-              icon: BitmapDescriptor.defaultMarker,
-              markerId: const MarkerId('currentLocation'),
-              position: _currentLocation!,
-              draggable: true,
-              infoWindow: const InfoWindow(title: 'My Location'),
-            ),
-          },
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: true,
-          mapToolbarEnabled: true,
-          myLocationEnabled: true,
-          mapType: MapType.normal,
-          onMapCreated: (controller) {
-            googleMapController = controller;
-          },
-          circles: {
-            Circle(
-                circleId: const CircleId('ID1'),
-                radius: radius,
-                fillColor: AppColors.primaryButton.withOpacity(0.2),
-                strokeColor: AppColors.primaryButton.withOpacity(0.1),
-                strokeWidth: 5,
-                center: _currentLocation!)
-          },
-        ));
+    if (_currentLocation != null) {
+      return Container(
+          width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
+          height: 550,
+          child: GoogleMap(
+            zoomGesturesEnabled: false,
+            indoorViewEnabled: true,
+            initialCameraPosition:
+                CameraPosition(target: _currentLocation!, zoom: 18),
+            markers: {
+              Marker(
+                icon: BitmapDescriptor.defaultMarker,
+                markerId: const MarkerId('currentLocation'),
+                position: _currentLocation!,
+                infoWindow: const InfoWindow(title: 'My Location'),
+              ),
+            },
+            zoomControlsEnabled: false,
+            myLocationButtonEnabled: true,
+            mapToolbarEnabled: false,
+            myLocationEnabled: true,
+            mapType: MapType.normal,
+            onMapCreated: (controller) {
+              googleMapController = controller;
+            },
+            circles: {
+              Circle(
+                  circleId: const CircleId('ID1'),
+                  radius: radius,
+                  fillColor: AppColors.primaryButton.withOpacity(0.2),
+                  strokeColor: AppColors.primaryButton.withOpacity(0.1),
+                  strokeWidth: 5,
+                  center: _currentLocation!)
+            },
+          ));
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 
   Widget customTextField(
