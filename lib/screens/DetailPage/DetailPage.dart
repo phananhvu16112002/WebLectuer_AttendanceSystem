@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/TestAttendanceDetail.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
@@ -31,11 +35,24 @@ class _DetailPageState extends State<DetailPage> {
   bool checkAttendanceForm = false;
   OverlayEntry? overlayEntry;
   TextEditingController searchInDashboardController = TextEditingController();
-
-  // List<TestAttendanceDetail> attendanceDetailList = [
-
-  // ];
   bool formCreated = false;
+  bool isCollapsedOpen = true;
+
+  List<Map<String, dynamic>> students = [
+    {"id": 1, "studentID": "520H0696", "name": "John Doe"},
+    {"id": 2, "studentID": "520H0380", "name": "Jane Smith"},
+    {"id": 2, "studentID": "520H0380", "name": "Nguyen Hoang Phuong Uyen"},
+    {"id": 2, "studentID": "520H0380", "name": "Tan Quang Hoang Tri"},
+    {"id": 2, "studentID": "520H0380", "name": "ádasdasdasdasdasdasdasdasdasdasdasds"},
+    {"id": 2, "studentID": "520H0380", "name": "Ho Tuan Kiet"},
+    {"id": 2, "studentID": "520H0380", "name": "Jane Smith"},
+  ];
+
+  void toggleDrawer() {
+    setState(() {
+      isCollapsedOpen = !isCollapsedOpen;
+    });
+  }
 
   void setFormCreated(bool value) {
     setState(() {
@@ -45,57 +62,73 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    int numberOfColumns = 10;
+
+    List<TableColumnWidth> listColumnWidths = [
+      FixedColumnWidth(40), // Kích thước cố định cho cột 'STT'
+      FlexColumnWidth(3), // Cột 'StudentID' có kích thước mở rộng
+      IntrinsicColumnWidth(), // Cột 'Name' tự động mở rộng
+    ];
+
+    // Tạo các cột tuần
+    for (int i = 0; i < numberOfColumns; i++) {
+      listColumnWidths
+          .add(FlexColumnWidth(2)); // Các cột tuần có kích thước mở rộng
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
+      appBar: appBar(),
       body: SingleChildScrollView(
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            header(),
-            Row(
-              children: [leftHeader(), selectedPage()],
-            )
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: isCollapsedOpen ? 250 : 70,
+              child: isCollapsedOpen ? leftHeader() : collapsedSideBar(),
+            ),
+            Expanded(
+              child: selectedPage(numberOfColumns, listColumnWidths),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget header() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      color: AppColors.colorHeader,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
+  //AppBar-------------------------------------------
+  PreferredSizeWidget appBar() {
+    return AppBar(
+      backgroundColor: AppColors.colorHeader,
+      flexibleSpace: Padding(
+        padding:
+            const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: MediaQuery.of(context).size.width / 5,
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {},
-                    mouseCursor: SystemMouseCursors.click,
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 50,
-                      height: 50,
-                    ),
+            Row(
+              children: [
+                InkWell(
+                  onTap: () {},
+                  mouseCursor: SystemMouseCursors.click,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 50,
+                    height: 50,
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 25,
-                        color: AppColors.textName,
-                      ))
-                ],
-              ),
+                ),
+                const SizedBox(width: 180),
+                IconButton(
+                    onPressed: () {
+                      toggleDrawer();
+                    },
+                    icon: const Icon(
+                      Icons.menu,
+                      size: 25,
+                      color: AppColors.textName,
+                    ))
+              ],
             ),
             Row(
               children: [
@@ -137,8 +170,6 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ],
                   ),
-                  // onEnter: (event) => _showPopupMenu(context),
-                  // onExit: (event) => _removePopupMenu(),
                   child: Container(
                     child: const Row(
                       children: [
@@ -166,6 +197,90 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
+  //AppBar-------------------------------------------------
+
+  //SideBar------------------------------------------------
+  Widget collapsedSideBar() {
+    return Container(
+      width: 80,
+      height: MediaQuery.of(context).size.height,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = true;
+                checkNotification = false;
+                checkReport = false;
+                checkForm = false;
+              });
+            },
+            child:
+                iconCollapseSideBar(const Icon(Icons.home_outlined), checkHome),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = true;
+                checkReport = false;
+                checkForm = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.notifications_outlined),
+              checkNotification,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = true;
+                checkForm = false;
+              });
+            },
+            child: iconCollapseSideBar(
+                const Icon(Icons.book_outlined), checkReport),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkForm = true;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.cloud_download_outlined),
+              checkForm,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container iconCollapseSideBar(Icon icon, bool check) {
+    return Container(
+        width: 50,
+        height: 30,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: Colors.white),
+            color: check
+                ? AppColors.colorHeader.withOpacity(0.5)
+                : Colors.transparent),
+        child: icon);
+  }
 
   Widget itemHeader(String title, Icon icon, bool check) {
     return InkWell(
@@ -175,7 +290,6 @@ class _DetailPageState extends State<DetailPage> {
           checkNotification = false;
           checkReport = false;
           checkForm = false;
-
           if (title == 'Home') {
             checkHome = true;
             checkAttendanceForm = false;
@@ -295,9 +409,9 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget selectedPage() {
+  Widget selectedPage(int numberOfWeeks, dynamic listColumnWidth) {
     if (checkHome) {
-      return containerHome();
+      return containerHome(numberOfWeeks, listColumnWidth);
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -307,33 +421,387 @@ class _DetailPageState extends State<DetailPage> {
     } else if (checkAttendanceForm) {
       return const CreateAttendanceFormPage();
     } else {
-      return containerHome();
+      return containerHome(numberOfWeeks, listColumnWidth);
     }
   }
+  //SideBar------------------------------------------------
+  //auto tao cot truoc(success), sau do cho chay 1 vong lap for chay trong tablerow, table cell
+  //Main---------------------------------------------------
 
-  Container containerHome() {
+  Container containerHome(int numberOfWeeks, dynamic listColumnWidth) {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
-      child: const Padding(
-        padding: EdgeInsets.only(left: 20, right: 20),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            CustomText(
+            const CustomText(
                 message: 'Dashboard',
                 fontSize: 25,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primaryText),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 250,
+              height: 130,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  customBoxInformation('All', 'assets/icons/student.png'),
+                  customBoxInformation('Pass', 'assets/icons/present.png'),
+                  customBoxInformation('Ban', 'assets/icons/absent.png'),
+                  customBoxInformation('Warning', 'assets/icons/pending.png'),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width - 250,
+              height: 40,
+              child: Row(
+                children: [
+                  customButtonDashBoard('Export'),
+                  customButtonDashBoard('PDF'),
+                  customButtonDashBoard('Excel'),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Container(
+                    width: 450,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2))
+                        ],
+                        border: Border.all(
+                            color: Colors.black.withOpacity(0.2), width: 0.5),
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(5))),
+                    child: TextFormField(
+                      readOnly: false,
+                      controller: searchInDashboardController,
+                      keyboardType: TextInputType.text,
+                      style: const TextStyle(
+                          color: AppColors.primaryText,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15),
+                      obscureText: false,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(20),
+                          suffixIcon: Icon(
+                            Icons.search,
+                            color: Colors.black.withOpacity(0.5),
+                          ),
+                          hintText: 'Search Student',
+                          hintStyle: const TextStyle(
+                              fontSize: 12, color: Color.fromARGB(73, 0, 0, 0)),
+                          enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              borderSide: BorderSide(
+                                  width: 1, color: Colors.transparent)),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            borderSide: BorderSide(
+                                width: 1, color: AppColors.primaryButton),
+                          )),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  customWeek('Previous'),
+                  customWeek('Week 8'),
+                  customWeek('Next'),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width - 250,
+              height: 380,
+              child: SingleChildScrollView(
+                  child: Table(
+                columnWidths: {
+                  for (var index in listColumnWidth.asMap().keys)
+                    index: listColumnWidth[index]
+                },
+                border: TableBorder.all(color: Colors.grey),
+                children: [
+                  TableRow(
+                    children: [
+                      TableCell(
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          color: const Color(0xff1770f0).withOpacity(0.5),
+                          child: const Center(
+                            child: Text(
+                              'STT',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: const Color(0xff1770f0).withOpacity(0.5),
+                          padding: const EdgeInsets.all(5),
+                          child: const Center(
+                            child: Text(
+                              'StudentID',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          color: const Color(0xff1770f0).withOpacity(0.5),
+                          child: const Center(
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      for (int i = 0; i < numberOfWeeks; i++)
+                        TableCell(
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            color: Colors.grey.withOpacity(0.21),
+                            child: Center(
+                              child: Text(
+                                'Week ${i + 1}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  for (var i = 0; i < students.length; i++)
+                    TableRow(
+                      children: [
+                        TableCell(
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            color: Colors.white,
+                            child: Center(
+                              child: Text(
+                                '${i + 1}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(5),
+                            child: Center(
+                              child: Text(
+                                '${students[i]['studentID']}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            color: Colors.white,
+                            child: Center(
+                              child: Text(
+                                '${students[i]['name']}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        for (int i = 0; i < numberOfWeeks; i++)
+                          TableCell(
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              color: Colors.white.withOpacity(0.21),
+                              child: Center(
+                                child: Text(
+                                  '',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
+                ],
+              )),
+            )
           ],
         ),
       ),
     );
   }
 }
+
+Widget customWeek(String nameButton) {
+  return InkWell(
+    onTap: () {},
+    mouseCursor: SystemMouseCursors.click,
+    child: Container(
+      width: 80,
+      height: 35,
+      decoration: BoxDecoration(
+          color: nameButton.contains('Week')
+              ? const Color(0xff2d71b1)
+              : Colors.white,
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          border: Border.all(
+            width: 0.5,
+            color: Colors.black.withOpacity(0.2),
+          )),
+      child: Center(
+        child: CustomText(
+            message: nameButton,
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            color: nameButton.contains('Week')
+                ? Colors.white
+                : AppColors.primaryText),
+      ),
+    ),
+  );
+}
+
+Widget customButtonDashBoard(String nameButton) {
+  return InkWell(
+    onTap: () {},
+    mouseCursor: SystemMouseCursors.click,
+    child: Container(
+      width: 80,
+      height: 40,
+      decoration: BoxDecoration(
+          color:
+              nameButton == 'Export' ? const Color(0xff2d71b1) : Colors.white,
+          border: Border.all(
+            width: 0.5,
+            color: Colors.black.withOpacity(0.2),
+          )),
+      child: Center(
+        child: CustomText(
+            message: nameButton,
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            color:
+                nameButton == 'Export' ? Colors.white : AppColors.primaryText),
+      ),
+    ),
+  );
+}
+
+Widget customBoxInformation(String title, String imagePath) {
+  return InkWell(
+    onTap: () {},
+    mouseCursor: SystemMouseCursors.click,
+    child: Container(
+      width: 200,
+      height: 90,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          boxShadow: [
+            BoxShadow(
+                color: AppColors.secondaryText,
+                blurRadius: 2,
+                offset: Offset(0, 2))
+          ]),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                    message: title,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.colorInformation),
+                const CustomText(
+                    message: '0',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.colorNumberInformation),
+                const CustomText(
+                    message: 'Student',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.secondaryText)
+              ],
+            ),
+            Image.asset(
+              imagePath,
+              width: 60,
+              height: 60,
+            )
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+
+  //Main---------------------------------------------------
+

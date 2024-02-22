@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
@@ -14,7 +16,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -31,31 +33,167 @@ class _HomePageState extends State<HomePage> {
 
   OverlayEntry? overlayEntry;
 
+  bool isCollapsedOpen = true;
+
+  void toggleDrawer() {
+    setState(() {
+      isCollapsedOpen = !isCollapsedOpen;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final classDataProvider =
+        Provider.of<ClassDataProvider>(context, listen: false);
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      appBar: appBar(),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            header(),
-            Row(
-              children: [leftHeader(), selectedPage()],
-            )
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: isCollapsedOpen ? 250 : 70,
+              child: isCollapsedOpen ? leftHeader() : collapsedSideBar(),
+            ),
+            Expanded(
+              child: selectedPage(classDataProvider),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget header() {
+  Widget collapsedSideBar() {
     return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      color: AppColors.colorHeader,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
+      width: 80,
+      height: MediaQuery.of(context).size.height,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = true;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child:
+                iconCollapseSideBar(const Icon(Icons.home_outlined), checkHome),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = true;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.notifications_outlined),
+              checkNotification,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = true;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+                const Icon(Icons.book_outlined), checkReport),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = true;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.cloud_download_outlined),
+              checkRepository,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = true;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.calendar_month_outlined),
+              checkCalendar,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = true;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.settings_outlined),
+              checkSettings,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container iconCollapseSideBar(Icon icon, bool check) {
+    return Container(
+        width: 50,
+        height: 30,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: Colors.white),
+            color: check
+                ? AppColors.colorHeader.withOpacity(0.5)
+                : Colors.transparent),
+        child: icon);
+  }
+
+  PreferredSizeWidget appBar() {
+    return AppBar(
+      backgroundColor: AppColors.colorHeader,
+      flexibleSpace: Padding(
+        padding:
+            const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -72,7 +210,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 180),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      toggleDrawer();
+                    },
                     icon: const Icon(
                       Icons.menu,
                       size: 25,
@@ -110,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                   onHover: (event) => showMenu(
                     color: Colors.white,
                     context: context,
-                    position: RelativeRect.fromLTRB(300, 50, 30, 100),
+                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
                     items: [
                       const PopupMenuItem(
                         child: Text("My Profile"),
@@ -120,8 +260,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  // onEnter: (event) => _showPopupMenu(context),
-                  // onExit: (event) => _removePopupMenu(),
                   child: Container(
                     child: const Row(
                       children: [
@@ -254,6 +392,24 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget selectedPage(ClassDataProvider classDataProvider) {
+    if (checkHome) {
+      return containerHome(classDataProvider);
+    } else if (checkNotification) {
+      return const NotificationPage();
+    } else if (checkReport) {
+      return const ReportPage();
+    } else if (checkRepository) {
+      return const RepositoryClassPage();
+    } else if (checkCalendar) {
+      return const CalendarPage();
+    } else if (checkSettings) {
+      return const SettingPage();
+    } else {
+      return containerHome(classDataProvider);
+    }
   }
 
   Widget customClass(String className, String typeClass, String group,
@@ -394,32 +550,14 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    Overlay.of(context).insert(overlayEntry!);
+    Overlay.of(context)?.insert(overlayEntry!);
   }
 
   void _removePopupMenu() {
     overlayEntry?.remove();
   }
 
-  Widget selectedPage() {
-    if (checkHome) {
-      return containerHome();
-    } else if (checkNotification) {
-      return const NotificationPage();
-    } else if (checkReport) {
-      return const ReportPage();
-    } else if (checkRepository) {
-      return const RepositoryClassPage();
-    } else if (checkCalendar) {
-      return const CalendarPage();
-    } else if (checkSettings) {
-      return const SettingPage();
-    } else {
-      return containerHome();
-    }
-  }
-
-  Container containerHome() {
+  Container containerHome(ClassDataProvider classDataProvider) {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -446,6 +584,9 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.hasData) {
                     if (snapshot.data != null) {
                       List<Class>? classes = snapshot.data;
+                      Future.delayed(Duration.zero, () {
+                        classDataProvider.setAttendanceFormData(classes!);
+                      });
                       return GridView.builder(
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -463,7 +604,8 @@ class _HomePageState extends State<HomePage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (builder) => DetailPage()));
+                                        builder: (builder) =>
+                                            const DetailPage()));
                               },
                               mouseCursor: SystemMouseCursors.click,
                               child: Container(

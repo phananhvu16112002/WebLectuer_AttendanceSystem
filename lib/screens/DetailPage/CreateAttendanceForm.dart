@@ -478,7 +478,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
           width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
           height: 550,
           child: GoogleMap(
-            zoomGesturesEnabled: false,
+            zoomGesturesEnabled: true,
             indoorViewEnabled: true,
             initialCameraPosition:
                 CameraPosition(target: _currentLocation!, zoom: 18),

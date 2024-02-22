@@ -28,6 +28,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
   @override
   void initState() {
     // TODO: implement initState
+    //Scan QR.
     super.initState();
     data = widget.attendanceForm!;
     var tempData = {
@@ -65,7 +66,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                       child: Container(
                         width:
                             (MediaQuery.of(context).size.width - 250) / 2 - 20,
-                        height: qrcode.isNotEmpty ? 580 : 450,
+                        height: qrcode.isNotEmpty ? 630 : 500,
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
@@ -313,6 +314,26 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                               Center(
                                 child: CustomButton(
                                     buttonName: 'Back to home',
+                                    backgroundColorButton: Colors.white,
+                                    borderColor: AppColors.primaryButton,
+                                    textColor: AppColors.primaryButton,
+                                    function: () {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (builder) => HomePage()),
+                                          (route) => false);
+                                    },
+                                    height: 40,
+                                    width: 300,
+                                    fontSize: 15,
+                                    colorShadow: Colors.transparent,
+                                    borderRadius: 10),
+                              ),
+                              const SizedBox(height: 10),
+                              Center(
+                                child: CustomButton(
+                                    buttonName: 'View Attendance',
                                     backgroundColorButton:
                                         AppColors.primaryButton,
                                     borderColor: Colors.transparent,
