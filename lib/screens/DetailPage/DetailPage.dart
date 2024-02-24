@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -37,16 +38,22 @@ class _DetailPageState extends State<DetailPage> {
   TextEditingController searchInDashboardController = TextEditingController();
   bool formCreated = false;
   bool isCollapsedOpen = true;
+  ScrollController scrollController = ScrollController();
 
-  List<Map<String, dynamic>> students = [
-    {"id": 1, "studentID": "520H0696", "name": "John Doe"},
-    {"id": 2, "studentID": "520H0380", "name": "Jane Smith"},
-    {"id": 2, "studentID": "520H0380", "name": "Nguyen Hoang Phuong Uyen"},
-    {"id": 2, "studentID": "520H0380", "name": "Tan Quang Hoang Tri"},
-    {"id": 2, "studentID": "520H0380", "name": "ádasdasdasdasdasdasdasdasdasdasdasds"},
-    {"id": 2, "studentID": "520H0380", "name": "Ho Tuan Kiet"},
-    {"id": 2, "studentID": "520H0380", "name": "Jane Smith"},
-  ];
+  final List<Map<String, String>> students = List.generate(
+    100,
+    (index) => {'studentID': 'ID ${index + 1}', 'name': 'Student ${index + 1}'},
+  );
+
+  int currentPage = 0;
+  int itemsPerPage = 10;
+
+  List<Map<String, String>> getPaginatedStudents() {
+    int startIndex = currentPage * itemsPerPage;
+    int endIndex = (currentPage + 1) * itemsPerPage;
+    if (endIndex > students.length) endIndex = students.length;
+    return students.sublist(startIndex, endIndex);
+  }
 
   void toggleDrawer() {
     setState(() {
@@ -62,18 +69,18 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    int numberOfColumns = 10;
+    int numberOfWeeks = 20;
 
     List<TableColumnWidth> listColumnWidths = [
-      FixedColumnWidth(40), // Kích thước cố định cho cột 'STT'
-      FlexColumnWidth(3), // Cột 'StudentID' có kích thước mở rộng
-      IntrinsicColumnWidth(), // Cột 'Name' tự động mở rộng
+      const FixedColumnWidth(10),
+      const FixedColumnWidth(80),
+      const IntrinsicColumnWidth(),
     ];
+    List<Map<String, String>> paginatedStudents = getPaginatedStudents();
 
     // Tạo các cột tuần
-    for (int i = 0; i < numberOfColumns; i++) {
-      listColumnWidths
-          .add(FlexColumnWidth(2)); // Các cột tuần có kích thước mở rộng
+    for (int i = 0; i < numberOfWeeks; i++) {
+      listColumnWidths.add(const FlexColumnWidth(2));
     }
 
     return Scaffold(
@@ -89,7 +96,8 @@ class _DetailPageState extends State<DetailPage> {
               child: isCollapsedOpen ? leftHeader() : collapsedSideBar(),
             ),
             Expanded(
-              child: selectedPage(numberOfColumns, listColumnWidths),
+              child: selectedPage(
+                  numberOfWeeks, listColumnWidths, paginatedStudents),
             ),
           ],
         ),
@@ -409,9 +417,10 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget selectedPage(int numberOfWeeks, dynamic listColumnWidth) {
+  Widget selectedPage(
+      int numberOfWeeks, dynamic listColumnWidth, dynamic paginated) {
     if (checkHome) {
-      return containerHome(numberOfWeeks, listColumnWidth);
+      return containerHome(numberOfWeeks, listColumnWidth, paginated);
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -421,14 +430,15 @@ class _DetailPageState extends State<DetailPage> {
     } else if (checkAttendanceForm) {
       return const CreateAttendanceFormPage();
     } else {
-      return containerHome(numberOfWeeks, listColumnWidth);
+      return containerHome(numberOfWeeks, listColumnWidth, paginated);
     }
   }
   //SideBar------------------------------------------------
   //auto tao cot truoc(success), sau do cho chay 1 vong lap for chay trong tablerow, table cell
   //Main---------------------------------------------------
 
-  Container containerHome(int numberOfWeeks, dynamic listColumnWidth) {
+  Container containerHome(
+      int numberOfWeeks, dynamic listColumnWidth, dynamic paginatedStudents) {
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -532,158 +542,284 @@ class _DetailPageState extends State<DetailPage> {
             const SizedBox(
               height: 10,
             ),
-            Container(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 380,
-              child: SingleChildScrollView(
-                  child: Table(
-                columnWidths: {
-                  for (var index in listColumnWidth.asMap().keys)
-                    index: listColumnWidth[index]
-                },
-                border: TableBorder.all(color: Colors.grey),
-                children: [
-                  TableRow(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width - 100,
+                  height: 300,
+                  child: Row(
                     children: [
-                      TableCell(
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          color: const Color(0xff1770f0).withOpacity(0.5),
-                          child: const Center(
-                            child: Text(
-                              'STT',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: const Color(0xff1770f0).withOpacity(0.5),
-                          padding: const EdgeInsets.all(5),
-                          child: const Center(
-                            child: Text(
-                              'StudentID',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          color: const Color(0xff1770f0).withOpacity(0.5),
-                          child: const Center(
-                            child: Text(
-                              'Name',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      for (int i = 0; i < numberOfWeeks; i++)
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: Colors.grey.withOpacity(0.21),
-                            child: Center(
-                              child: Text(
-                                'Week ${i + 1}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  for (var i = 0; i < students.length; i++)
-                    TableRow(
-                      children: [
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: Colors.white,
-                            child: Center(
-                              child: Text(
-                                '${i + 1}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            color: Colors.white,
-                            padding: const EdgeInsets.all(5),
-                            child: Center(
-                              child: Text(
-                                '${students[i]['studentID']}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: Colors.white,
-                            child: Center(
-                              child: Text(
-                                '${students[i]['name']}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        for (int i = 0; i < numberOfWeeks; i++)
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white.withOpacity(0.21),
-                              child: Center(
-                                child: Text(
-                                  '',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                      Container(
+                        width: 350,
+                        height: 350,
+                        child: Table(
+                          columnWidths: {
+                            for (var index in listColumnWidth.asMap().keys)
+                              index: listColumnWidth[index]
+                          },
+                          border: TableBorder.all(color: Colors.grey),
+                          children: [
+                            TableRow(children: [
+                              TableCell(
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  color:
+                                      const Color(0xff1770f0).withOpacity(0.5),
+                                  child: const Center(
+                                    child: Text(
+                                      'STT',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
+                              TableCell(
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  color:
+                                      const Color(0xff1770f0).withOpacity(0.5),
+                                  child: const Center(
+                                    child: Text(
+                                      'StudentID',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  color:
+                                      const Color(0xff1770f0).withOpacity(0.5),
+                                  child: const Center(
+                                    child: Text(
+                                      'Name',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ]),
+                            for (int i = 0; i < paginatedStudents.length; i++)
+                              TableRow(children: [
+                                TableCell(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    color: Colors.white,
+                                    child: Center(
+                                      child: Text(
+                                        '${currentPage * itemsPerPage + i + 1}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    color: Colors.white,
+                                    child: Center(
+                                      child: Text(
+                                        '${paginatedStudents[i]['studentID']}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    color: Colors.white,
+                                    child: Center(
+                                      child: Text(
+                                        '${paginatedStudents[i]['name']}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ])
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            height: 350,
+                            child: Table(
+                              border: TableBorder.all(color: Colors.grey),
+                              columnWidths: {
+                                for (int i = 0; i < numberOfWeeks; i++)
+                                  i: FixedColumnWidth(
+                                      numberOfWeeks <= 13 ? 30 : 60),
+                              },
+                              children: [
+                                TableRow(children: [
+                                  for (int i = 0; i < numberOfWeeks; i++)
+                                    TableCell(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        color: Colors.grey.withOpacity(0.21),
+                                        child: Center(
+                                          child: Text(
+                                            'Week ${i + 1}',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ]),
+                                for (int i = 0;
+                                    i < paginatedStudents.length;
+                                    i++)
+                                  TableRow(children: [
+                                    for (int i = 0; i < numberOfWeeks; i++)
+                                      TableCell(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          color: Colors.white,
+                                          child: const Center(
+                                            child: Text(
+                                              '',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ]),
+                              ],
                             ),
                           ),
-                      ],
-                    )
-                ],
-              )),
+                        ),
+                      ),
+                      Container(
+                        width: 100,
+                        height: 350,
+                        child: Table(
+                          border: TableBorder.all(color: Colors.grey),
+                          children: [
+                            TableRow(children: [
+                              TableCell(
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  color: Colors.grey.withOpacity(0.21),
+                                  child: const Center(
+                                    child: Text(
+                                      'Total',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]),
+                            for (int i = 0; i < paginatedStudents.length; i++)
+                              TableRow(children: [
+                                TableCell(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    color: Colors.white,
+                                    child: const Center(
+                                      child: Text(
+                                        '',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ])
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.white)),
+                      onPressed: currentPage > 0
+                          ? () {
+                              setState(() {
+                                currentPage--;
+                              });
+                            }
+                          : null,
+                      child: const Text(
+                        'Previous',
+                        style:
+                            TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                        '${currentPage + 1}/${(students.length / itemsPerPage).ceil()}'),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.white)),
+                      onPressed: currentPage <
+                              (students.length / itemsPerPage).ceil() - 1
+                          ? () {
+                              setState(() {
+                                currentPage++;
+                              });
+                            }
+                          : null,
+                      child: const Text(
+                        'Next',
+                        style:
+                            TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             )
           ],
         ),
@@ -805,3 +941,395 @@ Widget customBoxInformation(String title, String imagePath) {
 
   //Main---------------------------------------------------
 
+            // Container(
+            //   width: MediaQuery.of(context).size.width - 100,
+            //   height: 380,
+            //   child: Row(
+            //     children: [
+            //       Container(
+            //         width: 350,
+            //         height: 380,
+            //         child: Table(
+            //           columnWidths: {
+            //             for (var index in listColumnWidth.asMap().keys)
+            //               index: listColumnWidth[index]
+            //           },
+            //           border: TableBorder.all(color: Colors.grey),
+            //           children: [
+            //             TableRow(children: [
+            //               TableCell(
+            //                 child: Container(
+            //                   padding: const EdgeInsets.all(5),
+            //                   color: const Color(0xff1770f0).withOpacity(0.5),
+            //                   child: const Center(
+            //                     child: Text(
+            //                       'STT',
+            //                       style: TextStyle(
+            //                         fontSize: 11,
+            //                         fontWeight: FontWeight.bold,
+            //                         color: Colors.black,
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //               TableCell(
+            //                 child: Container(
+            //                   padding: const EdgeInsets.all(5),
+            //                   color: const Color(0xff1770f0).withOpacity(0.5),
+            //                   child: const Center(
+            //                     child: Text(
+            //                       'StudentID',
+            //                       style: TextStyle(
+            //                         fontSize: 11,
+            //                         fontWeight: FontWeight.bold,
+            //                         color: Colors.black,
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //               TableCell(
+            //                 child: Container(
+            //                   padding: const EdgeInsets.all(5),
+            //                   color: const Color(0xff1770f0).withOpacity(0.5),
+            //                   child: const Center(
+            //                     child: Text(
+            //                       'Name',
+            //                       style: TextStyle(
+            //                         fontSize: 11,
+            //                         fontWeight: FontWeight.bold,
+            //                         color: Colors.black,
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               )
+            //             ]),
+            //             for (int i = 0; i < students.length; i++)
+            //               TableRow(children: [
+            //                 TableCell(
+            //                   child: Container(
+            //                     padding: const EdgeInsets.all(5),
+            //                     color: Colors.white,
+            //                     child: Center(
+            //                       child: Text(
+            //                         '${i + 1}',
+            //                         style: const TextStyle(
+            //                           fontSize: 11,
+            //                           fontWeight: FontWeight.bold,
+            //                           color: Colors.black,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //                 TableCell(
+            //                   child: Container(
+            //                     padding: const EdgeInsets.all(5),
+            //                     color: Colors.white,
+            //                     child: Center(
+            //                       child: Text(
+            //                         '${students[i]['studentID']}',
+            //                         style: const TextStyle(
+            //                           fontSize: 11,
+            //                           fontWeight: FontWeight.bold,
+            //                           color: Colors.black,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //                 TableCell(
+            //                   child: Container(
+            //                     padding: const EdgeInsets.all(5),
+            //                     color: Colors.white,
+            //                     child: Center(
+            //                       child: Text(
+            //                         '${students[i]['name']}',
+            //                         style: const TextStyle(
+            //                           fontSize: 11,
+            //                           fontWeight: FontWeight.bold,
+            //                           color: Colors.black,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 )
+            //               ])
+            //           ],
+            //         ),
+            //       ),
+            //       // const SizedBox(width: 0.01,),
+            //       Expanded(
+            //         child: SingleChildScrollView(
+            //           scrollDirection: Axis.horizontal,
+            //           child: Expanded(
+            //             child: Table(
+            //               border: TableBorder.all(color: Colors.grey),
+            //               columnWidths: {
+            //                 for (int i = 0; i < numberOfWeeks; i++)
+            //                   i: FixedColumnWidth(
+            //                       numberOfWeeks <= 13 ? 30 : 60),
+            //               },
+            //               children: [
+            //                 TableRow(children: [
+            //                   for (int i = 0; i < numberOfWeeks; i++)
+            //                     TableCell(
+            //                       child: Container(
+            //                         padding: const EdgeInsets.all(5),
+            //                         color: Colors.grey.withOpacity(0.21),
+            //                         child: Center(
+            //                           child: Text(
+            //                             'Week ${i + 1}',
+            //                             style: const TextStyle(
+            //                               fontSize: 11,
+            //                               fontWeight: FontWeight.bold,
+            //                               color: Colors.black,
+            //                             ),
+            //                           ),
+            //                         ),
+            //                       ),
+            //                     ),
+            //                 ]),
+            //                 for (int i = 0; i < students.length; i++)
+            //                   TableRow(children: [
+            //                     for (int i = 0; i < numberOfWeeks; i++)
+            //                       TableCell(
+            //                         child: Container(
+            //                           padding: const EdgeInsets.all(5),
+            //                           color: Colors.white,
+            //                           child: const Center(
+            //                             child: Text(
+            //                               '',
+            //                               style: TextStyle(
+            //                                 fontSize: 11,
+            //                                 fontWeight: FontWeight.bold,
+            //                                 color: Colors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                       ),
+            //                   ]),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       Container(
+            //         width: 100,
+            //         height: 380,
+            //         child: Table(
+            //           border: TableBorder.all(color: Colors.grey),
+            //           children: [
+            //             TableRow(children: [
+            //               TableCell(
+            //                 child: Container(
+            //                   padding: const EdgeInsets.all(5),
+            //                   color: Colors.grey.withOpacity(0.21),
+            //                   child: const Center(
+            //                     child: Text(
+            //                       'Total',
+            //                       style: TextStyle(
+            //                         fontSize: 11,
+            //                         fontWeight: FontWeight.bold,
+            //                         color: Colors.black,
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             ]),
+            //             for (int i = 0; i < students.length; i++)
+            //               TableRow(children: [
+            //                 TableCell(
+            //                   child: Container(
+            //                     padding: const EdgeInsets.all(5),
+            //                     color: Colors.white,
+            //                     child: const Center(
+            //                       child: Text(
+            //                         '',
+            //                         style: TextStyle(
+            //                           fontSize: 11,
+            //                           fontWeight: FontWeight.bold,
+            //                           color: Colors.black,
+            //                         ),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ])
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+
+// SingleChildScrollView(
+//                 scrollDirection: Axis.horizontal,
+//                 child: Column(
+//                   children: [
+//                     Row(
+//                       children: [
+//                         Container(
+//                           width: MediaQuery.of(context).size.width - 250,
+//                           height: 380,
+//                           child: Table(
+//                             columnWidths: {
+//                               for (var index in listColumnWidth.asMap().keys)
+//                                 index: listColumnWidth[index]
+//                             },
+//                             border: TableBorder.all(color: Colors.grey),
+//                             children: [
+//                               TableRow(
+//                                 children: [
+//                                   TableCell(
+//                                     child: Container(
+//                                       padding: const EdgeInsets.all(5),
+//                                       color: const Color(0xff1770f0)
+//                                           .withOpacity(0.5),
+//                                       child: const Center(
+//                                         child: Text(
+//                                           'STT',
+//                                           style: TextStyle(
+//                                             fontSize: 11,
+//                                             fontWeight: FontWeight.bold,
+//                                             color: Colors.black,
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   TableCell(
+//                                     child: Container(
+//                                       color: const Color(0xff1770f0)
+//                                           .withOpacity(0.5),
+//                                       padding: const EdgeInsets.all(5),
+//                                       child: const Center(
+//                                         child: Text(
+//                                           'StudentID',
+//                                           style: TextStyle(
+//                                             fontSize: 11,
+//                                             fontWeight: FontWeight.bold,
+//                                             color: Colors.black,
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   TableCell(
+//                                     child: Container(
+//                                       padding: const EdgeInsets.all(5),
+//                                       color: const Color(0xff1770f0)
+//                                           .withOpacity(0.5),
+//                                       child: const Center(
+//                                         child: Text(
+//                                           'Name',
+//                                           style: TextStyle(
+//                                             fontSize: 11,
+//                                             fontWeight: FontWeight.bold,
+//                                             color: Colors.black,
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   for (int i = 0; i < numberOfWeeks; i++)
+//                                     TableCell(
+//                                       child: Container(
+//                                         padding: const EdgeInsets.all(5),
+//                                         color: Colors.grey.withOpacity(0.21),
+//                                         child: Center(
+//                                           child: Text(
+//                                             'Week ${i + 1}',
+//                                             style: const TextStyle(
+//                                               fontSize: 11,
+//                                               fontWeight: FontWeight.bold,
+//                                               color: Colors.black,
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                 ],
+//                               ),
+//                               for (var i = 0; i < students.length; i++)
+//                                 TableRow(
+//                                   children: [
+//                                     TableCell(
+//                                       child: Container(
+//                                         padding: const EdgeInsets.all(5),
+//                                         color: Colors.white,
+//                                         child: Center(
+//                                           child: Text(
+//                                             '${i + 1}',
+//                                             style: const TextStyle(
+//                                               fontSize: 11,
+//                                               fontWeight: FontWeight.bold,
+//                                               color: Colors.black,
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                     TableCell(
+//                                       child: Container(
+//                                         color: Colors.white,
+//                                         padding: const EdgeInsets.all(5),
+//                                         child: Center(
+//                                           child: Text(
+//                                             '${students[i]['studentID']}',
+//                                             style: const TextStyle(
+//                                               fontSize: 11,
+//                                               fontWeight: FontWeight.bold,
+//                                               color: Colors.black,
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                     TableCell(
+//                                       child: Container(
+//                                         padding: const EdgeInsets.all(5),
+//                                         color: Colors.white,
+//                                         child: Center(
+//                                           child: Text(
+//                                             '${students[i]['name']}',
+//                                             style: const TextStyle(
+//                                               fontSize: 11,
+//                                               fontWeight: FontWeight.bold,
+//                                               color: Colors.black,
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                     for (int i = 0; i < numberOfWeeks; i++)
+//                                       TableCell(
+//                                         child: Container(
+//                                           padding: const EdgeInsets.all(5),
+//                                           color: Colors.white.withOpacity(0.21),
+//                                           child: const Center(
+//                                             child: Text(
+//                                               '',
+//                                               style: TextStyle(
+//                                                 fontSize: 11,
+//                                                 fontWeight: FontWeight.bold,
+//                                                 color: Colors.black,
+//                                               ),
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                   ],
+//                                 )
+//                             ],
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
