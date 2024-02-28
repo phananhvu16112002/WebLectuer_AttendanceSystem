@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+
 
 class SocketServerProvider with ChangeNotifier {
   late IO.Socket _socket;

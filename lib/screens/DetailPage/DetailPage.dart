@@ -1,22 +1,22 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/TestAttendanceDetail.dart';
-import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
-
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceDetail.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Student.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
+
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({
@@ -39,21 +39,24 @@ class _DetailPageState extends State<DetailPage> {
   bool formCreated = false;
   bool isCollapsedOpen = true;
   ScrollController scrollController = ScrollController();
+  List<StudentClasses> passListData = [];
+  List<StudentClasses> banListData = [];
+  List<StudentClasses> warningListData = [];
+  List<StudentClasses> listData = [];
+  List<StudentClasses> listTemp = [];
+  List<StudentClasses> searchResult = [];
+  String isSelectedSection = 'All';
 
-  final List<Map<String, String>> students = List.generate(
-    100,
-    (index) => {'studentID': 'ID ${index + 1}', 'name': 'Student ${index + 1}'},
-  );
-
+  int numberAllStudent = 0;
+  int numberPassStudent = 0;
+  int numberBanStudent = 0;
+  int numberWarningStudent = 0;
   int currentPage = 0;
   int itemsPerPage = 10;
+  int itemsRecent = 0;
+  int lengthList = 0;
 
-  List<Map<String, String>> getPaginatedStudents() {
-    int startIndex = currentPage * itemsPerPage;
-    int endIndex = (currentPage + 1) * itemsPerPage;
-    if (endIndex > students.length) endIndex = students.length;
-    return students.sublist(startIndex, endIndex);
-  }
+  late Future<AttendanceDetailResponseStudent> fetchData;
 
   void toggleDrawer() {
     setState(() {
@@ -68,21 +71,139 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    int numberOfWeeks = 20;
+  void initState() {
+    super.initState();
+    fetchData = API().getStudentClassAttendanceDetail();
+    fetchData.then((value) {
+      setState(() {
+        listData = value!.data;
+        listTemp = value.data;
+        numberAllStudent = value.stats.all;
+        numberPassStudent = value.stats.pass;
+        numberBanStudent = value.stats.ban;
+        numberWarningStudent = value.stats.warning;
+      });
+    });
+  }
 
+  void newAllListData() {
+    setState(() {
+      listTemp = listData;
+      isSelectedSection = 'All';
+    });
+  }
+
+  void newPassListData() {
+    if (passListData.isEmpty || passListData.length == 0) {
+      for (var studentClasses in listData) {
+        if (studentClasses.status.contains('Pass') ||
+            studentClasses.status == 'Pass') {
+          passListData.add(studentClasses);
+        }
+      }
+    }
+    setState(() {
+      listTemp = passListData;
+      isSelectedSection = 'Pass';
+    });
+  }
+
+  void newBanListData() {
+    if (banListData.isEmpty || banListData.length == 0) {
+      for (var studentClasses in listData) {
+        if (studentClasses.status.contains('Ban') ||
+            studentClasses.status == 'Ban') {
+          banListData.add(studentClasses);
+        }
+      }
+    }
+    setState(() {
+      listTemp = banListData;
+      isSelectedSection = 'Ban';
+    });
+  }
+
+  void newWarningListData() {
+    if (warningListData.isEmpty || warningListData.length == 0) {
+      for (var studentClasses in listData) {
+        if (studentClasses.status.contains('Warning') ||
+            studentClasses.status == 'Warning') {
+          warningListData.add(studentClasses);
+        }
+      }
+    }
+    setState(() {
+      listTemp = warningListData;
+      isSelectedSection = 'Warning';
+    });
+  }
+
+  void newSetStateTable(String title) {
+    if (title == 'All' || title.contains('All')) {
+      newAllListData();
+    } else if (title == 'Pass' || title.contains(('Pass'))) {
+      newPassListData();
+    } else if (title == 'Ban' || title.contains('Ban')) {
+      newBanListData();
+    } else if (title == 'Warning' || title.contains('Warning')) {
+      newWarningListData();
+    } else {
+      newAllListData();
+    }
+  }
+
+  void searchTextChanged(String query) {
+    searchResult.clear();
+    if (query.isEmpty) {
+      setState(() {
+        listTemp = listDataSearch(isSelectedSection);
+      });
+      return;
+    }
+    List<StudentClasses> temp = listDataSearch(isSelectedSection);
+    for (var element in temp) {
+      if (element.student.studentName.contains(query) ||
+          element.student.studentName.toLowerCase().trim() ==
+              query.toLowerCase().trim() ||
+          element.student.studentID.toLowerCase().trim() ==
+              query.toLowerCase().trim() ||
+          element.student.studentID.contains(query)) {
+        searchResult.add(element);
+      }
+    }
+    print('----SearchResult: $searchResult');
+    setState(() {
+      listTemp = searchResult;
+    });
+  }
+
+  List<StudentClasses> listDataSearch(String section) {
+    if (section == 'All') {
+      return listData;
+    } else if (section == 'Pass') {
+      return passListData;
+    } else if (section == 'Ban') {
+      return banListData;
+    } else if (section == 'Warning') {
+      return warningListData;
+    } else {
+      return listData;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final studentClassesDataProvider =
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    int numberOfWeeks = 20; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
       const FixedColumnWidth(80),
       const IntrinsicColumnWidth(),
     ];
-    List<Map<String, String>> paginatedStudents = getPaginatedStudents();
-
-    // Tạo các cột tuần
     for (int i = 0; i < numberOfWeeks; i++) {
       listColumnWidths.add(const FlexColumnWidth(2));
     }
-
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: appBar(),
@@ -97,7 +218,13 @@ class _DetailPageState extends State<DetailPage> {
             ),
             Expanded(
               child: selectedPage(
-                  numberOfWeeks, listColumnWidths, paginatedStudents),
+                  numberOfWeeks,
+                  listColumnWidths,
+                  studentClassesDataProvider,
+                  listTemp,
+                  searchTextChanged,
+                  newSetStateTable,
+                  isSelectedSection),
             ),
           ],
         ),
@@ -147,6 +274,7 @@ class _DetailPageState extends State<DetailPage> {
                     suffixIcon: IconButton(
                         onPressed: () {}, icon: const Icon(Icons.search)),
                     hintText: 'Search',
+                    onChanged: (value) {},
                     prefixIcon: const Icon(null),
                     readOnly: false),
                 const SizedBox(
@@ -418,9 +546,22 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget selectedPage(
-      int numberOfWeeks, dynamic listColumnWidth, dynamic paginated) {
+      int numberOfWeeks,
+      dynamic listColumnWidth,
+      StudentClassesDataProvider studentClassesDataProvider,
+      List<StudentClasses> listData,
+      Function(String querySearch) functionSearch,
+      Function(String title) newSetStateTable,
+      String isSelectedSection) {
     if (checkHome) {
-      return containerHome(numberOfWeeks, listColumnWidth, paginated);
+      return containerHome(
+          numberOfWeeks,
+          listColumnWidth,
+          studentClassesDataProvider,
+          listData,
+          functionSearch,
+          newSetStateTable,
+          isSelectedSection);
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -430,399 +571,704 @@ class _DetailPageState extends State<DetailPage> {
     } else if (checkAttendanceForm) {
       return const CreateAttendanceFormPage();
     } else {
-      return containerHome(numberOfWeeks, listColumnWidth, paginated);
+      return containerHome(
+          numberOfWeeks,
+          listColumnWidth,
+          studentClassesDataProvider,
+          listData,
+          functionSearch,
+          newSetStateTable,
+          isSelectedSection);
     }
   }
   //SideBar------------------------------------------------
   //auto tao cot truoc(success), sau do cho chay 1 vong lap for chay trong tablerow, table cell
   //Main---------------------------------------------------
 
-  Container containerHome(
-      int numberOfWeeks, dynamic listColumnWidth, dynamic paginatedStudents) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 250,
-      height: MediaQuery.of(context).size.height,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomText(
-                message: 'Dashboard',
-                fontSize: 25,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 130,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget containerHome(
+      int numberOfWeeks,
+      dynamic listColumnWidth,
+      StudentClassesDataProvider studentClassesDataProvider,
+      List<StudentClasses>? listData,
+      Function(String querySearch) functionSearch,
+      Function(String title) newSetStateTable,
+      String isSelectedSection) {
+    return listData!.isNotEmpty
+        ? Container(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  customBoxInformation('All', 'assets/icons/student.png'),
-                  customBoxInformation('Pass', 'assets/icons/present.png'),
-                  customBoxInformation('Ban', 'assets/icons/absent.png'),
-                  customBoxInformation('Warning', 'assets/icons/pending.png'),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 40,
-              child: Row(
-                children: [
-                  customButtonDashBoard('Export'),
-                  customButtonDashBoard('PDF'),
-                  customButtonDashBoard('Excel'),
                   const SizedBox(
-                    width: 20,
+                    height: 10,
                   ),
-                  Container(
-                    width: 450,
-                    height: 40,
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2))
-                        ],
-                        border: Border.all(
-                            color: Colors.black.withOpacity(0.2), width: 0.5),
-                        color: Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5))),
-                    child: TextFormField(
-                      readOnly: false,
-                      controller: searchInDashboardController,
-                      keyboardType: TextInputType.text,
-                      style: const TextStyle(
-                          color: AppColors.primaryText,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15),
-                      obscureText: false,
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(20),
-                          suffixIcon: Icon(
-                            Icons.search,
-                            color: Colors.black.withOpacity(0.5),
-                          ),
-                          hintText: 'Search Student',
-                          hintStyle: const TextStyle(
-                              fontSize: 12, color: Color.fromARGB(73, 0, 0, 0)),
-                          enabledBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              borderSide: BorderSide(
-                                  width: 1, color: Colors.transparent)),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(
-                                width: 1, color: AppColors.primaryButton),
-                          )),
+                  const CustomText(
+                    message: 'Dashboard',
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 250,
+                    height: 130,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        customBoxInformation(
+                            'All',
+                            'assets/icons/student.png',
+                            numberAllStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Pass',
+                            'assets/icons/present.png',
+                            numberPassStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Ban',
+                            'assets/icons/absent.png',
+                            numberBanStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Warning',
+                            'assets/icons/pending.png',
+                            numberWarningStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                      ],
                     ),
                   ),
                   const SizedBox(
-                    width: 20,
+                    height: 20,
                   ),
-                  customWeek('Previous'),
-                  customWeek('Week 8'),
-                  customWeek('Next'),
+                  Container(
+                    width: MediaQuery.of(context).size.width - 250,
+                    height: 40,
+                    child: Row(
+                      children: [
+                        customButtonDashBoard('Export'),
+                        customButtonDashBoard('PDF'),
+                        customButtonDashBoard('Excel'),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Container(
+                          width: 450,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: const Color.fromRGBO(0, 0, 0, 1)
+                                  .withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                            color: Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                          ),
+                          child: TextFormField(
+                            onChanged: (value) {
+                              functionSearch(value);
+                            },
+                            readOnly: false,
+                            controller: searchInDashboardController,
+                            keyboardType: TextInputType.text,
+                            style: const TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 15,
+                            ),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(20),
+                              suffixIcon: Icon(
+                                Icons.search,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                              hintText: 'Search Student',
+                              hintStyle: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(73, 0, 0, 0),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.transparent),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: AppColors.primaryButton),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        customWeek('Previous'),
+                        customWeek('Week 8'),
+                        customWeek('Next'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  tableStudent(listColumnWidth, numberOfWeeks, listData),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
+          )
+        : Container(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const CustomText(
+                    message: 'Dashboard',
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 250,
+                    height: 130,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        customBoxInformation(
+                            'All',
+                            'assets/icons/student.png',
+                            numberAllStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Pass',
+                            'assets/icons/present.png',
+                            numberPassStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Ban',
+                            'assets/icons/absent.png',
+                            numberBanStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                        customBoxInformation(
+                            'Warning',
+                            'assets/icons/pending.png',
+                            numberWarningStudent,
+                            newSetStateTable,
+                            isSelectedSection),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width - 250,
+                    height: 40,
+                    child: Row(
+                      children: [
+                        customButtonDashBoard('Export'),
+                        customButtonDashBoard('PDF'),
+                        customButtonDashBoard('Excel'),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Container(
+                          width: 450,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: const Color.fromRGBO(0, 0, 0, 1)
+                                  .withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                            color: Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                          ),
+                          child: TextFormField(
+                            onChanged: (value) {
+                              functionSearch(value);
+                            },
+                            readOnly: false,
+                            controller: searchInDashboardController,
+                            keyboardType: TextInputType.text,
+                            style: const TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 15,
+                            ),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(20),
+                              suffixIcon: Icon(
+                                Icons.search,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                              hintText: 'Search Student',
+                              hintStyle: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(73, 0, 0, 0),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.transparent),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: AppColors.primaryButton),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        customWeek('Previous'),
+                        customWeek('Week 8'),
+                        customWeek('Next'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  tableStudent(listColumnWidth, numberOfWeeks, listData),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width - 100,
-                  height: 300,
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 350,
-                        height: 350,
-                        child: Table(
-                          columnWidths: {
-                            for (var index in listColumnWidth.asMap().keys)
-                              index: listColumnWidth[index]
-                          },
-                          border: TableBorder.all(color: Colors.grey),
-                          children: [
-                            TableRow(children: [
-                              TableCell(
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  color:
-                                      const Color(0xff1770f0).withOpacity(0.5),
-                                  child: const Center(
-                                    child: Text(
-                                      'STT',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  color:
-                                      const Color(0xff1770f0).withOpacity(0.5),
-                                  child: const Center(
-                                    child: Text(
-                                      'StudentID',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  color:
-                                      const Color(0xff1770f0).withOpacity(0.5),
-                                  child: const Center(
-                                    child: Text(
-                                      'Name',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ]),
-                            for (int i = 0; i < paginatedStudents.length; i++)
-                              TableRow(children: [
-                                TableCell(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: Text(
-                                        '${currentPage * itemsPerPage + i + 1}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: Text(
-                                        '${paginatedStudents[i]['studentID']}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: Text(
-                                        '${paginatedStudents[i]['name']}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ])
-                          ],
+          );
+  }
+
+  Widget tableStudent(
+      listColumnWidth, int numberOfWeeks, List<StudentClasses> listData) {
+    final students = List.generate(
+      listData.length,
+      (index) => {
+        'studentID': ' ${listData[index].student.studentID}',
+        'name': ' ${listData[index].student.studentName}',
+      },
+    );
+    List<Map<String, String>> getPaginatedStudents() {
+      int startIndex = currentPage * itemsPerPage;
+      int endIndex = (currentPage + 1) * itemsPerPage;
+      if (endIndex > students.length) endIndex = students.length;
+      return students.sublist(startIndex, endIndex);
+    }
+
+    List<Map<String, String>> paginatedStudents = getPaginatedStudents();
+    print('Current Page: $currentPage');
+    itemsRecent = paginatedStudents.length;
+    if (currentPage > 0) {
+      print('Recent Items: ${itemsRecent + itemsPerPage * (currentPage)}');
+    } else {
+      print('Item Recent $itemsRecent');
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width - 100,
+          height: 300,
+          child: listData.isNotEmpty
+              ? Row(
+                  children: [
+                    tableIntro(listColumnWidth, paginatedStudents),
+                    tableCheckAttendance(
+                        numberOfWeeks, paginatedStudents, listData),
+                    tableTotal(paginatedStudents),
+                  ],
+                )
+              : Center(
+                  child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Opacity(
+                        opacity: 0.3,
+                        child: Image.asset('assets/images/nodata.png'),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomText(
+                        message: 'No Student Record',
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primaryText.withOpacity(0.3))
+                  ],
+                )),
+        ),
+        showPage(students)
+      ],
+    );
+  }
+
+  Row showPage(List<Map<String, String>> students) {
+    return Row(
+      children: [
+        CustomText(
+          message:
+              'Show ${currentPage > 0 ? itemsRecent + itemsPerPage * (currentPage) : itemsRecent} of ${students.length} results',
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.primaryText,
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        students.isNotEmpty
+            ? ElevatedButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.white),
+                ),
+                onPressed: currentPage > 0
+                    ? () {
+                        setState(() {
+                          currentPage--;
+                        });
+                      }
+                    : null,
+                child: const Text(
+                  'Previous',
+                  style: TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
+                ),
+              )
+            : Container(),
+        const SizedBox(width: 10),
+        students.isNotEmpty
+            ? Text(
+                '${currentPage + 1}/${(students.length / itemsPerPage).ceil()}',
+              )
+            : Container(),
+        const SizedBox(width: 10),
+        students.isNotEmpty
+            ? ElevatedButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.white),
+                ),
+                onPressed:
+                    currentPage < (students.length / itemsPerPage).ceil() - 1
+                        ? () {
+                            setState(() {
+                              currentPage++;
+                            });
+                          }
+                        : null,
+                child: const Text(
+                  'Next',
+                  style: TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
+                ),
+              )
+            : Container(),
+      ],
+    );
+  }
+
+  Container tableTotal(List<Map<String, String>> paginatedStudents) {
+    return Container(
+      width: 100,
+      height: 350,
+      child: Table(
+        border: TableBorder.all(color: Colors.grey),
+        children: [
+          TableRow(children: [
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: Colors.grey.withOpacity(0.21),
+                child: const Center(
+                  child: Text(
+                    'Total',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ]),
+          for (int i = 0; i < paginatedStudents.length; i++)
+            TableRow(children: [
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: const Center(
+                    child: Text(
+                      '',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ])
+        ],
+      ),
+    );
+  }
+
+  Expanded tableCheckAttendance(
+      int numberOfWeeks,
+      List<Map<String, String>> paginatedStudents,
+      List<StudentClasses> listData) {
+    return Expanded(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          height: 350,
+          child: Table(
+            border: TableBorder.all(color: Colors.grey),
+            columnWidths: {
+              for (int i = 0; i < numberOfWeeks; i++)
+                i: FixedColumnWidth(numberOfWeeks <= 13 ? 30 : 60),
+            },
+            children: [
+              TableRow(children: [
+                for (int i = 0; i < numberOfWeeks; i++)
+                  TableCell(
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      color: Colors.grey.withOpacity(0.21),
+                      child: Center(
+                        child: Text(
+                          'Week ${i + 1}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Container(
-                            height: 350,
-                            child: Table(
-                              border: TableBorder.all(color: Colors.grey),
-                              columnWidths: {
-                                for (int i = 0; i < numberOfWeeks; i++)
-                                  i: FixedColumnWidth(
-                                      numberOfWeeks <= 13 ? 30 : 60),
-                              },
-                              children: [
-                                TableRow(children: [
-                                  for (int i = 0; i < numberOfWeeks; i++)
-                                    TableCell(
-                                      child: Container(
-                                        padding: const EdgeInsets.all(5),
-                                        color: Colors.grey.withOpacity(0.21),
-                                        child: Center(
-                                          child: Text(
-                                            'Week ${i + 1}',
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ]),
-                                for (int i = 0;
-                                    i < paginatedStudents.length;
-                                    i++)
-                                  TableRow(children: [
-                                    for (int i = 0; i < numberOfWeeks; i++)
-                                      TableCell(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          color: Colors.white,
-                                          child: const Center(
-                                            child: Text(
-                                              '',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ]),
-                              ],
+                    ),
+                  ),
+              ]),
+              for (int i = 0; i < paginatedStudents.length; i++)
+                TableRow(children: [
+                  for (int j = 0; j < numberOfWeeks; j++)
+                    TableCell(
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        color: Colors.white,
+                        child: Center(
+                          child: Tooltip(
+                            message: j < listData[i].attendanceDetail.length
+                                ? listData[i]
+                                    .attendanceDetail[j]
+                                    .dateAttendanced
+                                    .toString()
+                                : '',
+                            // message: formatDate('2024-01-17T14:15:00.000Z'),
+                            child: Text(
+                              j < listData[i].attendanceDetail.length
+                                  ? getResult(
+                                      listData[i].attendanceDetail[j].result)
+                                  : '',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      Container(
-                        width: 100,
-                        height: 350,
-                        child: Table(
-                          border: TableBorder.all(color: Colors.grey),
-                          children: [
-                            TableRow(children: [
-                              TableCell(
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  color: Colors.grey.withOpacity(0.21),
-                                  child: const Center(
-                                    child: Text(
-                                      'Total',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                            for (int i = 0; i < paginatedStudents.length; i++)
-                              TableRow(children: [
-                                TableCell(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    color: Colors.white,
-                                    child: const Center(
-                                      child: Text(
-                                        '',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ])
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                ]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
+  }
+
+  String getResult(int result) {
+    if (result == 0) {
+      return 'Absent';
+    } else if (result.toString() == 0.5.toString()) {
+      return 'Late';
+    } else {
+      return 'Present';
+    }
+  }
+
+  Container tableIntro(
+      listColumnWidth, List<Map<String, String>> paginatedStudents) {
+    return Container(
+      width: 350,
+      height: 350,
+      child: Table(
+        columnWidths: {
+          for (var index in listColumnWidth.asMap().keys)
+            index: listColumnWidth[index]
+        },
+        border: TableBorder.all(color: Colors.grey),
+        children: [
+          TableRow(children: [
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.5),
+                child: const Center(
+                  child: Text(
+                    'STT',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      style: const ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.white)),
-                      onPressed: currentPage > 0
-                          ? () {
-                              setState(() {
-                                currentPage--;
-                              });
-                            }
-                          : null,
-                      child: const Text(
-                        'Previous',
-                        style:
-                            TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
-                      ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.5),
+                child: const Center(
+                  child: Text(
+                    'StudentID',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                        '${currentPage + 1}/${(students.length / itemsPerPage).ceil()}'),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      style: const ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.white)),
-                      onPressed: currentPage <
-                              (students.length / itemsPerPage).ceil() - 1
-                          ? () {
-                              setState(() {
-                                currentPage++;
-                              });
-                            }
-                          : null,
-                      child: const Text(
-                        'Next',
-                        style:
-                            TextStyle(fontSize: 12, color: Color(0xff2d71b1)),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.5),
+                child: const Center(
+                  child: Text(
+                    'Name',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
             )
-          ],
-        ),
+          ]),
+          for (int i = 0; i < paginatedStudents.length; i++)
+            TableRow(children: [
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      '${currentPage * itemsPerPage + i + 1}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      '${paginatedStudents[i]['studentID']}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      '${paginatedStudents[i]['name']}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ])
+        ],
       ),
     );
   }
@@ -883,22 +1329,29 @@ Widget customButtonDashBoard(String nameButton) {
   );
 }
 
-Widget customBoxInformation(String title, String imagePath) {
+Widget customBoxInformation(String title, String imagePath, int count,
+    Function(String title) function, String isSelectedSection) {
   return InkWell(
-    onTap: () {},
+    onTap: () {
+      function(title);
+    },
     mouseCursor: SystemMouseCursors.click,
     child: Container(
       width: 200,
-      height: 90,
-      decoration: const BoxDecoration(
+      height: 91,
+      decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          boxShadow: [
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          boxShadow: const [
             BoxShadow(
                 color: AppColors.secondaryText,
                 blurRadius: 2,
                 offset: Offset(0, 2))
-          ]),
+          ],
+          border: Border.all(
+              color: title == isSelectedSection
+                  ? AppColors.primaryButton
+                  : Colors.white)),
       child: Padding(
         padding:
             const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
@@ -914,8 +1367,8 @@ Widget customBoxInformation(String title, String imagePath) {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.colorInformation),
-                const CustomText(
-                    message: '0',
+                CustomText(
+                    message: '$count',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.colorNumberInformation),
@@ -939,397 +1392,190 @@ Widget customBoxInformation(String title, String imagePath) {
 }
 
 
-  //Main---------------------------------------------------
-
-            // Container(
-            //   width: MediaQuery.of(context).size.width - 100,
-            //   height: 380,
-            //   child: Row(
-            //     children: [
-            //       Container(
-            //         width: 350,
-            //         height: 380,
-            //         child: Table(
-            //           columnWidths: {
-            //             for (var index in listColumnWidth.asMap().keys)
-            //               index: listColumnWidth[index]
-            //           },
-            //           border: TableBorder.all(color: Colors.grey),
-            //           children: [
-            //             TableRow(children: [
-            //               TableCell(
-            //                 child: Container(
-            //                   padding: const EdgeInsets.all(5),
-            //                   color: const Color(0xff1770f0).withOpacity(0.5),
-            //                   child: const Center(
-            //                     child: Text(
-            //                       'STT',
-            //                       style: TextStyle(
-            //                         fontSize: 11,
-            //                         fontWeight: FontWeight.bold,
-            //                         color: Colors.black,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //               TableCell(
-            //                 child: Container(
-            //                   padding: const EdgeInsets.all(5),
-            //                   color: const Color(0xff1770f0).withOpacity(0.5),
-            //                   child: const Center(
-            //                     child: Text(
-            //                       'StudentID',
-            //                       style: TextStyle(
-            //                         fontSize: 11,
-            //                         fontWeight: FontWeight.bold,
-            //                         color: Colors.black,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //               TableCell(
-            //                 child: Container(
-            //                   padding: const EdgeInsets.all(5),
-            //                   color: const Color(0xff1770f0).withOpacity(0.5),
-            //                   child: const Center(
-            //                     child: Text(
-            //                       'Name',
-            //                       style: TextStyle(
-            //                         fontSize: 11,
-            //                         fontWeight: FontWeight.bold,
-            //                         color: Colors.black,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //               )
-            //             ]),
-            //             for (int i = 0; i < students.length; i++)
-            //               TableRow(children: [
-            //                 TableCell(
-            //                   child: Container(
-            //                     padding: const EdgeInsets.all(5),
-            //                     color: Colors.white,
-            //                     child: Center(
-            //                       child: Text(
-            //                         '${i + 1}',
-            //                         style: const TextStyle(
-            //                           fontSize: 11,
-            //                           fontWeight: FontWeight.bold,
-            //                           color: Colors.black,
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 TableCell(
-            //                   child: Container(
-            //                     padding: const EdgeInsets.all(5),
-            //                     color: Colors.white,
-            //                     child: Center(
-            //                       child: Text(
-            //                         '${students[i]['studentID']}',
-            //                         style: const TextStyle(
-            //                           fontSize: 11,
-            //                           fontWeight: FontWeight.bold,
-            //                           color: Colors.black,
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 TableCell(
-            //                   child: Container(
-            //                     padding: const EdgeInsets.all(5),
-            //                     color: Colors.white,
-            //                     child: Center(
-            //                       child: Text(
-            //                         '${students[i]['name']}',
-            //                         style: const TextStyle(
-            //                           fontSize: 11,
-            //                           fontWeight: FontWeight.bold,
-            //                           color: Colors.black,
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 )
-            //               ])
-            //           ],
-            //         ),
-            //       ),
-            //       // const SizedBox(width: 0.01,),
-            //       Expanded(
-            //         child: SingleChildScrollView(
-            //           scrollDirection: Axis.horizontal,
-            //           child: Expanded(
-            //             child: Table(
-            //               border: TableBorder.all(color: Colors.grey),
-            //               columnWidths: {
-            //                 for (int i = 0; i < numberOfWeeks; i++)
-            //                   i: FixedColumnWidth(
-            //                       numberOfWeeks <= 13 ? 30 : 60),
-            //               },
-            //               children: [
-            //                 TableRow(children: [
-            //                   for (int i = 0; i < numberOfWeeks; i++)
-            //                     TableCell(
-            //                       child: Container(
-            //                         padding: const EdgeInsets.all(5),
-            //                         color: Colors.grey.withOpacity(0.21),
-            //                         child: Center(
-            //                           child: Text(
-            //                             'Week ${i + 1}',
-            //                             style: const TextStyle(
-            //                               fontSize: 11,
-            //                               fontWeight: FontWeight.bold,
-            //                               color: Colors.black,
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                 ]),
-            //                 for (int i = 0; i < students.length; i++)
-            //                   TableRow(children: [
-            //                     for (int i = 0; i < numberOfWeeks; i++)
-            //                       TableCell(
-            //                         child: Container(
-            //                           padding: const EdgeInsets.all(5),
-            //                           color: Colors.white,
-            //                           child: const Center(
-            //                             child: Text(
-            //                               '',
-            //                               style: TextStyle(
-            //                                 fontSize: 11,
-            //                                 fontWeight: FontWeight.bold,
-            //                                 color: Colors.black,
-            //                               ),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                   ]),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //       Container(
-            //         width: 100,
-            //         height: 380,
-            //         child: Table(
-            //           border: TableBorder.all(color: Colors.grey),
-            //           children: [
-            //             TableRow(children: [
-            //               TableCell(
-            //                 child: Container(
-            //                   padding: const EdgeInsets.all(5),
-            //                   color: Colors.grey.withOpacity(0.21),
-            //                   child: const Center(
-            //                     child: Text(
-            //                       'Total',
-            //                       style: TextStyle(
-            //                         fontSize: 11,
-            //                         fontWeight: FontWeight.bold,
-            //                         color: Colors.black,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //             ]),
-            //             for (int i = 0; i < students.length; i++)
-            //               TableRow(children: [
-            //                 TableCell(
-            //                   child: Container(
-            //                     padding: const EdgeInsets.all(5),
-            //                     color: Colors.white,
-            //                     child: const Center(
-            //                       child: Text(
-            //                         '',
-            //                         style: TextStyle(
-            //                           fontSize: 11,
-            //                           fontWeight: FontWeight.bold,
-            //                           color: Colors.black,
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ])
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-
-// SingleChildScrollView(
-//                 scrollDirection: Axis.horizontal,
-//                 child: Column(
-//                   children: [
-//                     Row(
-//                       children: [
-//                         Container(
-//                           width: MediaQuery.of(context).size.width - 250,
-//                           height: 380,
-//                           child: Table(
-//                             columnWidths: {
-//                               for (var index in listColumnWidth.asMap().keys)
-//                                 index: listColumnWidth[index]
-//                             },
-//                             border: TableBorder.all(color: Colors.grey),
-//                             children: [
-//                               TableRow(
-//                                 children: [
-//                                   TableCell(
-//                                     child: Container(
-//                                       padding: const EdgeInsets.all(5),
-//                                       color: const Color(0xff1770f0)
-//                                           .withOpacity(0.5),
-//                                       child: const Center(
-//                                         child: Text(
-//                                           'STT',
-//                                           style: TextStyle(
-//                                             fontSize: 11,
-//                                             fontWeight: FontWeight.bold,
-//                                             color: Colors.black,
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   TableCell(
-//                                     child: Container(
-//                                       color: const Color(0xff1770f0)
-//                                           .withOpacity(0.5),
-//                                       padding: const EdgeInsets.all(5),
-//                                       child: const Center(
-//                                         child: Text(
-//                                           'StudentID',
-//                                           style: TextStyle(
-//                                             fontSize: 11,
-//                                             fontWeight: FontWeight.bold,
-//                                             color: Colors.black,
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   TableCell(
-//                                     child: Container(
-//                                       padding: const EdgeInsets.all(5),
-//                                       color: const Color(0xff1770f0)
-//                                           .withOpacity(0.5),
-//                                       child: const Center(
-//                                         child: Text(
-//                                           'Name',
-//                                           style: TextStyle(
-//                                             fontSize: 11,
-//                                             fontWeight: FontWeight.bold,
-//                                             color: Colors.black,
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   for (int i = 0; i < numberOfWeeks; i++)
-//                                     TableCell(
-//                                       child: Container(
-//                                         padding: const EdgeInsets.all(5),
-//                                         color: Colors.grey.withOpacity(0.21),
-//                                         child: Center(
-//                                           child: Text(
-//                                             'Week ${i + 1}',
-//                                             style: const TextStyle(
-//                                               fontSize: 11,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.black,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                 ],
-//                               ),
-//                               for (var i = 0; i < students.length; i++)
-//                                 TableRow(
-//                                   children: [
-//                                     TableCell(
-//                                       child: Container(
-//                                         padding: const EdgeInsets.all(5),
-//                                         color: Colors.white,
-//                                         child: Center(
-//                                           child: Text(
-//                                             '${i + 1}',
-//                                             style: const TextStyle(
-//                                               fontSize: 11,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.black,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                     TableCell(
-//                                       child: Container(
-//                                         color: Colors.white,
-//                                         padding: const EdgeInsets.all(5),
-//                                         child: Center(
-//                                           child: Text(
-//                                             '${students[i]['studentID']}',
-//                                             style: const TextStyle(
-//                                               fontSize: 11,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.black,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                     TableCell(
-//                                       child: Container(
-//                                         padding: const EdgeInsets.all(5),
-//                                         color: Colors.white,
-//                                         child: Center(
-//                                           child: Text(
-//                                             '${students[i]['name']}',
-//                                             style: const TextStyle(
-//                                               fontSize: 11,
-//                                               fontWeight: FontWeight.bold,
-//                                               color: Colors.black,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                     for (int i = 0; i < numberOfWeeks; i++)
-//                                       TableCell(
-//                                         child: Container(
-//                                           padding: const EdgeInsets.all(5),
-//                                           color: Colors.white.withOpacity(0.21),
-//                                           child: const Center(
-//                                             child: Text(
-//                                               '',
-//                                               style: TextStyle(
-//                                                 fontSize: 11,
-//                                                 fontWeight: FontWeight.bold,
-//                                                 color: Colors.black,
-//                                               ),
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                   ],
-//                                 )
-//                             ],
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
+  // Widget containerHome(
+  //     int numberOfWeeks,
+  //     dynamic listColumnWidth,
+  //     StudentClassesDataProvider studentClassesDataProvider,
+  //     List<StudentClasses>? listData,
+  //     Function(String querySearch) functionSearch,
+  //     Function(String title) newSetStateTable) {
+  //   return listData!.isNotEmpty
+  //       ? Container(
+  //           width: MediaQuery.of(context).size.width - 250,
+  //           height: MediaQuery.of(context).size.height,
+  //           child: Padding(
+  //             padding: const EdgeInsets.only(left: 20, right: 20),
+  //             child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   const CustomText(
+  //                       message: 'Dashboard',
+  //                       fontSize: 25,
+  //                       fontWeight: FontWeight.w800,
+  //                       color: AppColors.primaryText),
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   SizedBox(
+  //                     width: MediaQuery.of(context).size.width - 250,
+  //                     height: 130,
+  //                     child: Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                       children: [
+  //                         customBoxInformation(
+  //                             'All',
+  //                             'assets/icons/student.png',
+  //                             numberAllStudent,
+  //                             newSetStateTable),
+  //                         customBoxInformation(
+  //                             'Pass',
+  //                             'assets/icons/present.png',
+  //                             numberPassStudent,
+  //                             newSetStateTable),
+  //                         customBoxInformation('Ban', 'assets/icons/absent.png',
+  //                             numberBanStudent, newSetStateTable),
+  //                         customBoxInformation(
+  //                             'Warning',
+  //                             'assets/icons/pending.png',
+  //                             numberWarningStudent,
+  //                             newSetStateTable),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     height: 20,
+  //                   ),
+  //                   Container(
+  //                     width: MediaQuery.of(context).size.width - 250,
+  //                     height: 40,
+  //                     child: Row(
+  //                       children: [
+  //                         customButtonDashBoard('Export'),
+  //                         customButtonDashBoard('PDF'),
+  //                         customButtonDashBoard('Excel'),
+  //                         const SizedBox(
+  //                           width: 20,
+  //                         ),
+  //                         Container(
+  //                           width: 450,
+  //                           height: 40,
+  //                           decoration: BoxDecoration(
+  //                               boxShadow: [
+  //                                 BoxShadow(
+  //                                     color: Colors.black.withOpacity(0.1),
+  //                                     blurRadius: 4,
+  //                                     offset: const Offset(0, 2))
+  //                               ],
+  //                               border: Border.all(
+  //                                   color: const Color.fromRGBO(0, 0, 0, 1)
+  //                                       .withOpacity(0.2),
+  //                                   width: 0.5),
+  //                               color: Colors.white,
+  //                               borderRadius:
+  //                                   const BorderRadius.all(Radius.circular(5))),
+  //                           child: TextFormField(
+  //                             onChanged: (value) {
+  //                               functionSearch(value);
+  //                             },
+  //                             readOnly: false,
+  //                             controller: searchInDashboardController,
+  //                             keyboardType: TextInputType.text,
+  //                             style: const TextStyle(
+  //                                 color: AppColors.primaryText,
+  //                                 fontWeight: FontWeight.normal,
+  //                                 fontSize: 15),
+  //                             obscureText: false,
+  //                             decoration: InputDecoration(
+  //                                 contentPadding: const EdgeInsets.all(20),
+  //                                 suffixIcon: Icon(
+  //                                   Icons.search,
+  //                                   color: Colors.black.withOpacity(0.5),
+  //                                 ),
+  //                                 hintText: 'Search Student',
+  //                                 hintStyle: const TextStyle(
+  //                                     fontSize: 12,
+  //                                     color: Color.fromARGB(73, 0, 0, 0)),
+  //                                 enabledBorder: const OutlineInputBorder(
+  //                                     borderRadius:
+  //                                         BorderRadius.all(Radius.circular(5)),
+  //                                     borderSide: BorderSide(
+  //                                         width: 1, color: Colors.transparent)),
+  //                                 focusedBorder: const OutlineInputBorder(
+  //                                   borderRadius:
+  //                                       BorderRadius.all(Radius.circular(5)),
+  //                                   borderSide: BorderSide(
+  //                                       width: 1,
+  //                                       color: AppColors.primaryButton),
+  //                                 )),
+  //                           ),
+  //                         ),
+  //                         const SizedBox(
+  //                           width: 20,
+  //                         ),
+  //                         customWeek('Previous'),
+  //                         customWeek('Week 8'),
+  //                         customWeek('Next'),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   tableStudent(listColumnWidth, numberOfWeeks, listData)
+  //                 ]),
+  //           ))
+  //       : Container(
+  //           width: MediaQuery.of(context).size.width - 250,
+  //           height: MediaQuery.of(context).size.height,
+  //           child: Padding(
+  //             padding: const EdgeInsets.only(left: 20, right: 20),
+  //             child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   const CustomText(
+  //                       message: 'Dashboard',
+  //                       fontSize: 25,
+  //                       fontWeight: FontWeight.w800,
+  //                       color: AppColors.primaryText),
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   SizedBox(
+  //                     width: MediaQuery.of(context).size.width - 250,
+  //                     height: 130,
+  //                     child: Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                       children: [
+  //                         customBoxInformation(
+  //                             'All',
+  //                             'assets/icons/student.png',
+  //                             numberAllStudent,
+  //                             newSetStateTable),
+  //                         customBoxInformation(
+  //                             'Pass',
+  //                             'assets/icons/present.png',
+  //                             numberPassStudent,
+  //                             newSetStateTable),
+  //                         customBoxInformation('Ban', 'assets/icons/absent.png',
+  //                             numberBanStudent, newSetStateTable),
+  //                         customBoxInformation(
+  //                             'Warning',
+  //                             'assets/icons/pending.png',
+  //                             numberWarningStudent,
+  //                             newSetStateTable),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     height: 20,
+  //                   ),
+  //                   Center(child: Text('Data is not available'))
+  //                 ]),
+  //           ));
+  // }

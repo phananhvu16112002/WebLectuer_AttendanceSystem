@@ -3,18 +3,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Test.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/components/DetailPage_Widget.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
-    ChangeNotifierProvider(create: (_) => SocketServerProvider())
+    ChangeNotifierProvider(create: (_) => SocketServerProvider()),
+    ChangeNotifierProvider(create: (_) => StudentClassesDataProvider())
   ], child: const MyApp()));
 }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 
 class AttendanceFormDataProvider with ChangeNotifier {
-  List<AttendanceForm> _attendanceFormList =[];
+  List<AttendanceForm> _attendanceFormList = [];
 
   List<AttendanceForm> get attendanceFormData => _attendanceFormList;
 

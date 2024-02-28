@@ -23,7 +23,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final String? Function(String?)? validator; // Specify the type here
   final Function(String?)? onSaved;
-  final Function(String)? onChanged;
+  final ValueChanged<String>? onChanged;
   final Icon prefixIcon;
   final bool readOnly;
 

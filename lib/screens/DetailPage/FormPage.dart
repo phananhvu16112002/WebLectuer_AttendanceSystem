@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});

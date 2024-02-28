@@ -1,7 +1,9 @@
 import 'dart:convert';
 
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceState.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:http/http.dart' as http;
 
 class API {
@@ -91,5 +93,33 @@ class API {
       return null;
     }
     return null;
+  }
+
+  Future<AttendanceDetailResponseStudent>
+      getStudentClassAttendanceDetail() async {
+    const url = 'http://localhost:8080/test/api/getStudentFakeAPI';
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      if (response.statusCode == 200) {
+        print('Successfully fetched data');
+        print('JsonDecode: ${jsonDecode(response.body)}');
+        return AttendanceDetailResponseStudent.fromJson(
+            jsonDecode(response.body));
+      } else {
+        print('Failed to load data: ${response.statusCode}');
+        return AttendanceDetailResponseStudent(
+            data: [],
+            stats: AttendanceStatus(all: 0, pass: 0, ban: 0, warning: 0));
+      }
+    } catch (error) {
+      print('Error: $error');
+      return AttendanceDetailResponseStudent(
+          data: [],
+          stats: AttendanceStatus(all: 0, pass: 0, ban: 0, warning: 0));
+    }
   }
 }

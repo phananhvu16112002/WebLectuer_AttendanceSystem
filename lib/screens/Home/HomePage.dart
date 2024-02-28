@@ -550,7 +550,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    Overlay.of(context)?.insert(overlayEntry!);
+    Overlay.of(context).insert(overlayEntry!);
   }
 
   void _removePopupMenu() {

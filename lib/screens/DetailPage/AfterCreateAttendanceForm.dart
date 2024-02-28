@@ -7,7 +7,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:gif_view/gif_view.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 class AfterCreateAttendanceForm extends StatefulWidget {
