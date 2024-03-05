@@ -6,13 +6,13 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Student.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
@@ -34,6 +34,7 @@ class _DetailPageState extends State<DetailPage> {
   bool checkReport = false;
   bool checkForm = false;
   bool checkAttendanceForm = false;
+  bool checkViewAttendance = false;
   OverlayEntry? overlayEntry;
   TextEditingController searchInDashboardController = TextEditingController();
   bool formCreated = false;
@@ -73,10 +74,15 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
+    _fetchData();
+    print('InitState-----');
+  }
+
+  void _fetchData() async {
     fetchData = API().getStudentClassAttendanceDetail();
     fetchData.then((value) {
       setState(() {
-        listData = value!.data;
+        listData = value.data;
         listTemp = value.data;
         numberAllStudent = value.stats.all;
         numberPassStudent = value.stats.pass;
@@ -84,12 +90,14 @@ class _DetailPageState extends State<DetailPage> {
         numberWarningStudent = value.stats.warning;
       });
     });
+    print('FetchData-----');
   }
 
   void newAllListData() {
     setState(() {
       listTemp = listData;
       isSelectedSection = 'All';
+      currentPage = 0;
     });
   }
 
@@ -105,6 +113,7 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       listTemp = passListData;
       isSelectedSection = 'Pass';
+      currentPage = 0;
     });
   }
 
@@ -120,6 +129,7 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       listTemp = banListData;
       isSelectedSection = 'Ban';
+      currentPage = 0;
     });
   }
 
@@ -135,6 +145,7 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       listTemp = warningListData;
       isSelectedSection = 'Warning';
+      currentPage = 0;
     });
   }
 
@@ -190,6 +201,13 @@ class _DetailPageState extends State<DetailPage> {
       return listData;
     }
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   // TODO: implement didChangeDependencies
+  //   super.didChangeDependencies();
+  //   print('OnDidChangeDependencies');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -426,21 +444,27 @@ class _DetailPageState extends State<DetailPage> {
           checkNotification = false;
           checkReport = false;
           checkForm = false;
+          checkViewAttendance = false;
           if (title == 'Home') {
             checkHome = true;
             checkAttendanceForm = false;
+            checkViewAttendance = false;
           } else if (title == 'Notifications') {
             checkNotification = true;
             checkAttendanceForm = false;
+            checkViewAttendance = false;
           } else if (title == 'Reports') {
             checkReport = true;
             checkAttendanceForm = false;
+            checkViewAttendance = false;
           } else if (title == 'Forms') {
             checkForm = true;
             checkAttendanceForm = false;
+            checkViewAttendance = false;
           } else {
             checkHome = true;
             checkAttendanceForm = false;
+            checkViewAttendance = false;
           }
         });
       },
@@ -562,6 +586,7 @@ class _DetailPageState extends State<DetailPage> {
           functionSearch,
           newSetStateTable,
           isSelectedSection);
+      // return EditAttendanceDetail();
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -570,6 +595,8 @@ class _DetailPageState extends State<DetailPage> {
       return const FormPage();
     } else if (checkAttendanceForm) {
       return const CreateAttendanceFormPage();
+    } else if (checkViewAttendance) {
+      return const RealtimeCheckAttendance();
     } else {
       return containerHome(
           numberOfWeeks,
@@ -654,6 +681,7 @@ class _DetailPageState extends State<DetailPage> {
                     width: MediaQuery.of(context).size.width - 250,
                     height: 40,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export'),
                         customButtonDashBoard('PDF'),
@@ -723,9 +751,26 @@ class _DetailPageState extends State<DetailPage> {
                         const SizedBox(
                           width: 20,
                         ),
-                        customWeek('Previous'),
-                        customWeek('Week 8'),
-                        customWeek('Next'),
+                        CustomButton(
+                            buttonName: 'View Attendance',
+                            backgroundColorButton: const Color(0xff2d71b1),
+                            borderColor: Colors.transparent,
+                            textColor: Colors.white,
+                            function: () {
+                              setState(() {
+                                checkViewAttendance = true;
+                                checkHome = false;
+                                checkNotification = false;
+                                checkReport = false;
+                                checkForm = false;
+                                checkAttendanceForm = false;
+                              });
+                            },
+                            height: 50,
+                            width: 150,
+                            fontSize: 12,
+                            colorShadow: Colors.white,
+                            borderRadius: 8)
                       ],
                     ),
                   ),
@@ -899,7 +944,6 @@ class _DetailPageState extends State<DetailPage> {
     }
 
     List<Map<String, String>> paginatedStudents = getPaginatedStudents();
-    print('Current Page: $currentPage');
     itemsRecent = paginatedStudents.length;
     if (currentPage > 0) {
       print('Recent Items: ${itemsRecent + itemsPerPage * (currentPage)}');
@@ -1060,9 +1104,10 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Expanded tableCheckAttendance(
-      int numberOfWeeks,
-      List<Map<String, String>> paginatedStudents,
-      List<StudentClasses> listData) {
+    int numberOfWeeks,
+    List<Map<String, String>> paginatedStudents,
+    List<StudentClasses> listData,
+  ) {
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -1075,57 +1120,61 @@ class _DetailPageState extends State<DetailPage> {
                 i: FixedColumnWidth(numberOfWeeks <= 13 ? 30 : 60),
             },
             children: [
-              TableRow(children: [
-                for (int i = 0; i < numberOfWeeks; i++)
-                  TableCell(
+              TableRow(
+                children: List.generate(
+                  numberOfWeeks,
+                  (j) => TableCell(
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       color: Colors.grey.withOpacity(0.21),
                       child: Center(
-                        child: Text(
-                          'Week ${i + 1}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ]),
-              for (int i = 0; i < paginatedStudents.length; i++)
-                TableRow(children: [
-                  for (int j = 0; j < numberOfWeeks; j++)
-                    TableCell(
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        color: Colors.white,
-                        child: Center(
-                          child: Tooltip(
-                            message: j < listData[i].attendanceDetail.length
-                                ? listData[i]
-                                    .attendanceDetail[j]
-                                    .dateAttendanced
-                                    .toString()
-                                : '',
-                            // message: formatDate('2024-01-17T14:15:00.000Z'),
-                            child: Text(
-                              j < listData[i].attendanceDetail.length
-                                  ? getResult(
-                                      listData[i].attendanceDetail[j].result)
-                                  : '',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black,
-                              ),
+                        child: Tooltip(
+                          message: (j < listData.length &&
+                                  j < listData[j].attendanceDetail.length)
+                              ? formatDate(listData[j]
+                                  .attendanceDetail[j]
+                                  .dateAttendanced
+                                  .toString())
+                              : '',
+                          child: Text(
+                            'Day ${j + 1}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
                         ),
                       ),
                     ),
-                ]),
+                  ),
+                ),
+              ),
+              for (int i = 0; i < paginatedStudents.length; i++)
+                TableRow(
+                  children: List.generate(
+                    numberOfWeeks,
+                    (j) => TableCell(
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        color: Colors.white,
+                        child: Center(
+                          child: Text(
+                            j < listData[i].attendanceDetail.length
+                                ? getResult(
+                                    listData[i].attendanceDetail[j].result)
+                                : '',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -1578,4 +1627,75 @@ Widget customBoxInformation(String title, String imagePath, int count,
   //                   Center(child: Text('Data is not available'))
   //                 ]),
   //           ));
+  // }
+
+
+
+  
+  // Expanded tableCheckAttendance(
+  //     int numberOfWeeks,
+  //     List<Map<String, String>> paginatedStudents,
+  //     List<StudentClasses> listData) {
+  //   return Expanded(
+  //     child: SingleChildScrollView(
+  //       scrollDirection: Axis.horizontal,
+  //       child: Container(
+  //         height: 350,
+  //         child: Table(
+  //           border: TableBorder.all(color: Colors.grey),
+  //           columnWidths: {
+  //             for (int i = 0; i < numberOfWeeks; i++)
+  //               i: FixedColumnWidth(numberOfWeeks <= 13 ? 30 : 60),
+  //           },
+  //           children: [
+  //             TableRow(children: [
+  //               for (int j = 0; j < numberOfWeeks; j++)
+  //                 TableCell(
+  //                   child: Container(
+  //                     padding: const EdgeInsets.all(5),
+  //                     color: Colors.grey.withOpacity(0.21),
+  //                     child: Center(
+  //                       child: Tooltip(
+  //                         message: 'null',
+  //                         child: Text(
+  //                           'Day ${j + 1}',
+  //                           style: const TextStyle(
+  //                             fontSize: 11,
+  //                             fontWeight: FontWeight.bold,
+  //                             color: Colors.black,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //             ]),
+  //             for (int i = 0; i < paginatedStudents.length; i++)
+  //               TableRow(children: [
+  //                 for (int j = 0; j < numberOfWeeks; j++)
+  //                   TableCell(
+  //                     child: Container(
+  //                       padding: const EdgeInsets.all(5),
+  //                       color: Colors.white,
+  //                       child: Center(
+  //                         child: Text(
+  //                           j < listData[i].attendanceDetail.length
+  //                               ? getResult(
+  //                                   listData[i].attendanceDetail[j].result)
+  //                               : '',
+  //                           style: const TextStyle(
+  //                             fontSize: 11,
+  //                             fontWeight: FontWeight.normal,
+  //                             color: Colors.black,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //               ]),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
   // }

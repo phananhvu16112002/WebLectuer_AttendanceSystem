@@ -1,20 +1,20 @@
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceState.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/StudentClasses.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceState.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
 
-class AttendanceModel {
+class AttendanceDetailResponseStudent {
   List<StudentClasses> data;
-  AttendanceStats stats;
+  AttendanceStatus stats;
 
-  AttendanceModel({
+  AttendanceDetailResponseStudent({
     required this.data,
     required this.stats,
   });
 
-  factory AttendanceModel.fromJson(Map<String, dynamic> json) {
-    return AttendanceModel(
+  factory AttendanceDetailResponseStudent.fromJson(Map<String, dynamic> json) {
+    return AttendanceDetailResponseStudent(
       data: List<StudentClasses>.from(
           json['data'].map((x) => StudentClasses.fromJson(x))),
-      stats: AttendanceStats.fromJson({
+      stats: AttendanceStatus.fromJson({
         'all': json['all'],
         'pass': json['pass'],
         'ban': json['ban'],

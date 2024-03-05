@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
@@ -14,6 +14,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart'
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
+import 'dart:html' as html;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -398,6 +399,7 @@ class _HomePageState extends State<HomePage> {
     if (checkHome) {
       return containerHome(classDataProvider);
     } else if (checkNotification) {
+      // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
     } else if (checkReport) {
       return const ReportPage();

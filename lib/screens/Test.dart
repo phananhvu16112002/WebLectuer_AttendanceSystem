@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class TestApp extends StatefulWidget {

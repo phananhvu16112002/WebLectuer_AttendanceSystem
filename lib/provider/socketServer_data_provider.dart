@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
-
 
 class SocketServerProvider with ChangeNotifier {
   late IO.Socket _socket;
@@ -11,6 +11,12 @@ class SocketServerProvider with ChangeNotifier {
 
   IO.Socket get socket => _socket;
   bool get isConnected => _isConnected;
+
+  final StreamController<Map<String, dynamic>>
+      _attendanceDetailStreamController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get attendanceStream =>
+      _attendanceDetailStreamController.stream;
 
   void connectToSocketServer(data) {
     _socket = IO.io('http://localhost:9000', <String, dynamic>{
@@ -59,9 +65,63 @@ class SocketServerProvider with ChangeNotifier {
     _socket.emit('sendAttendanceForm', jsonString);
   }
 
+  void getAttendanceDetail() {
+    _socket.on('getTakeAttendance', (data) {
+      var temp = jsonDecode(data);
+      var jsonData = {
+        'studentDetail': temp['studentDetail'],
+        'classDetail': temp['classDetail'],
+        'dateAttendanced': temp['dateAttendanced'],
+        'result': temp['result'],
+      };
+      _attendanceDetailStreamController.add(jsonData);
+    });
+  }
+
   void disconnectSocketServer() {
     _socket.disconnect();
     _isConnected = false;
     notifyListeners();
   }
 }
+
+
+
+
+
+
+  // late Map<String, int> _attendanceStatistics = {
+  //   'Present': 0,
+  //   'Absent': 0,
+  //   'Late': 0
+  // };
+  // Map<String, int> get attendanceStatistics => _attendanceStatistics;
+
+  // StreamController<Map<String, int>> _attendanceStreamController =
+  //     StreamController<Map<String, int>>.broadcast();
+
+
+
+
+
+
+    // void getAttendanceDetail() {
+  //   _socket.on('getTakeAttendance', (data) {
+  //     print('Data from socket: $data');
+  //     var temp = jsonDecode(data);
+  //     String result = temp['result'].toString();
+      
+  //     print('Result from socket: $result');
+  //     if (result == '1') {
+  //       attendanceStatistics.update('Present', (value) => value + 1,
+  //           ifAbsent: () => 1);
+  //     } else if (result == '0') {
+  //       attendanceStatistics.update('Absent', (value) => value + 1,
+  //           ifAbsent: () => 1);
+  //     } else if (result.toString() == '0.5') {
+  //       attendanceStatistics.update('Late', (value) => value + 1,
+  //           ifAbsent: () => 1);
+  //     }
+  //     _attendanceStreamController.add(attendanceStatistics);
+  //   });
+  // }

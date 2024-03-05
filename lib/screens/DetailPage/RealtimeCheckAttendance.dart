@@ -1,12 +1,17 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/TestAttendanceDetail.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceSummary.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
-//After create attendance form --> RealtimeCheckAttendance.
 class RealtimeCheckAttendance extends StatefulWidget {
-  const RealtimeCheckAttendance({super.key});
+  const RealtimeCheckAttendance({Key? key}) : super(key: key);
 
   @override
   State<RealtimeCheckAttendance> createState() =>
@@ -14,7 +19,188 @@ class RealtimeCheckAttendance extends StatefulWidget {
 }
 
 class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
+  int all = 0;
+  int present = 0;
+  int absent = 0;
+  int late = 0;
+  late Future<AttendanceSummary> fetchData;
+  String isSelectedSection = 'All';
+  int currentPage = 0;
+  int studentsPerPage = 10;
   TextEditingController searchInDashboardController = TextEditingController();
+  List<StudentAttendance> listTemp = [];
+  List<StudentAttendance> studentAttendance = [];
+  List<StudentAttendance> presentAttendance = [];
+  List<StudentAttendance> absentAttendance = [];
+  List<StudentAttendance> lateAttendance = [];
+  List<StudentAttendance> searchResult = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+    Future.delayed(Duration.zero, () {
+      var socketServerProvider =
+          Provider.of<SocketServerProvider>(context, listen: false);
+      socketServerProvider.connectToSocketServer('5202111_09_t000');
+      socketServerProvider.getAttendanceDetail();
+      socketServerProvider.attendanceStream.listen((data) {
+        updateData(data);
+      });
+    });
+    print('InitState-----as');
+  }
+
+  // void _fetchData() async {
+  //   // _dataLoaded = true;
+  //   fetchData = API().getAttendanceSummary();
+  //   fetchData.then((attendanceSummary) {
+  //     studentAttendance = attendanceSummary.data;
+  //     listTemp = attendanceSummary.data;
+  //     absentAttendance =
+  //         studentAttendance.where((element) => element.result == 0).toList();
+  //     lateAttendance =
+  //         studentAttendance.where((element) => element.result == 0.5).toList();
+  //     presentAttendance =
+  //         studentAttendance.where((element) => element.result == 1).toList();
+  //     all = attendanceSummary.all;
+  //     present = attendanceSummary.present;
+  //     absent = attendanceSummary.absent;
+  //     late = attendanceSummary.late;
+  //   });
+  // }
+
+  void _fetchData() async {
+    fetchData = API().getAttendanceSummary();
+    final attendanceSummary = await fetchData;
+    setState(() {
+      studentAttendance = attendanceSummary.data;
+      listTemp = attendanceSummary.data;
+      absentAttendance =
+          studentAttendance.where((element) => element.result == 0).toList();
+      lateAttendance =
+          studentAttendance.where((element) => element.result == 0.5).toList();
+      presentAttendance =
+          studentAttendance.where((element) => element.result == 1).toList();
+      all = attendanceSummary.all;
+      present = attendanceSummary.present;
+      absent = attendanceSummary.absent;
+      late = attendanceSummary.late;
+    });
+  }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  // }
+
+  void updateData(dynamic data) {
+    String studentID = data['studentDetail'];
+    for (int i = 0; i < studentAttendance.length; i++) {
+      if (studentID.contains(studentAttendance[i].studentDetail)) {
+        if (data['result'].toString() == '1') {
+          setState(() {
+            absent = absent - 1;
+            present = present + 1;
+            studentAttendance[i].result = data['result'];
+            presentAttendance.add(studentAttendance[i]);
+            absentAttendance.remove(studentAttendance[i]);
+          });
+        } else if (data['result'].toString() == '0.5') {
+          setState(() {
+            late = late + 1;
+            absent = absent - 1;
+            studentAttendance[i].result = data['result'];
+            lateAttendance.add(studentAttendance[i]);
+            absentAttendance.remove(studentAttendance[i]);
+          });
+        }
+      }
+    }
+  }
+
+  void newAllListData() {
+    setState(() {
+      isSelectedSection = 'All';
+      listTemp = studentAttendance;
+      currentPage = 0;
+    });
+  }
+
+  void newPresentListData() {
+    setState(() {
+      isSelectedSection = 'Present';
+      listTemp = presentAttendance;
+      currentPage = 0;
+    });
+  }
+
+  void newLateListData() {
+    setState(() {
+      isSelectedSection = 'Late';
+      listTemp = lateAttendance;
+      currentPage = 0;
+    });
+  }
+
+  void newAbsentListData() {
+    setState(() {
+      isSelectedSection = 'Absent';
+      listTemp = absentAttendance;
+      currentPage = 0;
+    });
+  }
+
+  void newSetStateTable(String title) {
+    if (title == 'All' || title.contains('All')) {
+      newAllListData();
+    } else if (title == 'Present' || title.contains(('Present'))) {
+      newPresentListData();
+    } else if (title == 'Late' || title.contains('Late')) {
+      newLateListData();
+    } else if (title == 'Absent' || title.contains('Absent')) {
+      newAbsentListData();
+    } else {
+      newAllListData();
+    }
+  }
+
+  void searchTextChanged(String query) {
+    searchResult.clear();
+    if (query.isEmpty) {
+      setState(() {
+        listTemp = listDataSearch(isSelectedSection);
+      });
+      return;
+    }
+    List<StudentAttendance> temp = listDataSearch(isSelectedSection);
+    for (var element in temp) {
+      if (element.studentDetail.contains(query) ||
+          element.studentDetail.toLowerCase().trim() ==
+              query.toLowerCase().trim()) {
+        searchResult.add(element);
+      }
+    }
+    print('----SearchResult: $searchResult');
+    setState(() {
+      listTemp = searchResult;
+    });
+  }
+
+  List<StudentAttendance> listDataSearch(String section) {
+    if (section == 'All') {
+      return studentAttendance;
+    } else if (section == 'Present') {
+      return presentAttendance;
+    } else if (section == 'Absent') {
+      return absentAttendance;
+    } else if (section == 'Late') {
+      return lateAttendance;
+    } else {
+      return studentAttendance;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,10 +228,14 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  customBoxInformation('All', 'assets/icons/student.png'),
-                  customBoxInformation('Present', 'assets/icons/present.png'),
-                  customBoxInformation('Absent', 'assets/icons/absent.png'),
-                  customBoxInformation('Late', 'assets/icons/pending.png'),
+                  customBoxInformation('All', 'assets/icons/student.png', all,
+                      newSetStateTable, isSelectedSection),
+                  customBoxInformation('Present', 'assets/icons/present.png',
+                      present, newSetStateTable, isSelectedSection),
+                  customBoxInformation('Absent', 'assets/icons/absent.png',
+                      absent, newSetStateTable, isSelectedSection),
+                  customBoxInformation('Late', 'assets/icons/pending.png', late,
+                      newSetStateTable, isSelectedSection),
                 ],
               ),
             ),
@@ -64,7 +254,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                     width: 20,
                   ),
                   Container(
-                    width: 450,
+                    width: 650,
                     height: 40,
                     decoration: BoxDecoration(
                         boxShadow: [
@@ -79,6 +269,9 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(5))),
                     child: TextFormField(
+                      onChanged: (value) {
+                        searchTextChanged(value);
+                      },
                       readOnly: false,
                       controller: searchInDashboardController,
                       keyboardType: TextInputType.text,
@@ -108,369 +301,503 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                           )),
                     ),
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  customWeek('Previous'),
-                  customWeek('Week 8'),
-                  customWeek('Next'),
                 ],
               ),
             ),
             const SizedBox(
               height: 10,
             ),
-            Container(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 380,
-              child: SingleChildScrollView(
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1), // Adjust the values as needed
-                    1: FlexColumnWidth(2),
-                    2: FlexColumnWidth(3),
-                    3: FlexColumnWidth(2),
-                    4: FlexColumnWidth(2),
-                    5: FlexColumnWidth(1),
-                    6: FlexColumnWidth(2),
-                    7: FlexColumnWidth(3),
-                  },
-                  border: TableBorder.all(color: AppColors.secondaryText),
-                  children: [
-                    TableRow(
+            listTemp.isNotEmpty
+                ? Container(
+                    width: MediaQuery.of(context).size.width - 250,
+                    height: 380,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'STT',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            padding: const EdgeInsets.all(5),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'StudentID',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'Name',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'Status',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'Time',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'Edit',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            color: const Color(0xff1770f0).withOpacity(0.21),
-                            child: const Center(
-                              child: CustomText(
-                                  message: 'Note',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
+                        tableAttendance(listTemp), // Truyen listData vao
+                        const SizedBox(height: 20),
+                        showPage(listTemp),
                       ],
                     ),
-                    for (var data in TestAttendanceDetail.getData())
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white,
-                              child: Center(
-                                child: CustomText(
-                                    message: '${data.number}',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.white,
-                              padding: const EdgeInsets.all(5),
-                              child: Center(
-                                child: CustomText(
-                                    message: data.studentID,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white,
-                              child: Center(
-                                child: CustomText(
-                                    message: data.nameStudent,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: chooseColor(data.status),
-                              child: Center(
-                                child: CustomText(
-                                    message: data.status,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white,
-                              child: Center(
-                                child: CustomText(
-                                    message: data.timeAttendance,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white,
-                              child: Center(
-                                child: InkWell(
-                                  mouseCursor: SystemMouseCursors.click,
-                                  onTap: () {
-                                    setState(() {});
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (builder) =>
-                                    //             EditAttendanceDetail()));
-                                  },
-                                  child: Text('Edit',
-                                      style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryButton,
-                                          decorationColor:
-                                              AppColors.primaryButton,
-                                          decoration:
-                                              TextDecoration.underline)),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.white,
-                              child: Center(
-                                child: CustomText(
-                                    message: data.note,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ],
+                  )
+                : Center(
+                    child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 50,
                       ),
-                  ],
-                ),
-              ),
-            )
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: Opacity(
+                          opacity: 0.3,
+                          child: Image.asset('assets/images/nodata.png'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomText(
+                          message: 'No Student Record',
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.primaryText.withOpacity(0.3))
+                    ],
+                  )),
           ],
         ),
       ),
     );
   }
-}
 
-Color chooseColor(String status) {
-  if (status == 'Present' || status.contains('Present')) {
-    return Colors.green;
-  } else if ((status == 'Absent' || status.contains('Absent'))) {
-    return AppColors.importantText;
-  } else if ((status == 'Late' || status.contains('Late'))) {
-    return const Color.fromARGB(245, 237, 167, 81);
-  }
-  return AppColors.importantText;
-}
-
-Widget customBoxInformation(String title, String imagePath) {
-  return InkWell(
-    onTap: () {},
-    mouseCursor: SystemMouseCursors.click,
-    child: Container(
-      width: 200,
-      height: 90,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          boxShadow: [
-            BoxShadow(
-                color: AppColors.secondaryText,
-                blurRadius: 2,
-                offset: Offset(0, 2))
-          ]),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Table tableAttendance(List<StudentAttendance> studentAttendance) {
+    int startIndex = currentPage * studentsPerPage;
+    int endIndex =
+        min((currentPage + 1) * studentsPerPage, studentAttendance.length);
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(2),
+        2: FlexColumnWidth(3),
+        3: FlexColumnWidth(2),
+        4: FlexColumnWidth(2),
+        5: FlexColumnWidth(1),
+        6: FlexColumnWidth(2),
+        7: FlexColumnWidth(3),
+      },
+      border: TableBorder.all(color: AppColors.secondaryText),
+      children: [
+        TableRow(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomText(
-                    message: title,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.colorInformation),
-                const CustomText(
-                    message: '0',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.colorNumberInformation),
-                const CustomText(
-                    message: 'Student',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.secondaryText)
-              ],
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'STT',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
             ),
-            Image.asset(
-              imagePath,
-              width: 60,
-              height: 60,
-            )
+            TableCell(
+              child: Container(
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                padding: const EdgeInsets.all(5),
+                child: const Center(
+                  child: CustomText(
+                      message: 'StudentID',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'Name',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'Status',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'Time',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'Edit',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                color: const Color(0xff1770f0).withOpacity(0.21),
+                child: const Center(
+                  child: CustomText(
+                      message: 'Note',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-    ),
-  );
-}
+        for (int i = startIndex; i < endIndex; i++)
+          TableRow(
+            children: [
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: CustomText(
+                        message: '${i + 1}',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(5),
+                  child: Center(
+                    child: CustomText(
+                        message: studentAttendance[i].studentDetail,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: CustomText(
+                        message: studentAttendance[i].studentDetail,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: chooseColor(
+                      getResult(studentAttendance[i].result.toString())),
+                  child: Center(
+                    child: CustomText(
+                        message:
+                            getResult(studentAttendance[i].result.toString()),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: CustomText(
+                        message:
+                            formatTime(studentAttendance[i].dateAttendanced),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: InkWell(
+                      mouseCursor: SystemMouseCursors.click,
+                      onTap: () {
+                        setState(() {});
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (builder) =>
+                        //             EditAttendanceDetail()));
+                      },
+                      child: const Text('Edit',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryButton,
+                              decorationColor: AppColors.primaryButton,
+                              decoration: TextDecoration.underline)),
+                    ),
+                  ),
+                ),
+              ),
+              TableCell(
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  color: Colors.white,
+                  child: Center(
+                    child: CustomText(
+                        message: studentAttendance[i].note,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
 
-Widget customWeek(String nameButton) {
-  return InkWell(
-    onTap: () {},
-    mouseCursor: SystemMouseCursors.click,
-    child: Container(
-      width: 80,
-      height: 35,
-      decoration: BoxDecoration(
-          color: nameButton.contains('Week')
-              ? const Color(0xff2d71b1)
-              : Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(5)),
-          border: Border.all(
-            width: 0.5,
-            color: Colors.black.withOpacity(0.2),
-          )),
-      child: Center(
-        child: CustomText(
-            message: nameButton,
+  Widget showPage(List<StudentAttendance> studentAttendance) {
+    int startIndex = currentPage * studentsPerPage;
+    int endIndex = (currentPage + 1) * studentsPerPage;
+    if (endIndex > studentAttendance.length) {
+      endIndex = studentAttendance.length;
+    }
+
+    return Row(
+      children: [
+        CustomText(
+          message:
+              'Show ${startIndex + 1} - $endIndex of ${studentAttendance.length} results',
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.primaryText,
+        ),
+        const SizedBox(width: 10),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+              currentPage > 0 ? Colors.white : Colors.white,
+            ),
+          ),
+          onPressed: currentPage > 0
+              ? () {
+                  setState(() {
+                    currentPage--;
+                  });
+                }
+              : null,
+          child: Text(
+            'Previous',
+            style: TextStyle(
+              fontSize: 12,
+              color: currentPage > 0 ? const Color(0xff2d71b1) : Colors.grey,
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        CustomText(
+            message:
+                '${currentPage + 1}/${(studentAttendance.length / studentsPerPage).ceil()}',
             fontSize: 12,
             fontWeight: FontWeight.normal,
+            color: AppColors.primaryText),
+        const SizedBox(width: 10),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+              currentPage <
+                      (studentAttendance.length / studentsPerPage).ceil() - 1
+                  ? Colors.white
+                  : Colors.white,
+            ),
+          ),
+          onPressed: currentPage <
+                  (studentAttendance.length / studentsPerPage).ceil() - 1
+              ? () {
+                  setState(() {
+                    currentPage++;
+                  });
+                }
+              : null,
+          child: Text(
+            'Next',
+            style: TextStyle(
+              fontSize: 12,
+              color: currentPage <
+                      (studentAttendance.length / studentsPerPage).ceil() - 1
+                  ? const Color(0xff2d71b1)
+                  : Colors.grey,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color chooseColor(String status) {
+    if (status == 'Present' || status.contains('Present')) {
+      return Colors.green;
+    } else if ((status == 'Absent' || status.contains('Absent'))) {
+      return AppColors.importantText;
+    } else if ((status == 'Late' || status.contains('Late'))) {
+      return const Color.fromARGB(245, 237, 167, 81);
+    }
+    return AppColors.importantText;
+  }
+
+  String getResult(String result) {
+    if (result == '1') {
+      return 'Present';
+    } else if (result == '0.5') {
+      return 'Late';
+    } else {
+      return 'Absent';
+    }
+  }
+
+  Widget customBoxInformation(String title, String imagePath, int count,
+      Function(String title) function, String isSelectedSection) {
+    return InkWell(
+      onTap: () {
+        function(title);
+      },
+      mouseCursor: SystemMouseCursors.click,
+      child: Container(
+        width: 200,
+        height: 91,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            boxShadow: const [
+              BoxShadow(
+                  color: AppColors.secondaryText,
+                  blurRadius: 2,
+                  offset: Offset(0, 2))
+            ],
+            border: Border.all(
+                color: title == isSelectedSection
+                    ? AppColors.primaryButton
+                    : Colors.white)),
+        child: Padding(
+          padding:
+              const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomText(
+                      message: title,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.colorInformation),
+                  CustomText(
+                      message: '$count',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.colorNumberInformation),
+                  const CustomText(
+                      message: 'Student',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.secondaryText)
+                ],
+              ),
+              Image.asset(
+                imagePath,
+                width: 60,
+                height: 60,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
+  }
+
+  Widget customWeek(String nameButton) {
+    return InkWell(
+      onTap: () {},
+      mouseCursor: SystemMouseCursors.click,
+      child: Container(
+        width: 80,
+        height: 35,
+        decoration: BoxDecoration(
             color: nameButton.contains('Week')
-                ? Colors.white
-                : AppColors.primaryText),
+                ? const Color(0xff2d71b1)
+                : Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            border: Border.all(
+              width: 0.5,
+              color: Colors.black.withOpacity(0.2),
+            )),
+        child: Center(
+          child: CustomText(
+              message: nameButton,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              color: nameButton.contains('Week')
+                  ? Colors.white
+                  : AppColors.primaryText),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget customButtonDashBoard(String nameButton) {
-  return InkWell(
-    onTap: () {},
-    mouseCursor: SystemMouseCursors.click,
-    child: Container(
-      width: 80,
-      height: 40,
-      decoration: BoxDecoration(
-          color:
-              nameButton == 'Export' ? const Color(0xff2d71b1) : Colors.white,
-          border: Border.all(
-            width: 0.5,
-            color: Colors.black.withOpacity(0.2),
-          )),
-      child: Center(
-        child: CustomText(
-            message: nameButton,
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
+  Widget customButtonDashBoard(String nameButton) {
+    return InkWell(
+      onTap: () {},
+      mouseCursor: SystemMouseCursors.click,
+      child: Container(
+        width: 80,
+        height: 40,
+        decoration: BoxDecoration(
             color:
-                nameButton == 'Export' ? Colors.white : AppColors.primaryText),
+                nameButton == 'Export' ? const Color(0xff2d71b1) : Colors.white,
+            border: Border.all(
+              width: 0.5,
+              color: Colors.black.withOpacity(0.2),
+            )),
+        child: Center(
+          child: CustomText(
+              message: nameButton,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              color: nameButton == 'Export'
+                  ? Colors.white
+                  : AppColors.primaryText),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

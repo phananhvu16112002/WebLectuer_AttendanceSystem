@@ -1,10 +1,9 @@
-import 'package:weblectuer_attendancesystem_nodejs/models/AttendanceDetail.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Student.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceDetail.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Student.dart';
 
 class StudentClasses {
   Student student;
   List<AttendanceDetail> attendanceDetail;
-
   String status;
 
   StudentClasses(

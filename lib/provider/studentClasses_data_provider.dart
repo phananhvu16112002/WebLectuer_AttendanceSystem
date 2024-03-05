@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/StudentClasses.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
 
 class StudentClassesDataProvider with ChangeNotifier {
   List<StudentClasses> _studentClassesList = [];

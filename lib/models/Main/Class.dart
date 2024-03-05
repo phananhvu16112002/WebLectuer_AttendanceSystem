@@ -1,5 +1,5 @@
-import 'package:weblectuer_attendancesystem_nodejs/models/Course.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Teacher.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Course.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Teacher.dart';
 
 class Class {
   final String classID;
