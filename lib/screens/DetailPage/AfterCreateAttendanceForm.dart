@@ -34,6 +34,10 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
     var tempData = {
       "formID": data.formID,
       "classID": data.classes,
+      "startTime": data.startTime,
+      "endTime": data.endTime,
+      "dateOpen": data.dateOpen,
+      "typeAttendanced": data.typeAttendance
     };
     if (data.formID.isNotEmpty) {
       qrcode = jsonEncode(tempData);
