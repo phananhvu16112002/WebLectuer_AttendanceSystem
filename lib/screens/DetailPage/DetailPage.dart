@@ -185,6 +185,7 @@ class _DetailPageState extends State<DetailPage> {
     print('----SearchResult: $searchResult');
     setState(() {
       listTemp = searchResult;
+      //currentPage = 0; nen kiem tra lai
     });
   }
 
@@ -911,9 +912,26 @@ class _DetailPageState extends State<DetailPage> {
                         const SizedBox(
                           width: 20,
                         ),
-                        customWeek('Previous'),
-                        customWeek('Week 8'),
-                        customWeek('Next'),
+                        CustomButton(
+                            buttonName: 'View Attendance',
+                            backgroundColorButton: const Color(0xff2d71b1),
+                            borderColor: Colors.transparent,
+                            textColor: Colors.white,
+                            function: () {
+                              setState(() {
+                                checkViewAttendance = true;
+                                checkHome = false;
+                                checkNotification = false;
+                                checkReport = false;
+                                checkForm = false;
+                                checkAttendanceForm = false;
+                              });
+                            },
+                            height: 50,
+                            width: 150,
+                            fontSize: 12,
+                            colorShadow: Colors.white,
+                            borderRadius: 8)
                       ],
                     ),
                   ),

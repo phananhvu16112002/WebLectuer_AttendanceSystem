@@ -184,6 +184,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     print('----SearchResult: $searchResult');
     setState(() {
       listTemp = searchResult;
+      //currentPage = 0; nen kiem tra lai
     });
   }
 

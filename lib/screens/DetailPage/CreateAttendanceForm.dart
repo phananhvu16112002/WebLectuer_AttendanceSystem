@@ -203,8 +203,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             CustomText(
                 message: 'Class',
                 fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryText.withOpacity(0.7)),
+                fontWeight: FontWeight.normal,
+                color: AppColors.primaryText),
             const SizedBox(
               height: 5,
             ),
@@ -223,8 +223,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             CustomText(
                 message: 'Type',
                 fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryText.withOpacity(0.7)),
+                fontWeight: FontWeight.normal,
+                color: AppColors.primaryText),
             const SizedBox(
               height: 5,
             ),
@@ -273,8 +273,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             CustomText(
                 message: 'Date',
                 fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryText.withOpacity(0.7)),
+                fontWeight: FontWeight.normal,
+                color: AppColors.primaryText),
             const SizedBox(height: 5),
             customTextField(
                 560,
@@ -291,8 +291,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             CustomText(
                 message: 'Distance: ${radius.ceil()}m',
                 fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryText.withOpacity(0.7)),
+                fontWeight: FontWeight.normal,
+                color: AppColors.primaryText),
             const SizedBox(height: 5),
             Slider(
                 thumbColor: AppColors.primaryButton.withOpacity(0.5),
@@ -317,8 +317,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                     CustomText(
                         message: "Start Time ",
                         fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.primaryText.withOpacity(0.7)),
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primaryText),
                     const SizedBox(
                       height: 5,
                     ),
@@ -348,8 +348,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                     CustomText(
                         message: "End Time ",
                         fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.primaryText.withOpacity(0.7)),
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primaryText),
                     const SizedBox(
                       height: 5,
                     ),
@@ -379,8 +379,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 CustomText(
                     message: 'Push Notification to everyone',
                     fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.primaryText.withOpacity(0.7)),
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.primaryText),
                 const SizedBox(
                   width: 10,
                 ),
