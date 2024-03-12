@@ -4,6 +4,7 @@ import 'package:otp_text_field/style.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -14,6 +15,7 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _SignInPageState extends State<ForgotPasswordPage> {
   TextEditingController emailController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String textDesciption =
       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged';
@@ -133,27 +135,33 @@ class _SignInPageState extends State<ForgotPasswordPage> {
                                 ),
                                 Center(
                                   child: Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const CustomText(
-                                            message: 'Email',
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryText),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        customTextFormField(
-                                            emailController,
-                                            TextInputType.emailAddress,
-                                            'Enter your email',
-                                            IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(null)),
-                                            const Icon(null)),
-                                      ],
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const CustomText(
+                                              message: 'Email',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.primaryText),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          customTextFormField(
+                                              emailController,
+                                              TextInputType.emailAddress,
+                                              'Enter your email',
+                                              IconButton(
+                                                  onPressed: () {},
+                                                  icon: const Icon(null)),
+                                              validateTextField,
+                                              Icon(Icons.email_outlined,
+                                                  color: AppColors.primaryText
+                                                      .withOpacity(0.5))),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -167,7 +175,14 @@ class _SignInPageState extends State<ForgotPasswordPage> {
                                           AppColors.primaryButton,
                                       borderColor: Colors.white,
                                       textColor: Colors.white,
-                                      function: () {},
+                                      function: () {
+                                        if(_formKey.currentState!.validate()){
+                                          print('sucessfully');
+                                        }
+                                        else {
+                                          print('failed');
+                                        }
+                                      },
                                       height: 50,
                                       width: 200,
                                       fontSize: 15,
@@ -188,11 +203,17 @@ class _SignInPageState extends State<ForgotPasswordPage> {
                                     InkWell(
                                       onTap: () {},
                                       mouseCursor: SystemMouseCursors.click,
-                                      child: const CustomText(
-                                          message: 'Login',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.importantText),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => SignInPage()));
+                                        },
+                                        mouseCursor: SystemMouseCursors.click,
+                                        child: const CustomText(
+                                            message: 'Login',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.importantText),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -206,11 +227,19 @@ class _SignInPageState extends State<ForgotPasswordPage> {
                 ))));
   }
 
+  String? validateTextField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Field cannot be empty';
+    }
+    return null;
+  }
+
   Container customTextFormField(
       TextEditingController controller,
       TextInputType textInputType,
       String labelText,
       IconButton suffixIcon,
+      String? Function(String?)? validator,
       Icon prefixIcon) {
     return Container(
       width: 400,
@@ -219,6 +248,7 @@ class _SignInPageState extends State<ForgotPasswordPage> {
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: TextFormField(
+        validator: validator,
         readOnly: false,
         controller: controller,
         keyboardType: textInputType,
