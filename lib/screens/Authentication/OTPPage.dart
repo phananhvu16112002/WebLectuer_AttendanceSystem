@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'dart:html' as html;
 
 class OTPPage extends StatefulWidget {
   const OTPPage({super.key});
@@ -16,11 +19,45 @@ class _SignInPageState extends State<OTPPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   OtpFieldController otpFieldController = OtpFieldController();
+  int secondsRemaining = 60; // Initial value for 1 minute
+  bool canResend = false;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsRemaining > 0) {
+        setState(() {
+          secondsRemaining--;
+        });
+      } else {
+        setState(() {
+          canResend = true;
+        });
+        timer.cancel();
+      }
+    });
+  }
 
   String textDesciption =
       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged';
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _timer.cancel();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    html.window.history.pushState({}, 'OTP', 'OTP');
+
     return Scaffold(
         backgroundColor: const Color(0xffced9e9),
         body: Center(
@@ -182,10 +219,17 @@ class _SignInPageState extends State<OTPPage> {
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.primaryText),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        if (canResend) {
+                                          // Start the countdown timer
+                                          startTimer();
+                                        }
+                                      },
                                       mouseCursor: SystemMouseCursors.click,
-                                      child: const CustomText(
-                                          message: 'Re-send',
+                                      child: CustomText(
+                                          message: canResend
+                                              ? "Re-send"
+                                              : "Resend in $secondsRemaining seconds",
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.importantText),

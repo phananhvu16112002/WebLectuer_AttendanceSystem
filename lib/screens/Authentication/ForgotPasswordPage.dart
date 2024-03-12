@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:otp_text_field/otp_text_field.dart';
-import 'package:otp_text_field/style.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'dart:html' as html;
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -19,6 +18,8 @@ class _SignInPageState extends State<ForgotPasswordPage> {
       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged';
   @override
   Widget build(BuildContext context) {
+    html.window.history.pushState({}, 'ForgotPassword', 'ForgotPassword');
+
     return Scaffold(
         backgroundColor: const Color(0xffced9e9),
         body: Center(
