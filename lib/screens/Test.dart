@@ -20,7 +20,7 @@ class _TestAppState extends State<TestApp> {
     return Scaffold(
         body: Center(
       child: FutureBuilder(
-          future: API().getStudentClassAttendanceDetail(),
+          future: API(context).getStudentClassAttendanceDetail(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data != null) {}

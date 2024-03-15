@@ -7,10 +7,6 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassData.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/StudentData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
@@ -21,19 +17,16 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
-class DetailPage extends StatefulWidget {
-  const DetailPage({
+class DetailPageTest extends StatefulWidget {
+  const DetailPageTest({
     super.key,
-    required this.classes,
   });
 
-  final Class classes;
-
   @override
-  State<DetailPage> createState() => _DetailPageState();
+  State<DetailPageTest> createState() => _DetailPageState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _DetailPageState extends State<DetailPageTest> {
   TextEditingController searchController = TextEditingController();
   bool checkHome = true;
   bool checkNotification = false;
@@ -46,12 +39,12 @@ class _DetailPageState extends State<DetailPage> {
   bool formCreated = false;
   bool isCollapsedOpen = true;
   ScrollController scrollController = ScrollController();
-  List<StudentData> passListData = [];
-  List<StudentData> banListData = [];
-  List<StudentData> warningListData = [];
-  List<StudentData> listData = [];
-  List<StudentData> listTemp = [];
-  List<StudentData> searchResult = [];
+  List<StudentClasses> passListData = [];
+  List<StudentClasses> banListData = [];
+  List<StudentClasses> warningListData = [];
+  List<StudentClasses> listData = [];
+  List<StudentClasses> listTemp = [];
+  List<StudentClasses> searchResult = [];
   String isSelectedSection = 'All';
 
   int numberAllStudent = 0;
@@ -63,8 +56,7 @@ class _DetailPageState extends State<DetailPage> {
   int itemsRecent = 0;
   int lengthList = 0;
 
-  late Future<ClassModel?> fetchData;
-  late Class classes;
+  late Future<AttendanceDetailResponseStudent> fetchData;
 
   void toggleDrawer() {
     setState(() {
@@ -81,22 +73,20 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    classes = widget.classes;
     _fetchData();
     print('InitState-----');
   }
 
   void _fetchData() async {
-    fetchData = API(context).getStudentsWithAllAttendanceDetails(
-        classes.classID); // get Student from class
+    fetchData = API(context).getStudentClassAttendanceDetail(); // get Student from class
     fetchData.then((value) {
       setState(() {
-        listData = value!.data;
+        listData = value.data;
         listTemp = value.data;
-        numberAllStudent = value.classData.total;
-        numberPassStudent = value.classData.pass;
-        numberBanStudent = value.classData.ban;
-        numberWarningStudent = value.classData.warning;
+        numberAllStudent = value.stats.all;
+        numberPassStudent = value.stats.pass;
+        numberBanStudent = value.stats.ban;
+        numberWarningStudent = value.stats.warning;
       });
     });
     print('FetchData-----');
@@ -180,14 +170,14 @@ class _DetailPageState extends State<DetailPage> {
       });
       return;
     }
-    List<StudentData> temp = listDataSearch(isSelectedSection);
+    List<StudentClasses> temp = listDataSearch(isSelectedSection);
     for (var element in temp) {
-      if (element.studentName.contains(query) ||
-          element.studentName.toLowerCase().trim() ==
+      if (element.student.studentName.contains(query) ||
+          element.student.studentName.toLowerCase().trim() ==
               query.toLowerCase().trim() ||
-          element.studentID.toLowerCase().trim() ==
+          element.student.studentID.toLowerCase().trim() ==
               query.toLowerCase().trim() ||
-          element.studentID.contains(query)) {
+          element.student.studentID.contains(query)) {
         searchResult.add(element);
       }
     }
@@ -198,7 +188,7 @@ class _DetailPageState extends State<DetailPage> {
     });
   }
 
-  List<StudentData> listDataSearch(String section) {
+  List<StudentClasses> listDataSearch(String section) {
     if (section == 'All') {
       return listData;
     } else if (section == 'Pass') {
@@ -223,7 +213,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     final studentClassesDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
-    int numberOfWeeks = classes.course.totalWeeks; // course through provider
+    int numberOfWeeks = 20; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
       const FixedColumnWidth(80),
@@ -584,7 +574,7 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       dynamic listColumnWidth,
       StudentClassesDataProvider studentClassesDataProvider,
-      List<StudentData> listData,
+      List<StudentClasses> listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
       String isSelectedSection) {
@@ -627,7 +617,7 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       dynamic listColumnWidth,
       StudentClassesDataProvider studentClassesDataProvider,
-      List<StudentData>? listData,
+      List<StudentClasses>? listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
       String isSelectedSection) {
@@ -956,12 +946,12 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget tableStudent(
-      listColumnWidth, int numberOfWeeks, List<StudentData> listData) {
+      listColumnWidth, int numberOfWeeks, List<StudentClasses> listData) {
     final students = List.generate(
       listData.length,
       (index) => {
-        'studentID': ' ${listData[index].studentID}',
-        'name': ' ${listData[index].studentName}',
+        'studentID': ' ${listData[index].student.studentID}',
+        'name': ' ${listData[index].student.studentName}',
       },
     );
     List<Map<String, String>> getPaginatedStudents() {
@@ -1134,7 +1124,7 @@ class _DetailPageState extends State<DetailPage> {
   Expanded tableCheckAttendance(
     int numberOfWeeks,
     List<Map<String, String>> paginatedStudents,
-    List<StudentData> listData,
+    List<StudentClasses> listData,
   ) {
     return Expanded(
       child: SingleChildScrollView(
@@ -1145,7 +1135,7 @@ class _DetailPageState extends State<DetailPage> {
             border: TableBorder.all(color: Colors.grey),
             columnWidths: {
               for (int i = 0; i < numberOfWeeks; i++)
-                i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
+                i: FixedColumnWidth(numberOfWeeks <= 13 ? 30 : 60),
             },
             children: [
               TableRow(
@@ -1158,9 +1148,9 @@ class _DetailPageState extends State<DetailPage> {
                       child: Center(
                         child: Tooltip(
                           message: (j < listData.length &&
-                                  j < listData[j].attendancedetails.length)
+                                  j < listData[j].attendanceDetail.length)
                               ? formatDate(listData[j]
-                                  .attendancedetails[j]
+                                  .attendanceDetail[j]
                                   .dateAttendanced
                                   .toString())
                               : '',
@@ -1188,9 +1178,9 @@ class _DetailPageState extends State<DetailPage> {
                         color: Colors.white,
                         child: Center(
                           child: Text(
-                            j < listData[i].attendancedetails.length
+                            j < listData[i].attendanceDetail.length
                                 ? getResult(
-                                    listData[i].attendancedetails[j].result)
+                                    listData[i].attendanceDetail[j].result)
                                 : '',
                             style: const TextStyle(
                               fontSize: 11,

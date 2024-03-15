@@ -25,7 +25,7 @@ class _RealtimeCheckAttendanceState extends State<TestRealTimeCheck> {
   void initState() {
     super.initState();
 
-    fetchData = API().getAttendanceSummary();
+    fetchData = API(context).getAttendanceSummary();
     fetchData.then((attendanceSummary) {
       all = attendanceSummary.all;
       present = attendanceSummary.present;

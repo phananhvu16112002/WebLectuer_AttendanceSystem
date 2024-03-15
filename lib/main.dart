@@ -10,7 +10,7 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPageTest.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 void main() {
@@ -49,6 +49,6 @@ class _MyAppState extends State<MyApp> {
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: true,
         ),
-        home: const SignInPage());
+        home: const WelcomePage());
   }
 }

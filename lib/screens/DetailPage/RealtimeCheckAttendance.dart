@@ -71,7 +71,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   // }
 
   void _fetchData() async {
-    fetchData = API().getAttendanceSummary();
+    fetchData = API(context).getAttendanceSummary();
     final attendanceSummary = await fetchData;
     setState(() {
       studentAttendance = attendanceSummary.data;

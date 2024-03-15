@@ -409,7 +409,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                     bool check = checkDuplicateTime();
                     if (check) {
                       print('Longtitude: $longtitude');
-                      AttendanceForm? attendanceForm = await API()
+                      AttendanceForm? attendanceForm = await API(context)
                           .createFormAttendance(
                               '5202111_09_t000',
                               formatTimeOfDate(timeStart!).toString(),

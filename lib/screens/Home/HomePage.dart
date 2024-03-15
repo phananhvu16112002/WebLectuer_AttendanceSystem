@@ -9,6 +9,7 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPageTest.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
@@ -611,7 +612,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
               child: FutureBuilder(
-                future: API().getClassForTeacher('222h333'),
+                future: API(context).getClassForTeacher(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data != null) {
@@ -636,8 +637,9 @@ class _HomePageState extends State<HomePage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (builder) =>
-                                            const DetailPage()));
+                                        builder: (builder) => DetailPage(
+                                              classes: data,
+                                            )));
                               },
                               mouseCursor: SystemMouseCursors.click,
                               child: Container(
