@@ -7,6 +7,8 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.d
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
@@ -15,6 +17,8 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassP
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'dart:html' as html;
+
+import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -31,10 +35,12 @@ class _HomePageState extends State<HomePage> {
   bool checkRepository = false;
   bool checkCalendar = false;
   bool checkSettings = false;
+  final storage = SecureStorage();
 
   OverlayEntry? overlayEntry;
 
   bool isCollapsedOpen = true;
+  late String name;
 
   void toggleDrawer() {
     setState(() {
@@ -42,12 +48,36 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _loadToken() async {
+    String? loadToken = await storage.readSecureData('accessToken');
+    String? refreshToken1 = await storage.readSecureData('refreshToken');
+    if (loadToken.isEmpty ||
+        refreshToken1.isEmpty ||
+        loadToken.contains('No Data Found') ||
+        refreshToken1.contains('No Data Found')) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const WelcomePage()),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadToken();
+  }
+
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<ClassDataProvider>(context, listen: false);
+    final teacherDataProvider =
+        Provider.of<TeacherDataProvider>(context, listen: false);
     return Scaffold(
-      appBar: appBar(),
+      appBar: appBar(teacherDataProvider),
       body: SingleChildScrollView(
         child: Row(
           children: [
@@ -189,7 +219,7 @@ class _HomePageState extends State<HomePage> {
         child: icon);
   }
 
-  PreferredSizeWidget appBar() {
+  PreferredSizeWidget appBar(TeacherDataProvider teacherDataProvider) {
     return AppBar(
       backgroundColor: AppColors.colorHeader,
       flexibleSpace: Padding(
@@ -262,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   child: Container(
-                    child: const Row(
+                    child: Row(
                       children: [
                         CircleAvatar(
                           backgroundColor: Colors.transparent,
@@ -273,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                           width: 5,
                         ),
                         CustomText(
-                            message: 'Anh Vu',
+                            message: teacherDataProvider.userData.teacherName,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textName)

@@ -9,17 +9,18 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/CreateNewPasswordPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/Authentication.dart';
 
-class OTPPage extends StatefulWidget {
-  const OTPPage({super.key});
+class ForgotPasswordOTP extends StatefulWidget {
+  const ForgotPasswordOTP({super.key});
 
   @override
-  State<OTPPage> createState() => _OTPPageState();
+  State<ForgotPasswordOTP> createState() => _ForgotPasswordOTPState();
 }
 
-class _OTPPageState extends State<OTPPage> {
+class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   OtpFieldController otpFieldController = OtpFieldController();
@@ -32,6 +33,7 @@ class _OTPPageState extends State<OTPPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    startTimer();
     _progressDialog = ProgressDialog(context,
         customBody: Container(
           width: 200,
@@ -59,7 +61,6 @@ class _OTPPageState extends State<OTPPage> {
             ],
           )),
         ));
-    startTimer();
   }
 
   void startTimer() {
@@ -75,14 +76,6 @@ class _OTPPageState extends State<OTPPage> {
         timer.cancel();
       }
     });
-  }
-
-  void restartTimer() {
-    setState(() {
-      secondsRemaining = 10;
-      canResend = false;
-    });
-    startTimer(); // Start the timer again
   }
 
   String textDesciption =
@@ -143,7 +136,7 @@ class _OTPPageState extends State<OTPPage> {
                           ),
                           Center(
                             child: Image.asset(
-                              'assets/images/OTPPage.png',
+                              'assets/images/forgotPassword.png',
                               width: 300,
                               height: 300,
                             ),
@@ -244,9 +237,8 @@ class _OTPPageState extends State<OTPPage> {
                                       borderColor: Colors.white,
                                       textColor: Colors.white,
                                       function: () async {
-                                        // _progressDialog.show();
                                         String checkOTP = await Authenticate()
-                                            .verifyOTP(
+                                            .verifyForgotPassword(
                                                 teacherDataProvider
                                                     .userData.teacherEmail,
                                                 teacherDataProvider
@@ -258,7 +250,7 @@ class _OTPPageState extends State<OTPPage> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
-                                                  const SignInPage(),
+                                                  const CreateNewPasswordPage(),
                                               transitionDuration:
                                                   const Duration(
                                                       milliseconds: 1000),
@@ -312,24 +304,31 @@ class _OTPPageState extends State<OTPPage> {
                                     InkWell(
                                       onTap: () async {
                                         if (canResend) {
-                                          bool check = await Authenticate()
-                                              .resendOTP(teacherDataProvider
-                                                  .userData.teacherEmail);
-                                          if (check) {
-                                            if (mounted) {
-                                              restartTimer();
-                                              _showDialog(
-                                                  context,
-                                                  'OTP has been resent to email',
-                                                  'Success');
-                                            }
-                                          } else {
-                                            if (mounted) {
-                                              _showDialog(context,
-                                                  'Failed resend OTP', 'Error');
-                                            }
-                                          }
                                           // Start the countdown timer
+                                          print('alo alo');
+                                          _progressDialog.show();
+                                          bool check = await Authenticate()
+                                              .resendOTPForgotPassword(
+                                                  teacherDataProvider
+                                                      .userData.teacherEmail);
+                                          if (check) {
+                                            print('sucess');
+                                            // ignore: use_build_context_synchronously
+                                            await _showDialog(
+                                                context,
+                                                'OTP has been sent your email',
+                                                'Success');
+                                          } else {
+                                            print('failed');
+                                            // ignore: use_build_context_synchronously
+                                            await _showDialog(
+                                                context,
+                                                'Failed to resend OTP',
+                                                'Error');
+                                          }
+
+                                          restartTimer();
+                                          await _progressDialog.hide();
                                         }
                                       },
                                       mouseCursor: SystemMouseCursors.click,
@@ -351,35 +350,6 @@ class _OTPPageState extends State<OTPPage> {
                     )
                   ],
                 ))));
-  }
-
-  Future<dynamic> _showDialog(
-      BuildContext context, String errorMessage, String title) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text(title),
-            content: Text(
-              errorMessage,
-            ),
-            actions: <Widget>[
-              TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge,
-                ),
-                child: const Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // if (errorMessage == 'OTP has been resent to email') {
-                  //   restartTimer();
-                  // }
-                },
-              ),
-            ],
-          );
-        });
   }
 
   Container customTextFormField(
@@ -421,5 +391,42 @@ class _OTPPageState extends State<OTPPage> {
             )),
       ),
     );
+  }
+
+  Future<dynamic> _showDialog(
+      BuildContext context, String errorMessage, String title) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text(title),
+            content: Text(
+              errorMessage,
+            ),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // if (errorMessage == 'OTP has been resent to email') {
+                  //   restartTimer();
+                  // }
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void restartTimer() {
+    setState(() {
+      secondsRemaining = 10;
+      canResend = false;
+    });
+    startTimer(); // Start the timer again
   }
 }

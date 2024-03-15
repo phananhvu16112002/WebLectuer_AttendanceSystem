@@ -1,9 +1,9 @@
 class Teacher {
-  final String teacherID;
-  final String teacherName;
+  String teacherID;
+  String teacherName;
   final String teacherHashedPassword;
-  final String teacherEmail;
-  final String teacherHashedOTP;
+  String teacherEmail;
+  String teacherHashedOTP;
   final String timeToLiveOTP;
   final String accessToken;
   final String refreshToken;

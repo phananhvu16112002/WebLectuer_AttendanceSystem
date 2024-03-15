@@ -56,7 +56,7 @@ class API {
       double latitude,
       double longtitude,
       double radius) async {
-    const url = 'http://localhost:8080/api/teacher/createAttendanceForm';
+    const url = 'http://localhost:8080/api/teacher/form/submit';
     var request = {
       'classID': classID,
       'startTime': startTime,
