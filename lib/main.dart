@@ -3,6 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Course.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Teacher.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
@@ -10,11 +13,10 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPageTest.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 
 void main() {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
@@ -22,7 +24,6 @@ void main() {
     ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
     ChangeNotifierProvider(create: (_) => ClassDataProvider()),
     ChangeNotifierProvider(create: (_) => TeacherDataProvider())
-
   ], child: const MyApp()));
 }
 
@@ -49,6 +50,6 @@ class _MyAppState extends State<MyApp> {
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: true,
         ),
-        home: const WelcomePage());
+        home: SignInPage());
   }
 }

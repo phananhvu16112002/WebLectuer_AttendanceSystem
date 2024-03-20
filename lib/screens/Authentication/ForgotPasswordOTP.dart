@@ -10,7 +10,6 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/CreateNewPasswordPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/Authentication.dart';
 
 class ForgotPasswordOTP extends StatefulWidget {

@@ -37,7 +37,7 @@ class GetLocation {
     return position;
   }
 
-  Future<String?> getAddressFromLatLong(Position position) async {
+  Future<String> getAddressFromLatLong(Position position) async {
     try {
       String apiurl =
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=AIzaSyAj53xWW9TWMq2obphJulyMKZjQlKapcYI";
@@ -46,7 +46,7 @@ class GetLocation {
         Map data = json.decode(response.body);
         if (data['status'] == 'OK') {
           Map firstResult = data['results'][0];
-          address = firstResult['formatted_address'];
+          var address = firstResult['formatted_address'];
           return address;
         }
       } else {
@@ -55,7 +55,7 @@ class GetLocation {
     } catch (e) {
       print(e);
     }
-    return null;
+    return '';
   }
 
   String processAddress(String address) {

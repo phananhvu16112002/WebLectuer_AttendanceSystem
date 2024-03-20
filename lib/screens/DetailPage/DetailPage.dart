@@ -6,12 +6,12 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/StudentData.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
@@ -27,7 +27,7 @@ class DetailPage extends StatefulWidget {
     required this.classes,
   });
 
-  final Class classes;
+  final Class? classes;
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -81,9 +81,13 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    classes = widget.classes;
+    classes = widget.classes!;
     _fetchData();
-    print('InitState-----');
+    Future.delayed(Duration.zero, () {
+      var socketServerProvider =
+          Provider.of<SocketServerProvider>(context, listen: false);
+      socketServerProvider.connectToSocketServer(classes.classID);
+    });
   }
 
   void _fetchData() async {
@@ -212,17 +216,14 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   // TODO: implement didChangeDependencies
-  //   super.didChangeDependencies();
-  //   print('OnDidChangeDependencies');
-  // }
-
   @override
   Widget build(BuildContext context) {
     final studentClassesDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
+    final attendanceFormProvider =
+        Provider.of<AttendanceFormDataProvider>(context, listen: false);
     int numberOfWeeks = classes.course.totalWeeks; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
@@ -234,7 +235,7 @@ class _DetailPageState extends State<DetailPage> {
     }
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: appBar(),
+      appBar: appBar(socketServerProvider),
       body: SingleChildScrollView(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,6 +250,7 @@ class _DetailPageState extends State<DetailPage> {
                   numberOfWeeks,
                   listColumnWidths,
                   studentClassesDataProvider,
+                  attendanceFormProvider,
                   listTemp,
                   searchTextChanged,
                   newSetStateTable,
@@ -261,9 +263,9 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   //AppBar-------------------------------------------
-  PreferredSizeWidget appBar() {
+  PreferredSizeWidget appBar(SocketServerProvider socketServerProvider) {
     return AppBar(
-      leading: null,
+      leading: const Icon(null),
       backgroundColor: AppColors.colorHeader,
       flexibleSpace: Padding(
         padding:
@@ -274,7 +276,10 @@ class _DetailPageState extends State<DetailPage> {
             Row(
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    socketServerProvider.disconnectSocketServer();
+                    Navigator.pop(context);
+                  },
                   mouseCursor: SystemMouseCursors.click,
                   child: Image.asset(
                     'assets/images/logo.png',
@@ -584,6 +589,7 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       dynamic listColumnWidth,
       StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormDataProvider,
       List<StudentData> listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
@@ -593,26 +599,36 @@ class _DetailPageState extends State<DetailPage> {
           numberOfWeeks,
           listColumnWidth,
           studentClassesDataProvider,
+          attendanceFormDataProvider,
           listData,
           functionSearch,
           newSetStateTable,
           isSelectedSection);
+
       // return EditAttendanceDetail();
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
       return const ReportPage();
     } else if (checkForm) {
-      return const FormPage();
+      return FormPage(
+        classes: classes,
+      );
     } else if (checkAttendanceForm) {
-      return const CreateAttendanceFormPage();
+      return CreateAttendanceFormPage(
+        classes: classes,
+      );
     } else if (checkViewAttendance) {
-      return const RealtimeCheckAttendance();
+      // return RealtimeCheckAttendance(
+      //   attendanceForm: null,
+      // );
+      return Container();
     } else {
       return containerHome(
           numberOfWeeks,
           listColumnWidth,
           studentClassesDataProvider,
+          attendanceFormDataProvider,
           listData,
           functionSearch,
           newSetStateTable,
@@ -627,6 +643,7 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       dynamic listColumnWidth,
       StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormDataProvider,
       List<StudentData>? listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
@@ -768,14 +785,22 @@ class _DetailPageState extends State<DetailPage> {
                             borderColor: Colors.transparent,
                             textColor: Colors.white,
                             function: () {
-                              setState(() {
-                                checkViewAttendance = true;
-                                checkHome = false;
-                                checkNotification = false;
-                                checkReport = false;
-                                checkForm = false;
-                                checkAttendanceForm = false;
-                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          RealtimeCheckAttendance(
+                                              formID:
+                                                  listData
+                                                      .last
+                                                      .attendancedetails
+                                                      .last
+                                                      .attendanceForm,
+                                              classes: listData
+                                                  .last
+                                                  .attendancedetails
+                                                  .last
+                                                  .classDetail)));
                             },
                             height: 50,
                             width: 150,
@@ -928,14 +953,22 @@ class _DetailPageState extends State<DetailPage> {
                             borderColor: Colors.transparent,
                             textColor: Colors.white,
                             function: () {
-                              setState(() {
-                                checkViewAttendance = true;
-                                checkHome = false;
-                                checkNotification = false;
-                                checkReport = false;
-                                checkForm = false;
-                                checkAttendanceForm = false;
-                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          RealtimeCheckAttendance(
+                                            formID: listData
+                                                .last
+                                                .attendancedetails
+                                                .last
+                                                .attendanceForm,
+                                            classes: listData
+                                                .last
+                                                .attendancedetails
+                                                .last
+                                                .classDetail,
+                                          )));
                             },
                             height: 50,
                             width: 150,
@@ -1157,19 +1190,24 @@ class _DetailPageState extends State<DetailPage> {
                       color: Colors.grey.withOpacity(0.21),
                       child: Center(
                         child: Tooltip(
-                          message: (j < listData.length &&
-                                  j < listData[j].attendancedetails.length)
-                              ? formatDate(listData[j]
-                                  .attendancedetails[j]
-                                  .dateAttendanced
-                                  .toString())
-                              : '',
-                          child: Text(
-                            'Day ${j + 1}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          // message: (j < listData.length)
+                          //     ? formatDate(listData[j]
+                          //         .attendancedetails[j]
+                          //         .createdAt
+                          //         .toString())
+                          //     : '',
+                          message: '',
+                          child: InkWell(
+                            onTap:
+                                () {}, // Navigator to view realtime check attendance through Day.
+                            mouseCursor: SystemMouseCursors.click,
+                            child: Text(
+                              'Day ${j + 1}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -1211,9 +1249,12 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   String formatDate(String date) {
-    DateTime serverDateTime = DateTime.parse(date).toLocal();
-    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
-    return formattedDate;
+    if (date != '') {
+      DateTime serverDateTime = DateTime.parse(date!).toLocal();
+      String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+      return formattedDate;
+    }
+    return '';
   }
 
   String formatTime(String time) {
@@ -1222,7 +1263,7 @@ class _DetailPageState extends State<DetailPage> {
     return formattedTime;
   }
 
-  String getResult(int result) {
+  String getResult(double result) {
     if (result == 0) {
       return 'Absent';
     } else if (result.toString() == 0.5.toString()) {
@@ -1467,263 +1508,3 @@ Widget customBoxInformation(String title, String imagePath, int count,
     ),
   );
 }
-
-
-  // Widget containerHome(
-  //     int numberOfWeeks,
-  //     dynamic listColumnWidth,
-  //     StudentClassesDataProvider studentClassesDataProvider,
-  //     List<StudentClasses>? listData,
-  //     Function(String querySearch) functionSearch,
-  //     Function(String title) newSetStateTable) {
-  //   return listData!.isNotEmpty
-  //       ? Container(
-  //           width: MediaQuery.of(context).size.width - 250,
-  //           height: MediaQuery.of(context).size.height,
-  //           child: Padding(
-  //             padding: const EdgeInsets.only(left: 20, right: 20),
-  //             child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   const SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   const CustomText(
-  //                       message: 'Dashboard',
-  //                       fontSize: 25,
-  //                       fontWeight: FontWeight.w800,
-  //                       color: AppColors.primaryText),
-  //                   const SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   SizedBox(
-  //                     width: MediaQuery.of(context).size.width - 250,
-  //                     height: 130,
-  //                     child: Row(
-  //                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //                       children: [
-  //                         customBoxInformation(
-  //                             'All',
-  //                             'assets/icons/student.png',
-  //                             numberAllStudent,
-  //                             newSetStateTable),
-  //                         customBoxInformation(
-  //                             'Pass',
-  //                             'assets/icons/present.png',
-  //                             numberPassStudent,
-  //                             newSetStateTable),
-  //                         customBoxInformation('Ban', 'assets/icons/absent.png',
-  //                             numberBanStudent, newSetStateTable),
-  //                         customBoxInformation(
-  //                             'Warning',
-  //                             'assets/icons/pending.png',
-  //                             numberWarningStudent,
-  //                             newSetStateTable),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 20,
-  //                   ),
-  //                   Container(
-  //                     width: MediaQuery.of(context).size.width - 250,
-  //                     height: 40,
-  //                     child: Row(
-  //                       children: [
-  //                         customButtonDashBoard('Export'),
-  //                         customButtonDashBoard('PDF'),
-  //                         customButtonDashBoard('Excel'),
-  //                         const SizedBox(
-  //                           width: 20,
-  //                         ),
-  //                         Container(
-  //                           width: 450,
-  //                           height: 40,
-  //                           decoration: BoxDecoration(
-  //                               boxShadow: [
-  //                                 BoxShadow(
-  //                                     color: Colors.black.withOpacity(0.1),
-  //                                     blurRadius: 4,
-  //                                     offset: const Offset(0, 2))
-  //                               ],
-  //                               border: Border.all(
-  //                                   color: const Color.fromRGBO(0, 0, 0, 1)
-  //                                       .withOpacity(0.2),
-  //                                   width: 0.5),
-  //                               color: Colors.white,
-  //                               borderRadius:
-  //                                   const BorderRadius.all(Radius.circular(5))),
-  //                           child: TextFormField(
-  //                             onChanged: (value) {
-  //                               functionSearch(value);
-  //                             },
-  //                             readOnly: false,
-  //                             controller: searchInDashboardController,
-  //                             keyboardType: TextInputType.text,
-  //                             style: const TextStyle(
-  //                                 color: AppColors.primaryText,
-  //                                 fontWeight: FontWeight.normal,
-  //                                 fontSize: 15),
-  //                             obscureText: false,
-  //                             decoration: InputDecoration(
-  //                                 contentPadding: const EdgeInsets.all(20),
-  //                                 suffixIcon: Icon(
-  //                                   Icons.search,
-  //                                   color: Colors.black.withOpacity(0.5),
-  //                                 ),
-  //                                 hintText: 'Search Student',
-  //                                 hintStyle: const TextStyle(
-  //                                     fontSize: 12,
-  //                                     color: Color.fromARGB(73, 0, 0, 0)),
-  //                                 enabledBorder: const OutlineInputBorder(
-  //                                     borderRadius:
-  //                                         BorderRadius.all(Radius.circular(5)),
-  //                                     borderSide: BorderSide(
-  //                                         width: 1, color: Colors.transparent)),
-  //                                 focusedBorder: const OutlineInputBorder(
-  //                                   borderRadius:
-  //                                       BorderRadius.all(Radius.circular(5)),
-  //                                   borderSide: BorderSide(
-  //                                       width: 1,
-  //                                       color: AppColors.primaryButton),
-  //                                 )),
-  //                           ),
-  //                         ),
-  //                         const SizedBox(
-  //                           width: 20,
-  //                         ),
-  //                         customWeek('Previous'),
-  //                         customWeek('Week 8'),
-  //                         customWeek('Next'),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   tableStudent(listColumnWidth, numberOfWeeks, listData)
-  //                 ]),
-  //           ))
-  //       : Container(
-  //           width: MediaQuery.of(context).size.width - 250,
-  //           height: MediaQuery.of(context).size.height,
-  //           child: Padding(
-  //             padding: const EdgeInsets.only(left: 20, right: 20),
-  //             child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   const SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   const CustomText(
-  //                       message: 'Dashboard',
-  //                       fontSize: 25,
-  //                       fontWeight: FontWeight.w800,
-  //                       color: AppColors.primaryText),
-  //                   const SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   SizedBox(
-  //                     width: MediaQuery.of(context).size.width - 250,
-  //                     height: 130,
-  //                     child: Row(
-  //                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //                       children: [
-  //                         customBoxInformation(
-  //                             'All',
-  //                             'assets/icons/student.png',
-  //                             numberAllStudent,
-  //                             newSetStateTable),
-  //                         customBoxInformation(
-  //                             'Pass',
-  //                             'assets/icons/present.png',
-  //                             numberPassStudent,
-  //                             newSetStateTable),
-  //                         customBoxInformation('Ban', 'assets/icons/absent.png',
-  //                             numberBanStudent, newSetStateTable),
-  //                         customBoxInformation(
-  //                             'Warning',
-  //                             'assets/icons/pending.png',
-  //                             numberWarningStudent,
-  //                             newSetStateTable),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 20,
-  //                   ),
-  //                   Center(child: Text('Data is not available'))
-  //                 ]),
-  //           ));
-  // }
-
-
-
-  
-  // Expanded tableCheckAttendance(
-  //     int numberOfWeeks,
-  //     List<Map<String, String>> paginatedStudents,
-  //     List<StudentClasses> listData) {
-  //   return Expanded(
-  //     child: SingleChildScrollView(
-  //       scrollDirection: Axis.horizontal,
-  //       child: Container(
-  //         height: 350,
-  //         child: Table(
-  //           border: TableBorder.all(color: Colors.grey),
-  //           columnWidths: {
-  //             for (int i = 0; i < numberOfWeeks; i++)
-  //               i: FixedColumnWidth(numberOfWeeks <= 13 ? 30 : 60),
-  //           },
-  //           children: [
-  //             TableRow(children: [
-  //               for (int j = 0; j < numberOfWeeks; j++)
-  //                 TableCell(
-  //                   child: Container(
-  //                     padding: const EdgeInsets.all(5),
-  //                     color: Colors.grey.withOpacity(0.21),
-  //                     child: Center(
-  //                       child: Tooltip(
-  //                         message: 'null',
-  //                         child: Text(
-  //                           'Day ${j + 1}',
-  //                           style: const TextStyle(
-  //                             fontSize: 11,
-  //                             fontWeight: FontWeight.bold,
-  //                             color: Colors.black,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //             ]),
-  //             for (int i = 0; i < paginatedStudents.length; i++)
-  //               TableRow(children: [
-  //                 for (int j = 0; j < numberOfWeeks; j++)
-  //                   TableCell(
-  //                     child: Container(
-  //                       padding: const EdgeInsets.all(5),
-  //                       color: Colors.white,
-  //                       child: Center(
-  //                         child: Text(
-  //                           j < listData[i].attendanceDetail.length
-  //                               ? getResult(
-  //                                   listData[i].attendanceDetail[j].result)
-  //                               : '',
-  //                           style: const TextStyle(
-  //                             fontSize: 11,
-  //                             fontWeight: FontWeight.normal,
-  //                             color: Colors.black,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //               ]),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }

@@ -503,7 +503,7 @@ class _SignInPageState extends State<RegisterPage> {
       Icon prefixIcon) {
     return Container(
       width: 420,
-      height: 50,
+      // height: 50,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -519,7 +519,10 @@ class _SignInPageState extends State<RegisterPage> {
             fontSize: 15),
         obscureText: obscureText,
         decoration: InputDecoration(
-            border: InputBorder.none,
+             border: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                borderSide:
+                    BorderSide(width: 1, color: Colors.black.withOpacity(0.2))),
             contentPadding: const EdgeInsets.all(20),
             suffixIcon: suffixIcon,
             prefixIcon: prefixIcon,

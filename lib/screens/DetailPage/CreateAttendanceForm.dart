@@ -7,6 +7,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
@@ -14,7 +15,8 @@ import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/GetLocation.dart';
 
 class CreateAttendanceFormPage extends StatefulWidget {
-  const CreateAttendanceFormPage({super.key});
+  const CreateAttendanceFormPage({super.key, required this.classes});
+  final Class classes;
 
   @override
   State<CreateAttendanceFormPage> createState() =>
@@ -47,19 +49,20 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   int selectedIndex = 0;
   bool isStartTimeSelected = false;
   bool isEndTimeSelected = false;
+  late Class classes;
 
   void getLocation() async {
     Position position = await GetLocation().determinePosition();
-    String? tempAddress = await GetLocation().getAddressFromLatLong(position);
+    String tempAddress = await GetLocation().getAddressFromLatLong(position);
 
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
-      myLocation = tempAddress!;
+      // myLocation = tempAddress!; //API expired;
       latitude = position.latitude;
       longtitude = position.longitude;
       print('Latitude: ${position.latitude}');
       print('Longtitude: ${position.longitude}');
-      print('Address:$myLocation');
+      print('Address:$tempAddress');
     });
   }
 
@@ -143,12 +146,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      var socketServerProvider =
-          Provider.of<SocketServerProvider>(context, listen: false);
-      socketServerProvider.connectToSocketServer('5202111_09_t000');
-    });
     getLocation();
+    classes = widget.classes;
   }
 
   @override
@@ -200,7 +199,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             const SizedBox(
               height: 5,
             ),
-            CustomText(
+            const CustomText(
                 message: 'Class',
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
@@ -215,12 +214,12 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 typeAttendanceController,
                 TextInputType.none,
                 IconButton(onPressed: () {}, icon: const Icon(null)),
-                'Cross-platform Programming,Tuesday ,Shift: 3, Room: A0401',
+                '${classes.course.courseName},${classes.teacher.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
                 false),
             const SizedBox(
               height: 5,
             ),
-            CustomText(
+            const CustomText(
                 message: 'Type',
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
@@ -270,7 +269,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
               ),
             ),
             const SizedBox(height: 5),
-            CustomText(
+            const CustomText(
                 message: 'Date',
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
@@ -314,7 +313,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    const CustomText(
                         message: "Start Time ",
                         fontSize: 15,
                         fontWeight: FontWeight.normal,
@@ -345,7 +344,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    const CustomText(
                         message: "End Time ",
                         fontSize: 15,
                         fontWeight: FontWeight.normal,
@@ -376,7 +375,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             ),
             Row(
               children: [
-                CustomText(
+                const CustomText(
                     message: 'Push Notification to everyone',
                     fontSize: 15,
                     fontWeight: FontWeight.normal,
@@ -411,7 +410,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                       print('Longtitude: $longtitude');
                       AttendanceForm? attendanceForm = await API(context)
                           .createFormAttendance(
-                              '5202111_09_t000',
+                              classes.classID,
                               formatTimeOfDate(timeStart!).toString(),
                               formatTimeOfDate(timeEnd!).toString(),
                               selectedIndex,
@@ -419,12 +418,11 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                               latitude,
                               longtitude,
                               radius);
-                      List<AttendanceForm> temp = [];
-                      temp.add(attendanceForm!);
 
                       final currentContext = context;
                       Future.delayed(Duration.zero, () {
-                        attendanceFormDataProvider.setAttendanceFormData(temp);
+                        attendanceFormDataProvider
+                            .setAttendanceFormData(attendanceForm!);
                         socketServerProvider.sendAttendanceForm(attendanceForm);
                       });
                       //QR View have properties data so add data from provider and display QR Code on screen
@@ -436,8 +434,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                                       attendanceForm: attendanceForm,
                                     )));
                       }
-
-                      print('Success');
                     } else {
                       showDialog(
                         context: context,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
@@ -8,6 +9,8 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.d
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 class AfterCreateAttendanceForm extends StatefulWidget {
@@ -47,6 +50,8 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
   @override
   Widget build(BuildContext context) {
     print('String QRCODE: $qrcode');
+    final socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
@@ -322,10 +327,13 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                     borderColor: AppColors.primaryButton,
                                     textColor: AppColors.primaryButton,
                                     function: () {
+                                      socketServerProvider
+                                          .disconnectSocketServer();
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (builder) => HomePage()),
+                                              builder: (builder) =>
+                                                  const HomePage()),
                                           (route) => false);
                                     },
                                     height: 40,
@@ -342,7 +350,16 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                         AppColors.primaryButton,
                                     borderColor: Colors.transparent,
                                     textColor: Colors.white,
-                                    function: () {},
+                                    function: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (builder) =>
+                                                  RealtimeCheckAttendance(
+                                                    formID: widget.attendanceForm!.formID,
+                                                    classes: widget.attendanceForm!.classes,
+                                                  )));
+                                    },
                                     height: 40,
                                     width: 300,
                                     fontSize: 15,
@@ -383,8 +400,10 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (builder) => HomePage()));
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => const HomePage()));
                     },
                     mouseCursor: SystemMouseCursors.click,
                     child: Image.asset(

@@ -78,7 +78,8 @@ class _DetailPageState extends State<DetailPageTest> {
   }
 
   void _fetchData() async {
-    fetchData = API(context).getStudentClassAttendanceDetail(); // get Student from class
+    fetchData = API(context)
+        .getStudentClassAttendanceDetail(); // get Student from class
     fetchData.then((value) {
       setState(() {
         listData = value.data;
@@ -593,11 +594,14 @@ class _DetailPageState extends State<DetailPageTest> {
     } else if (checkReport) {
       return const ReportPage();
     } else if (checkForm) {
-      return const FormPage();
+      // return const FormPage();
+      return Container();
     } else if (checkAttendanceForm) {
-      return const CreateAttendanceFormPage();
+      // return const CreateAttendanceFormPage();
+      return Container();
     } else if (checkViewAttendance) {
-      return const RealtimeCheckAttendance();
+      // return const RealtimeCheckAttendance();
+      return Container();
     } else {
       return containerHome(
           numberOfWeeks,

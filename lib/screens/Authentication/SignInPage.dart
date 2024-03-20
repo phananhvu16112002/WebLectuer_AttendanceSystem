@@ -8,7 +8,6 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provide
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/ForgotPasswordPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/RegisterPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/Authentication.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -201,8 +200,7 @@ class _SignInPageState extends State<SignInPage> {
                                         TextInputType.emailAddress,
                                         'Enter your email',
                                         const IconButton(
-                                            onPressed: null,
-                                            icon: Icon(null)),
+                                            onPressed: null, icon: Icon(null)),
                                         Icon(Icons.email_outlined,
                                             color: AppColors.primaryText
                                                 .withOpacity(0.5)),
@@ -311,7 +309,8 @@ class _SignInPageState extends State<SignInPage> {
                                                     .setTeacherName(
                                                         teacherName);
                                                 if (mounted) {
-                                                  await Navigator.pushAndRemoveUntil(
+                                                  await Navigator
+                                                      .pushAndRemoveUntil(
                                                     context,
                                                     PageRouteBuilder(
                                                       pageBuilder: (context,
@@ -353,12 +352,12 @@ class _SignInPageState extends State<SignInPage> {
                                                 }
 
                                                 await _progressDialog.hide();
-                                              }
-                                              else {
-                                                await _showDialog(context, result);
+                                              } else {
+                                                await _showDialog(
+                                                    context, result);
                                                 await _progressDialog.hide();
                                               }
-                                            } 
+                                            }
                                           },
                                           height: 50,
                                           width: 200,
@@ -433,7 +432,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-    Future<dynamic> _showDialog(BuildContext context, String errorMessage) {
+  Future<dynamic> _showDialog(BuildContext context, String errorMessage) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -468,9 +467,9 @@ class _SignInPageState extends State<SignInPage> {
       String? Function(String?)? validator) {
     return Container(
       width: 420,
-      height: 50,
+      // height: ,
       decoration: const BoxDecoration(
-          color: Colors.white,
+          // color: Colors.black, 
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: TextFormField(
         validator: validator,
@@ -489,7 +488,10 @@ class _SignInPageState extends State<SignInPage> {
             labelText: labelText,
             labelStyle: const TextStyle(
                 fontSize: 12, color: Color.fromARGB(73, 0, 0, 0)),
-            border: InputBorder.none,
+            border: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                borderSide:
+                    BorderSide(width: 1, color: Colors.black.withOpacity(0.2))),
             enabledBorder: OutlineInputBorder(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 borderSide:

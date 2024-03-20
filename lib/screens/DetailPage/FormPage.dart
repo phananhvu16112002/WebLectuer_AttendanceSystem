@@ -1,18 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
-
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class FormPage extends StatefulWidget {
-  const FormPage({super.key});
+  const FormPage({super.key, required this.classes});
+  final Class classes;
 
   @override
   State<FormPage> createState() => _RepositoryClassPageState();
 }
 
 class _RepositoryClassPageState extends State<FormPage> {
+  late Class classes;
+  late Future<List<FormData>> _fetchFormData;
+  List<FormData> listData = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    classes = widget.classes;
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    _fetchFormData = API(context).getFormForTeacher(classes.classID);
+    _fetchFormData.then((value) {
+      setState(() {
+        listData = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,16 +68,16 @@ class _RepositoryClassPageState extends State<FormPage> {
                             crossAxisSpacing: 10,
                             childAspectRatio: 1.25,
                             mainAxisSpacing: 10),
-                    itemCount: AttendanceForm.getData().length,
+                    itemCount: listData.length,
                     itemBuilder: (context, index) {
-                      final form = AttendanceForm.getData()[index];
+                      final form = listData[index];
                       return customForm(
                           form.formID,
-                          form.classes,
-                          '5',
-                          'A0503',
+                          form.radius,
+                          form.latitude,
+                          form.longitude,
                           form.dateOpen,
-                          form.typeAttendance,
+                          form.type,
                           form.startTime,
                           form.endTime);
                     })),
@@ -65,9 +90,9 @@ class _RepositoryClassPageState extends State<FormPage> {
 
 Widget customForm(
   String formID,
-  String className,
-  String shift,
-  String room,
+  int radius,
+  double latitude,
+  double longitude,
   String? dateOpen,
   int typeAttendance,
   String? startTime,
@@ -91,20 +116,22 @@ Widget customForm(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(
-                  message: 'FormID: $formID',
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryText),
-              InkWell(
-                  onTap: () {},
-                  mouseCursor: SystemMouseCursors.click,
-                  child: Icon(Icons.more_vert))
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                    width: 280,
+                    child: cusTomText('FormID: $formID', 12, FontWeight.w500,
+                        AppColors.primaryText)),
+                InkWell(
+                    onTap: () {},
+                    mouseCursor: SystemMouseCursors.click,
+                    child: const Icon(Icons.more_vert))
+              ],
+            ),
           ),
           Divider(
             color: AppColors.primaryText.withOpacity(0.2),
@@ -114,7 +141,7 @@ Widget customForm(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomText(
-                  message: 'Class: $className',
+                  message: 'Radius: $radius',
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: AppColors.primaryText),
@@ -122,7 +149,7 @@ Widget customForm(
                 height: 10,
               ),
               CustomText(
-                  message: 'Shift: $shift - Room: $room',
+                  message: 'Latitude: $latitude - Longitude: $longitude',
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: AppColors.primaryText),
@@ -150,15 +177,15 @@ Widget customForm(
               Row(
                 children: [
                   CustomText(
-                      message: 'StartTime: ${startTime!}',
+                      message: 'StartTime: ${formatTime(startTime!)}',
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.primaryText),
                   const SizedBox(
-                    width: 50,
+                    width: 20,
                   ),
                   CustomText(
-                      message: 'EndTime: ${endTime!}',
+                      message: 'EndTime: ${formatTime(endTime!)}',
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.primaryText),
@@ -195,4 +222,27 @@ Widget customForm(
       ),
     ),
   );
+}
+
+String formatDate(String date) {
+  if (date != '') {
+    DateTime serverDateTime = DateTime.parse(date!).toLocal();
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+  return '';
+}
+
+String formatTime(String time) {
+  DateTime serverDateTime = DateTime.parse(time).toLocal();
+  String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+  return formattedTime;
+}
+
+Widget cusTomText(
+    String message, double fontSize, FontWeight fontWeight, Color color) {
+  return Text(message,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.inter(
+          fontSize: fontSize, fontWeight: fontWeight, color: color));
 }

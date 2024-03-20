@@ -9,13 +9,13 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPageTest.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/TestPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'dart:html' as html;
 
@@ -433,7 +433,7 @@ class _HomePageState extends State<HomePage> {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
     } else if (checkReport) {
-      return const ReportPage();
+      return ReportPage();
     } else if (checkRepository) {
       return const RepositoryClassPage();
     } else if (checkCalendar) {

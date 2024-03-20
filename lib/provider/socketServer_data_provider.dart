@@ -51,7 +51,7 @@ class SocketServerProvider with ChangeNotifier {
       "type": attendanceForm.typeAttendance,
       "location": attendanceForm.location,
       "latitude": attendanceForm.latitude,
-      "longtitude": attendanceForm.longtitude,
+      "longitude": attendanceForm.longtitude,
       "radius": attendanceForm.radius
     };
 
@@ -67,14 +67,20 @@ class SocketServerProvider with ChangeNotifier {
 
   void getAttendanceDetail() {
     _socket.on('getTakeAttendance', (data) {
-      var temp = jsonDecode(data);
-      var jsonData = {
-        'studentDetail': temp['studentDetail'],
-        'classDetail': temp['classDetail'],
-        'dateAttendanced': temp['dateAttendanced'],
-        'result': temp['result'],
-      };
-      _attendanceDetailStreamController.add(jsonData);
+      try {
+        print('Data: $data');
+        var temp = jsonDecode(data);
+        print(temp);
+        var jsonData = {
+          'studentDetail': temp['studentDetail'],
+          'classDetail': temp['classDetail'],
+          'dateTimeAttendance': temp['dateTimeAttendance'],
+          'result': temp['result'].toString(),
+        };
+        _attendanceDetailStreamController.add(jsonData);
+      } catch (e) {
+        print('Error: $e');
+      }
     });
   }
 

@@ -4,14 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
+import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceSummary.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class RealtimeCheckAttendance extends StatefulWidget {
-  const RealtimeCheckAttendance({Key? key}) : super(key: key);
+  const RealtimeCheckAttendance(
+      {Key? key, required this.formID, required this.classes})
+      : super(key: key);
+  // final AttendanceForm? attendanceForm;
+  final String formID;
+  final String classes;
 
   @override
   State<RealtimeCheckAttendance> createState() =>
@@ -23,17 +34,18 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   int present = 0;
   int absent = 0;
   int late = 0;
-  late Future<AttendanceSummary> fetchData;
+  late Future<AttendanceModel?> fetchData;
+  TextEditingController searchController = TextEditingController();
   String isSelectedSection = 'All';
   int currentPage = 0;
   int studentsPerPage = 10;
   TextEditingController searchInDashboardController = TextEditingController();
-  List<StudentAttendance> listTemp = [];
-  List<StudentAttendance> studentAttendance = [];
-  List<StudentAttendance> presentAttendance = [];
-  List<StudentAttendance> absentAttendance = [];
-  List<StudentAttendance> lateAttendance = [];
-  List<StudentAttendance> searchResult = [];
+  List<AttendanceData> listTemp = [];
+  List<AttendanceData> studentAttendance = [];
+  List<AttendanceData> presentAttendance = [];
+  List<AttendanceData> absentAttendance = [];
+  List<AttendanceData> lateAttendance = [];
+  List<AttendanceData> searchResult = [];
 
   @override
   void initState() {
@@ -42,75 +54,57 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     Future.delayed(Duration.zero, () {
       var socketServerProvider =
           Provider.of<SocketServerProvider>(context, listen: false);
-      socketServerProvider.connectToSocketServer('5202111_09_t000');
+      socketServerProvider.connectToSocketServer(widget.classes);
       socketServerProvider.getAttendanceDetail();
       socketServerProvider.attendanceStream.listen((data) {
-        updateData(data);
+        if (mounted) {
+          updateData(data);
+        }
       });
     });
     print('InitState-----as');
   }
 
-  // void _fetchData() async {
-  //   // _dataLoaded = true;
-  //   fetchData = API().getAttendanceSummary();
-  //   fetchData.then((attendanceSummary) {
-  //     studentAttendance = attendanceSummary.data;
-  //     listTemp = attendanceSummary.data;
-  //     absentAttendance =
-  //         studentAttendance.where((element) => element.result == 0).toList();
-  //     lateAttendance =
-  //         studentAttendance.where((element) => element.result == 0.5).toList();
-  //     presentAttendance =
-  //         studentAttendance.where((element) => element.result == 1).toList();
-  //     all = attendanceSummary.all;
-  //     present = attendanceSummary.present;
-  //     absent = attendanceSummary.absent;
-  //     late = attendanceSummary.late;
-  //   });
-  // }
-
   void _fetchData() async {
-    fetchData = API(context).getAttendanceSummary();
+    fetchData = API(context).getAttendanceDetailRealtime(widget.formID);
     final attendanceSummary = await fetchData;
     setState(() {
-      studentAttendance = attendanceSummary.data;
+      studentAttendance = attendanceSummary!.data;
+      print('-----${studentAttendance.first.dateAttendanced}');
       listTemp = attendanceSummary.data;
       absentAttendance =
-          studentAttendance.where((element) => element.result == 0).toList();
-      lateAttendance =
-          studentAttendance.where((element) => element.result == 0.5).toList();
+          studentAttendance.where((element) => element.result == '0').toList();
+      lateAttendance = studentAttendance
+          .where((element) => element.result == '0.5')
+          .toList();
       presentAttendance =
-          studentAttendance.where((element) => element.result == 1).toList();
-      all = attendanceSummary.all;
-      present = attendanceSummary.present;
-      absent = attendanceSummary.absent;
-      late = attendanceSummary.late;
+          studentAttendance.where((element) => element.result == '1').toList();
+      all = attendanceSummary.stats.total;
+      present = attendanceSummary.stats.totalPresence;
+      absent = attendanceSummary.stats.totalAbsence;
+      late = attendanceSummary.stats.totalLate;
     });
   }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  // }
 
   void updateData(dynamic data) {
     String studentID = data['studentDetail'];
     for (int i = 0; i < studentAttendance.length; i++) {
-      if (studentID.contains(studentAttendance[i].studentDetail)) {
-        if (data['result'].toString() == '1') {
+      if (studentID.contains(studentAttendance[i].studentID)) {
+        if (data['result'] == '1') {
           setState(() {
             absent = absent - 1;
             present = present + 1;
             studentAttendance[i].result = data['result'];
+            studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
             presentAttendance.add(studentAttendance[i]);
             absentAttendance.remove(studentAttendance[i]);
           });
-        } else if (data['result'].toString() == '0.5') {
+        } else if (data['result'] == '0.5') {
           setState(() {
             late = late + 1;
             absent = absent - 1;
             studentAttendance[i].result = data['result'];
+            studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
             lateAttendance.add(studentAttendance[i]);
             absentAttendance.remove(studentAttendance[i]);
           });
@@ -173,10 +167,10 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
       });
       return;
     }
-    List<StudentAttendance> temp = listDataSearch(isSelectedSection);
+    List<AttendanceData> temp = listDataSearch(isSelectedSection);
     for (var element in temp) {
-      if (element.studentDetail.contains(query) ||
-          element.studentDetail.toLowerCase().trim() ==
+      if (element.studentID.contains(query) ||
+          element.studentID.toLowerCase().trim() ==
               query.toLowerCase().trim()) {
         searchResult.add(element);
       }
@@ -188,7 +182,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     });
   }
 
-  List<StudentAttendance> listDataSearch(String section) {
+  List<AttendanceData> listDataSearch(String section) {
     if (section == 'All') {
       return studentAttendance;
     } else if (section == 'Present') {
@@ -204,155 +198,188 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 250,
-      height: MediaQuery.of(context).size.height,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomText(
-                message: 'Dashboard',
-                fontSize: 25,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 130,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  customBoxInformation('All', 'assets/icons/student.png', all,
-                      newSetStateTable, isSelectedSection),
-                  customBoxInformation('Present', 'assets/icons/present.png',
-                      present, newSetStateTable, isSelectedSection),
-                  customBoxInformation('Absent', 'assets/icons/absent.png',
-                      absent, newSetStateTable, isSelectedSection),
-                  customBoxInformation('Late', 'assets/icons/pending.png', late,
-                      newSetStateTable, isSelectedSection),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width - 250,
-              height: 40,
-              child: Row(
-                children: [
-                  customButtonDashBoard('Export'),
-                  customButtonDashBoard('PDF'),
-                  customButtonDashBoard('Excel'),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Container(
-                    width: 650,
-                    height: 40,
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2))
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      body: SingleChildScrollView(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          header(),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const CustomText(
+                        message: 'Dashboard',
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryText),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 250,
+                      height: 130,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          customBoxInformation(
+                              'All',
+                              'assets/icons/student.png',
+                              all,
+                              newSetStateTable,
+                              isSelectedSection),
+                          customBoxInformation(
+                              'Present',
+                              'assets/icons/present.png',
+                              present,
+                              newSetStateTable,
+                              isSelectedSection),
+                          customBoxInformation(
+                              'Absent',
+                              'assets/icons/absent.png',
+                              absent,
+                              newSetStateTable,
+                              isSelectedSection),
+                          customBoxInformation(
+                              'Late',
+                              'assets/icons/pending.png',
+                              late,
+                              newSetStateTable,
+                              isSelectedSection),
                         ],
-                        border: Border.all(
-                            color: Colors.black.withOpacity(0.2), width: 0.5),
-                        color: Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5))),
-                    child: TextFormField(
-                      onChanged: (value) {
-                        searchTextChanged(value);
-                      },
-                      readOnly: false,
-                      controller: searchInDashboardController,
-                      keyboardType: TextInputType.text,
-                      style: const TextStyle(
-                          color: AppColors.primaryText,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15),
-                      obscureText: false,
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(20),
-                          suffixIcon: Icon(
-                            Icons.search,
-                            color: Colors.black.withOpacity(0.5),
-                          ),
-                          hintText: 'Search Student',
-                          hintStyle: const TextStyle(
-                              fontSize: 12, color: Color.fromARGB(73, 0, 0, 0)),
-                          enabledBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              borderSide: BorderSide(
-                                  width: 1, color: Colors.transparent)),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(
-                                width: 1, color: AppColors.primaryButton),
-                          )),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 250,
+                      height: 40,
+                      child: Row(
+                        children: [
+                          customButtonDashBoard('Export'),
+                          customButtonDashBoard('PDF'),
+                          customButtonDashBoard('Excel'),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            width: 650,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2))
+                                ],
+                                border: Border.all(
+                                    color: Colors.black.withOpacity(0.2),
+                                    width: 0.5),
+                                color: Colors.white,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(5))),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                searchTextChanged(value);
+                              },
+                              readOnly: false,
+                              controller: searchInDashboardController,
+                              keyboardType: TextInputType.text,
+                              style: const TextStyle(
+                                  color: AppColors.primaryText,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 15),
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.all(20),
+                                  suffixIcon: Icon(
+                                    Icons.search,
+                                    color: Colors.black.withOpacity(0.5),
+                                  ),
+                                  hintText: 'Search Student',
+                                  hintStyle: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color.fromARGB(73, 0, 0, 0)),
+                                  enabledBorder: const OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5)),
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.transparent)),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)),
+                                    borderSide: BorderSide(
+                                        width: 1,
+                                        color: AppColors.primaryButton),
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    listTemp.isNotEmpty
+                        ? Container(
+                            width: MediaQuery.of(context).size.width - 250,
+                            height: 380,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                tableAttendance(
+                                    listTemp), // Truyen listData vao
+                                const SizedBox(height: 20),
+                                showPage(listTemp),
+                              ],
+                            ),
+                          )
+                        : Center(
+                            child: Column(
+                            children: [
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              SizedBox(
+                                width: 200,
+                                height: 200,
+                                child: Opacity(
+                                  opacity: 0.3,
+                                  child:
+                                      Image.asset('assets/images/nodata.png'),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              CustomText(
+                                  message: 'No Student Record',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                  color: AppColors.primaryText.withOpacity(0.3))
+                            ],
+                          )),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            listTemp.isNotEmpty
-                ? Container(
-                    width: MediaQuery.of(context).size.width - 250,
-                    height: 380,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        tableAttendance(listTemp), // Truyen listData vao
-                        const SizedBox(height: 20),
-                        showPage(listTemp),
-                      ],
-                    ),
-                  )
-                : Center(
-                    child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      SizedBox(
-                        width: 200,
-                        height: 200,
-                        child: Opacity(
-                          opacity: 0.3,
-                          child: Image.asset('assets/images/nodata.png'),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      CustomText(
-                          message: 'No Student Record',
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.primaryText.withOpacity(0.3))
-                    ],
-                  )),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }
 
-  Table tableAttendance(List<StudentAttendance> studentAttendance) {
+  Table tableAttendance(List<AttendanceData> studentAttendance) {
     int startIndex = currentPage * studentsPerPage;
     int endIndex =
         min((currentPage + 1) * studentsPerPage, studentAttendance.length);
+    print('---${studentAttendance.first.dateAttendanced}');
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1),
@@ -483,7 +510,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                   padding: const EdgeInsets.all(5),
                   child: Center(
                     child: CustomText(
-                        message: studentAttendance[i].studentDetail,
+                        message: studentAttendance[i].studentID,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black),
@@ -496,7 +523,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                   color: Colors.white,
                   child: Center(
                     child: CustomText(
-                        message: studentAttendance[i].studentDetail,
+                        message: studentAttendance[i].studentName,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black),
@@ -524,8 +551,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                   color: Colors.white,
                   child: Center(
                     child: CustomText(
-                        message:
-                            formatTime(studentAttendance[i].dateAttendanced),
+                        message: studentAttendance[i].dateAttendanced,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black),
@@ -577,7 +603,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     );
   }
 
-  Widget showPage(List<StudentAttendance> studentAttendance) {
+  Widget showPage(List<AttendanceData> studentAttendance) {
     int startIndex = currentPage * studentsPerPage;
     int endIndex = (currentPage + 1) * studentsPerPage;
     if (endIndex > studentAttendance.length) {
@@ -741,9 +767,123 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   }
 
   String formatTime(String time) {
-    DateTime serverDateTime = DateTime.parse(time).toLocal();
-    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
-    return formattedTime;
+    if (time != '' && time != null) {
+      DateTime serverDateTime = DateTime.parse(time).toLocal();
+      String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+      return formattedTime;
+    }
+    return '';
+  }
+
+  Widget header() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 50,
+      color: AppColors.colorHeader,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width / 5,
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => const HomePage()));
+                    },
+                    mouseCursor: SystemMouseCursors.click,
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.menu,
+                        size: 25,
+                        color: AppColors.textName,
+                      ))
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                CustomTextField(
+                    controller: searchController,
+                    textInputType: TextInputType.text,
+                    obscureText: false,
+                    suffixIcon: IconButton(
+                        onPressed: () {}, icon: const Icon(Icons.search)),
+                    hintText: 'Search',
+                    prefixIcon: const Icon(null),
+                    readOnly: false),
+                const SizedBox(
+                  width: 60,
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.notifications_none_outlined)),
+                const SizedBox(
+                  width: 10,
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.messenger_outline_sharp)),
+                const SizedBox(
+                  width: 10,
+                ),
+                MouseRegion(
+                  onHover: (event) => showMenu(
+                    color: Colors.white,
+                    context: context,
+                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
+                    items: [
+                      const PopupMenuItem(
+                        child: Text("My Profile"),
+                      ),
+                      const PopupMenuItem(
+                        child: Text("Log Out"),
+                      ),
+                    ],
+                  ),
+                  // onEnter: (event) => _showPopupMenu(context),
+                  // onExit: (event) => _removePopupMenu(),
+                  child: Container(
+                    child: const Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          backgroundImage:
+                              AssetImage('assets/images/avatar.png'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        CustomText(
+                            message: 'Anh Vu',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textName)
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget customWeek(String nameButton) {
