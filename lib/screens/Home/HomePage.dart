@@ -12,8 +12,8 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/Welcom
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPageTest.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/TestPage.dart';
@@ -429,13 +429,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget selectedPage(ClassDataProvider classDataProvider) {
     if (checkHome) {
-      // return containerHome(classDataProvider);
-      return ReportPageTest();
+      return containerHome(classDataProvider);
     } else if (checkNotification) {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
     } else if (checkReport) {
-      return ReportPageTest();
+      return const ReportPage();
     } else if (checkRepository) {
       return const RepositoryClassPage();
     } else if (checkCalendar) {

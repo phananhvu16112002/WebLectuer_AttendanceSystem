@@ -15,6 +15,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCh
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class DetailPageTest extends StatefulWidget {
