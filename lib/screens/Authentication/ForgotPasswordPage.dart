@@ -116,7 +116,7 @@ class _SignInPageState extends State<ForgotPasswordPage> {
                           ),
                           Container(
                             width: MediaQuery.of(context).size.width - 100,
-                            height: 150,
+                            height: 140,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

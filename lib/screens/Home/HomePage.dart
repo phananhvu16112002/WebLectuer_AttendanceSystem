@@ -13,6 +13,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/CalendarPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPageTest.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/TestPage.dart';
@@ -428,12 +429,13 @@ class _HomePageState extends State<HomePage> {
 
   Widget selectedPage(ClassDataProvider classDataProvider) {
     if (checkHome) {
-      return containerHome(classDataProvider);
+      // return containerHome(classDataProvider);
+      return ReportPageTest();
     } else if (checkNotification) {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
     } else if (checkReport) {
-      return ReportPage();
+      return ReportPageTest();
     } else if (checkRepository) {
       return const RepositoryClassPage();
     } else if (checkCalendar) {

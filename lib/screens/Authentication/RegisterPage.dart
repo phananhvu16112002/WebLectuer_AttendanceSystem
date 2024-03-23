@@ -124,7 +124,7 @@ class _SignInPageState extends State<RegisterPage> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width - 100,
-                              height: 150,
+                              height: 140,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -147,11 +147,11 @@ class _SignInPageState extends State<RegisterPage> {
                         ),
                       ),
                       Container(
-                        height: MediaQuery.of(context).size.height - 100,
+                        height: MediaQuery.of(context).size.height - 110,
                         width: 550,
                         child: Center(
                           child: Container(
-                            height: MediaQuery.of(context).size.height - 150,
+                            height: MediaQuery.of(context).size.height - 130,
                             width: 450,
                             decoration: BoxDecoration(
                                 color:
@@ -164,7 +164,7 @@ class _SignInPageState extends State<RegisterPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(
-                                    height: 10,
+                                    height: 0,
                                   ),
                                   const Center(
                                     child: Column(
@@ -383,7 +383,7 @@ class _SignInPageState extends State<RegisterPage> {
                                           }
                                         },
                                         height: 40,
-                                        width: 150,
+                                        width: 145,
                                         fontSize: 13,
                                         colorShadow: Colors.transparent,
                                         borderRadius: 5),

@@ -12,6 +12,7 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassM
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/AttendanceReport.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
@@ -23,7 +24,7 @@ class API {
   Future<String> getAccessToken() async {
     SecureStorage secureStorage = SecureStorage();
     var accessToken = await secureStorage.readSecureData('accessToken');
-    print('alo alo accesss');
+    // print('alo alo accesss');
     return accessToken;
   }
 
@@ -277,12 +278,60 @@ class API {
           return [];
         }
       } else {
-        print('Failed to load data. Status code: ${response.statusCode}');
+        print(
+            'Failed to load reports data. Status code: ${response.statusCode}');
         return [];
       }
     } catch (e) {
       print('Error: $e');
       return [];
+    }
+  }
+
+  Future<HistoryReportDialog?> getDetailHistoryReport(
+      String classID, int historyReports) async {
+    final url =
+        'http://localhost:8080/api/teacher/historyreports/detail/$historyReports/$classID';
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      // print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        HistoryReportDialog data = HistoryReportDialog.fromJson(responseData);
+        print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(url), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            HistoryReportDialog data =
+                HistoryReportDialog.fromJson(responseData);
+
+            // print('Data $data');
+            return data;
+          } else {
+            return null;
+          }
+        } else {
+          print('New Access Token is empty');
+          return null;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 
@@ -435,12 +484,12 @@ class API {
   }
 
   Future<bool> editFeedback(
-      int reportID,String topic ,String message, String confirmStatus) async {
+      int reportID, String topic, String message, String confirmStatus) async {
     final url = 'http://localhost:8080/api/teacher/feedback/edit/$reportID';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
-      'topic':topic,
+      'topic': topic,
       'message': message,
       'confirmStatus': confirmStatus,
     };

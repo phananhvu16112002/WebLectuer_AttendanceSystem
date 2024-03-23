@@ -27,7 +27,7 @@ class Class {
   });
 
   factory Class.fromJson(Map<String, dynamic> json) {
-    print('Class.fromJson: $json');
+    // print('Class.fromJson: $json');
     return Class(
       classID: json['classID'],
       roomNumber: json['roomNumber'] ?? "",

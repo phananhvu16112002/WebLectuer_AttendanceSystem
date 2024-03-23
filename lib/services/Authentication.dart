@@ -62,7 +62,7 @@ class Authenticate {
       var teacherEmail = responseData['teacherEmail'];
       var teacherName = responseData['teacherName'];
 
-      print('--Response Data: $responseData');
+      // print('--Response Data: $responseData');
 
       await SecureStorage().writeSecureData('accessToken', accessToken);
       await SecureStorage().writeSecureData('refreshToken', refreshToken);
@@ -73,7 +73,7 @@ class Authenticate {
     } else {
       // ignore: avoid_print
       final Map<String, dynamic> responseData1 = jsonDecode(response.body);
-      print('Message: ${responseData1['message']}');
+      // print('Message: ${responseData1['message']}');
       return responseData1['message'];
     }
   }

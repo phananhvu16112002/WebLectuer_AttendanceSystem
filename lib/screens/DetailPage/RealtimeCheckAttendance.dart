@@ -551,7 +551,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                   color: Colors.white,
                   child: Center(
                     child: CustomText(
-                        message: studentAttendance[i].dateAttendanced,
+                        message: formatTime(studentAttendance[i].dateAttendanced),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black),

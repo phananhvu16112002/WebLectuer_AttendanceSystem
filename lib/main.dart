@@ -14,6 +14,7 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provide
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Test.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,6 @@ class _MyAppState extends State<MyApp> {
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: true,
         ),
-        home: SignInPage());
+        home: WelcomePage());
   }
 }
