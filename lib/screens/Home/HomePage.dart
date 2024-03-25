@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
@@ -23,7 +24,7 @@ import 'dart:html' as html;
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -296,12 +297,12 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     child: Row(
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           backgroundColor: Colors.transparent,
                           backgroundImage:
                               AssetImage('assets/images/avatar.png'),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         CustomText(
@@ -448,7 +449,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget customClass(String className, String typeClass, String group,
       String subGroup, int shiftNumber, String room, String imgPath) {
-    return Container(
+    return SizedBox(
         width: 380,
         height: 200,
         child: Card(
@@ -457,7 +458,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Stack(
               children: [
-                Container(
+                SizedBox(
                   width: 380,
                   height: 100,
                   child: ClipRRect(
@@ -478,11 +479,11 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomText(
-                                message: className,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                            SizedBox(
+                              width: 265,
+                              child: cusTomText(
+                                  className, 18, FontWeight.bold, Colors.white),
+                            ),
                             const SizedBox(
                               height: 5,
                             ),
@@ -591,8 +592,17 @@ class _HomePageState extends State<HomePage> {
     overlayEntry?.remove();
   }
 
-  Container containerHome(ClassDataProvider classDataProvider) {
-    return Container(
+  Widget cusTomText(
+      String message, double fontSize, FontWeight fontWeight, Color color) {
+    return Text(message,
+        overflow: TextOverflow.ellipsis,
+        maxLines: null,
+        style: GoogleFonts.inter(
+            fontSize: fontSize, fontWeight: fontWeight, color: color));
+  }
+
+  Widget containerHome(ClassDataProvider classDataProvider) {
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
       child: Padding(

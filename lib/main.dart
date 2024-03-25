@@ -51,6 +51,6 @@ class _MyAppState extends State<MyApp> {
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: true,
         ),
-        home: WelcomePage());
+        home: const WelcomePage());
   }
 }

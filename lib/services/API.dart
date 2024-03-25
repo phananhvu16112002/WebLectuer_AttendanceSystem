@@ -9,11 +9,13 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/EditPage/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/AttendanceReport.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 
@@ -187,7 +189,7 @@ class API {
   }
 
   Future<void> uploadFileExcel(File file) async {
-    final URL = 'http://localhost:8080/';
+    const URL = 'http://localhost:8080/';
     var request = http.MultipartRequest('POST', Uri.parse(URL));
     var multipartFile = await http.MultipartFile.fromPath('excel', file.path);
     request.files.add(multipartFile);
@@ -200,7 +202,7 @@ class API {
   }
 
   Future<List<ReportData>> getReports() async {
-    final URL = 'http://localhost:8080/api/teacher/reports'; //10.0.2.2
+    const URL = 'http://localhost:8080/api/teacher/reports'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
@@ -427,7 +429,7 @@ class API {
 
   Future<bool> submitFeedback(
       int reportID, String topic, String message, String status) async {
-    final url = 'http://localhost:8080/api/teacher/feedback/submit';
+    const url = 'http://localhost:8080/api/teacher/feedback/submit';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
@@ -677,44 +679,53 @@ class API {
     }
   }
 
-  // Future<List<Class>> getClassForTeacher(String teacherID) async {
-  //   final url = 'http://localhost:8080/api/teacher/getClasses';
-  //   var request = {'teacherID': teacherID};
-  //   var body = json.encode(request);
-  //   var headers = {
-  //     'Content-type': 'application/json; charset=UTF-8',
-  //     'Accept': 'application/json',
-  //   };
-  //   final response =
-  //       await http.post(Uri.parse(url), headers: headers, body: body);
-  //   try {
-  //     if (response.statusCode == 200) {
-  //       print('Respone.body ${response.body}');
-  //       print('JsonDecode:${jsonDecode(response.body)}');
-  //       List classTeacherList = jsonDecode(response.body);
-  //       List<Class> data = [];
-  //       for (var temp in classTeacherList) {
-  //         if (temp is Map<String, dynamic>) {
-  //           try {
-  //             data.add(Class.fromJson(temp));
-  //           } catch (e) {
-  //             print('Error parsing data: $e');
-  //           }
-  //         } else {
-  //           print('Invalid data type: $temp');
-  //         }
-  //       }
-  //       print('Data ${data}');
-  //       return data;
-  //     } else {
-  //       print('Failed to load data. Status code: ${response.statusCode}');
-  //       return [];
-  //     }
-  //   } catch (e) {
-  //     print('Error: $e');
-  //     return [];
-  //   }
-  // }
+  Future<StudentAttendanceEdit?> getAttendanceDetailStudent(
+      String classID, String studentID, String formID) async {
+    final url =
+        'http://localhost:8080/api/teacher/attendancedetail/$classID/$studentID/$formID';
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      // print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        StudentAttendanceEdit data =
+            StudentAttendanceEdit.fromJson(responseData);
+        print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(url), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            StudentAttendanceEdit data =
+                StudentAttendanceEdit.fromJson(responseData);
+
+            // print('Data $data');
+            return data;
+          } else {
+            return null;
+          }
+        } else {
+          print('New Access Token is empty');
+          return null;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
 
   Future<AttendanceForm?> createFormAttendance(
       String classID,

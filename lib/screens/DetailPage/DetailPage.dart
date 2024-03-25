@@ -14,6 +14,7 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
 
@@ -21,6 +22,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
+import 'package:excel/excel.dart' as excel;
 
 class DetailPage extends StatefulWidget {
   const DetailPage({
@@ -116,7 +118,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void newPassListData() {
-    if (passListData.isEmpty || passListData.length == 0) {
+    if (passListData.isEmpty || passListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Pass') ||
             studentClasses.status == 'Pass') {
@@ -132,7 +134,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void newBanListData() {
-    if (banListData.isEmpty || banListData.length == 0) {
+    if (banListData.isEmpty || banListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Ban') ||
             studentClasses.status == 'Ban') {
@@ -148,7 +150,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void newWarningListData() {
-    if (warningListData.isEmpty || warningListData.length == 0) {
+    if (warningListData.isEmpty || warningListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Warning') ||
             studentClasses.status == 'Warning') {
@@ -602,11 +604,9 @@ class _DetailPageState extends State<DetailPage> {
           studentClassesDataProvider,
           attendanceFormDataProvider,
           listData,
-          functionSearch,
-          newSetStateTable,
+          (querySearch) => null,
+          (title) => null,
           isSelectedSection);
-
-      // return EditAttendanceDetail();
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -620,9 +620,6 @@ class _DetailPageState extends State<DetailPage> {
         classes: classes,
       );
     } else if (checkViewAttendance) {
-      // return RealtimeCheckAttendance(
-      //   attendanceForm: null,
-      // );
       return Container();
     } else {
       return containerHome(
@@ -631,8 +628,8 @@ class _DetailPageState extends State<DetailPage> {
           studentClassesDataProvider,
           attendanceFormDataProvider,
           listData,
-          functionSearch,
-          newSetStateTable,
+          (querySearch) => null,
+          (title) => null,
           isSelectedSection);
     }
   }
@@ -650,7 +647,7 @@ class _DetailPageState extends State<DetailPage> {
       Function(String title) newSetStateTable,
       String isSelectedSection) {
     return listData!.isNotEmpty
-        ? Container(
+        ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -706,15 +703,18 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width - 250,
                     height: 40,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customButtonDashBoard('Export'),
-                        customButtonDashBoard('PDF'),
-                        customButtonDashBoard('Excel'),
+                        customButtonDashBoard('Export', listData,
+                            widget.classes!.course.totalWeeks),
+                        customButtonDashBoard(
+                            'PDF', listData, widget.classes!.course.totalWeeks),
+                        customButtonDashBoard('Excel', listData,
+                            widget.classes!.course.totalWeeks),
                         const SizedBox(
                           width: 20,
                         ),
@@ -819,7 +819,7 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
           )
-        : Container(
+        : SizedBox(
             width: MediaQuery.of(context).size.width - 250,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -875,14 +875,17 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width - 250,
                     height: 40,
                     child: Row(
                       children: [
-                        customButtonDashBoard('Export'),
-                        customButtonDashBoard('PDF'),
-                        customButtonDashBoard('Excel'),
+                        customButtonDashBoard('Export', listData,
+                            widget.classes!.course.totalWeeks),
+                        customButtonDashBoard(
+                            'PDF', listData, widget.classes!.course.totalWeeks),
+                        customButtonDashBoard('Excel', listData,
+                            widget.classes!.course.totalWeeks),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1015,7 +1018,7 @@ class _DetailPageState extends State<DetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        SizedBox(
           width: MediaQuery.of(context).size.width - 100,
           height: 300,
           child: listData.isNotEmpty
@@ -1116,8 +1119,8 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Container tableTotal(List<Map<String, String>> paginatedStudents) {
-    return Container(
+  Widget tableTotal(List<Map<String, String>> paginatedStudents) {
+    return SizedBox(
       width: 100,
       height: 350,
       child: Table(
@@ -1173,7 +1176,7 @@ class _DetailPageState extends State<DetailPage> {
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Container(
+        child: SizedBox(
           height: 350,
           child: Table(
             border: TableBorder.all(color: Colors.grey),
@@ -1226,15 +1229,35 @@ class _DetailPageState extends State<DetailPage> {
                         padding: const EdgeInsets.all(5),
                         color: Colors.white,
                         child: Center(
-                          child: Text(
-                            j < listData[i].attendancedetails.length
-                                ? getResult(
-                                    listData[i].attendancedetails[j].result)
-                                : '',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          EditAttendanceDetail(
+                                            studentID: listData[i].studentID,
+                                            classID: listData[i]
+                                                .attendancedetails[j]
+                                                .classDetail,
+                                            formID: listData[i]
+                                                .attendancedetails[j]
+                                                .attendanceForm,
+                                            studentName:
+                                                listData[i].studentName,
+                                            classes: widget.classes!,
+                                          )));
+                            },
+                            child: Text(
+                              j < listData[i].attendancedetails.length
+                                  ? getResult(
+                                      listData[i].attendancedetails[j].result)
+                                  : '',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -1251,7 +1274,7 @@ class _DetailPageState extends State<DetailPage> {
 
   String formatDate(String date) {
     if (date != '') {
-      DateTime serverDateTime = DateTime.parse(date!).toLocal();
+      DateTime serverDateTime = DateTime.parse(date).toLocal();
       String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
       return formattedDate;
     }
@@ -1274,9 +1297,9 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Container tableIntro(
+  Widget tableIntro(
       listColumnWidth, List<Map<String, String>> paginatedStudents) {
-    return Container(
+    return SizedBox(
       width: 350,
       height: 350,
       child: Table(
@@ -1391,6 +1414,82 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
+
+  void exportToExcel(
+      List<StudentData> studentAttendance, int totalWeeks) async {
+    var excel1 = excel.Excel.createExcel();
+    var sheet = excel1['Sheet1'];
+
+    List<excel.CellValue> listCellValue = [];
+    listCellValue.add(
+      const excel.TextCellValue('No'),
+    );
+    listCellValue.add(
+      const excel.TextCellValue('StudentID'),
+    );
+    listCellValue.add(
+      const excel.TextCellValue('Name'),
+    );
+    listCellValue.add(const excel.TextCellValue('Email'));
+
+    for (int i = 1; i <= totalWeeks; i++) {
+      listCellValue.add(excel.TextCellValue('Day $i'));
+    }
+    listCellValue.add(const excel.TextCellValue('Total'));
+    sheet.appendRow(listCellValue);
+
+    // Add data
+    for (int i = 0; i < studentAttendance.length; i++) {
+      // Assuming Student has properties studentID, studentName, and studentEmail
+      List<excel.CellValue> studentRow = [];
+
+      studentRow.add(excel.IntCellValue(i + 1)); // No
+      studentRow.add(excel.TextCellValue(studentAttendance[i].studentID));
+      studentRow.add(excel.TextCellValue(studentAttendance[i].studentName));
+      studentRow.add(excel.TextCellValue(studentAttendance[i].studentEmail));
+      for (int j = 0; j < studentAttendance[i].attendancedetails.length; j++) {
+        studentRow.add(excel.TextCellValue(
+            studentAttendance[i].attendancedetails[j].result.toString()));
+      }
+      sheet.appendRow(studentRow);
+    }
+    int totalColumns = 4 + totalWeeks + 1;
+    for (int i = 1; i <= totalColumns; i++) {
+      sheet.setColumnAutoFit(i);
+    }
+    // Save the Excel file
+    excel1.save(fileName: 'My_Excel_File_Name.xlsx');
+  }
+
+  Widget customButtonDashBoard(
+      String nameButton, List<StudentData> listTemp, int totalWeeks) {
+    return InkWell(
+      onTap: () {
+        exportToExcel(listTemp, totalWeeks);
+      },
+      mouseCursor: SystemMouseCursors.click,
+      child: Container(
+        width: 80,
+        height: 40,
+        decoration: BoxDecoration(
+            color:
+                nameButton == 'Export' ? const Color(0xff2d71b1) : Colors.white,
+            border: Border.all(
+              width: 0.5,
+              color: Colors.black.withOpacity(0.2),
+            )),
+        child: Center(
+          child: CustomText(
+              message: nameButton,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              color: nameButton == 'Export'
+                  ? Colors.white
+                  : AppColors.primaryText),
+        ),
+      ),
+    );
+  }
 }
 
 Widget customWeek(String nameButton) {
@@ -1417,32 +1516,6 @@ Widget customWeek(String nameButton) {
             color: nameButton.contains('Week')
                 ? Colors.white
                 : AppColors.primaryText),
-      ),
-    ),
-  );
-}
-
-Widget customButtonDashBoard(String nameButton) {
-  return InkWell(
-    onTap: () {},
-    mouseCursor: SystemMouseCursors.click,
-    child: Container(
-      width: 80,
-      height: 40,
-      decoration: BoxDecoration(
-          color:
-              nameButton == 'Export' ? const Color(0xff2d71b1) : Colors.white,
-          border: Border.all(
-            width: 0.5,
-            color: Colors.black.withOpacity(0.2),
-          )),
-      child: Center(
-        child: CustomText(
-            message: nameButton,
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-            color:
-                nameButton == 'Export' ? Colors.white : AppColors.primaryText),
       ),
     ),
   );
