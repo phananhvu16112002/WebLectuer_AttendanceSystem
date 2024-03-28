@@ -15,7 +15,6 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendanc
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/AttendanceReport.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 

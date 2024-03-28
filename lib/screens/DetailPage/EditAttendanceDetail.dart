@@ -8,7 +8,6 @@ import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/EditPage/HistoryEdition.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/EditPage/StudentAttendance.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 

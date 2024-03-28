@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
@@ -122,7 +121,7 @@ Widget customForm(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                     width: 280,
                     child: cusTomText('FormID: $formID', 12, FontWeight.w500,
                         AppColors.primaryText)),
@@ -226,7 +225,7 @@ Widget customForm(
 
 String formatDate(String date) {
   if (date != '') {
-    DateTime serverDateTime = DateTime.parse(date!).toLocal();
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
