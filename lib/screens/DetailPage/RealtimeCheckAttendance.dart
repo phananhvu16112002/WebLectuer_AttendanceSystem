@@ -6,20 +6,15 @@ import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceSummary.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class RealtimeCheckAttendance extends StatefulWidget {
   const RealtimeCheckAttendance(
-      {Key? key, required this.formID, required this.classes})
-      : super(key: key);
+      {super.key, required this.formID, required this.classes});
   // final AttendanceForm? attendanceForm;
   final String formID;
   final String classes;
@@ -203,7 +198,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
       body: SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           header(),
-          Container(
+          SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -259,7 +254,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 250,
                       height: 40,
                       child: Row(
@@ -329,7 +324,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                       height: 10,
                     ),
                     listTemp.isNotEmpty
-                        ? Container(
+                        ? SizedBox(
                             width: MediaQuery.of(context).size.width - 250,
                             height: 380,
                             child: Column(
@@ -551,7 +546,8 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                   color: Colors.white,
                   child: Center(
                     child: CustomText(
-                        message: formatTime(studentAttendance[i].dateAttendanced),
+                        message:
+                            formatTime(studentAttendance[i].dateAttendanced),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black),
@@ -767,7 +763,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   }
 
   String formatTime(String time) {
-    if (time != '' && time != null) {
+    if (time != '') {
       DateTime serverDateTime = DateTime.parse(time).toLocal();
       String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
       return formattedTime;
@@ -785,7 +781,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width / 5,
               height: 50,
               child: Row(

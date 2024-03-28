@@ -9,13 +9,9 @@ import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/StudentClasses.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class DetailPageTest extends StatefulWidget {
@@ -103,7 +99,7 @@ class _DetailPageState extends State<DetailPageTest> {
   }
 
   void newPassListData() {
-    if (passListData.isEmpty || passListData.length == 0) {
+    if (passListData.isEmpty || passListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Pass') ||
             studentClasses.status == 'Pass') {
@@ -119,7 +115,7 @@ class _DetailPageState extends State<DetailPageTest> {
   }
 
   void newBanListData() {
-    if (banListData.isEmpty || banListData.length == 0) {
+    if (banListData.isEmpty || banListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Ban') ||
             studentClasses.status == 'Ban') {
@@ -135,7 +131,7 @@ class _DetailPageState extends State<DetailPageTest> {
   }
 
   void newWarningListData() {
-    if (warningListData.isEmpty || warningListData.length == 0) {
+    if (warningListData.isEmpty || warningListData.isEmpty) {
       for (var studentClasses in listData) {
         if (studentClasses.status.contains('Warning') ||
             studentClasses.status == 'Warning') {
@@ -627,7 +623,7 @@ class _DetailPageState extends State<DetailPageTest> {
       Function(String title) newSetStateTable,
       String isSelectedSection) {
     return listData!.isNotEmpty
-        ? Container(
+        ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -683,7 +679,7 @@ class _DetailPageState extends State<DetailPageTest> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width - 250,
                     height: 40,
                     child: Row(
@@ -788,7 +784,7 @@ class _DetailPageState extends State<DetailPageTest> {
               ),
             ),
           )
-        : Container(
+        : SizedBox(
             width: MediaQuery.of(context).size.width - 250,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -844,7 +840,7 @@ class _DetailPageState extends State<DetailPageTest> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width - 250,
                     height: 40,
                     child: Row(
@@ -976,7 +972,7 @@ class _DetailPageState extends State<DetailPageTest> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        SizedBox(
           width: MediaQuery.of(context).size.width - 100,
           height: 300,
           child: listData.isNotEmpty
@@ -1077,8 +1073,8 @@ class _DetailPageState extends State<DetailPageTest> {
     );
   }
 
-  Container tableTotal(List<Map<String, String>> paginatedStudents) {
-    return Container(
+  Widget tableTotal(List<Map<String, String>> paginatedStudents) {
+    return SizedBox(
       width: 100,
       height: 350,
       child: Table(
@@ -1134,7 +1130,7 @@ class _DetailPageState extends State<DetailPageTest> {
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Container(
+        child: SizedBox(
           height: 350,
           child: Table(
             border: TableBorder.all(color: Colors.grey),
@@ -1227,9 +1223,9 @@ class _DetailPageState extends State<DetailPageTest> {
     }
   }
 
-  Container tableIntro(
+  Widget tableIntro(
       listColumnWidth, List<Map<String, String>> paginatedStudents) {
-    return Container(
+    return SizedBox(
       width: 350,
       height: 350,
       child: Table(

@@ -3,18 +3,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Course.dart';
-import 'package:weblectuer_attendancesystem_nodejs/models/Main/Teacher.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/DetailPage.dart';
-import 'package:weblectuer_attendancesystem_nodejs/screens/Test.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
