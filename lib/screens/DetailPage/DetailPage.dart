@@ -1525,6 +1525,7 @@ Widget customBoxInformation(String title, String imagePath, int count,
     Function(String title) function, String isSelectedSection) {
   return InkWell(
     onTap: () {
+      print("Tapped");
       function(title);
     },
     mouseCursor: SystemMouseCursors.click,
