@@ -743,7 +743,7 @@ class API {
       'type': typeAttendance,
       'location': location,
       'latitude': latitude,
-      'longtitude': longtitude,
+      'longitude': longtitude,
       'radius': radius
     };
     var body = json.encode(request);

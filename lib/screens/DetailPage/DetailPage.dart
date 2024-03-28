@@ -6,6 +6,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/StudentData.dart';
@@ -19,6 +20,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCh
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:excel/excel.dart' as excel;
 
@@ -602,8 +604,8 @@ class _DetailPageState extends State<DetailPage> {
           studentClassesDataProvider,
           attendanceFormDataProvider,
           listData,
-          (querySearch) => null,
-          (title) => null,
+          functionSearch,
+          newSetStateTable,
           isSelectedSection);
     } else if (checkNotification) {
       return const NotificationPage();
@@ -1523,7 +1525,6 @@ Widget customBoxInformation(String title, String imagePath, int count,
     Function(String title) function, String isSelectedSection) {
   return InkWell(
     onTap: () {
-      print("Tapped");
       function(title);
     },
     mouseCursor: SystemMouseCursors.click,
