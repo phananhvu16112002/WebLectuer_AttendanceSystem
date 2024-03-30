@@ -44,6 +44,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   var items = [
     'Scan face',
     'Check in class',
+    'Scan QR',
   ];
   String dropdownvalue = 'Scan face';
   int selectedIndex = 0;
@@ -156,7 +157,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final socketServerProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
       child: Padding(
@@ -247,7 +248,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                       value: items,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Container(
+                        child: SizedBox(
                           width: 380,
                           child: Text(
                             items,
@@ -470,7 +471,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
   Widget googleMaps(BuildContext context) {
     if (_currentLocation != null) {
-      return Container(
+      return SizedBox(
           width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
           height: 550,
           child: GoogleMap(

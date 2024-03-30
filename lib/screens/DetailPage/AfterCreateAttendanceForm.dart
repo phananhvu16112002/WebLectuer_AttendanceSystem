@@ -280,7 +280,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                             context: context,
                                             builder: (context) {
                                               return Dialog(
-                                                  child: Container(
+                                                  child: SizedBox(
                                                 height: 300,
                                                 width: 300,
                                                 child: Center(
@@ -374,7 +374,8 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                   ],
                 ),
               ),
-            )
+            ),
+            const SizedBox(height: 20,),
           ],
         ),
       ),
@@ -391,7 +392,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width / 5,
               height: 50,
               child: Row(
