@@ -32,6 +32,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   bool checkPushNotification = false;
   bool formCreated = false;
   double radius = 0;
+  double timeLate = 5;
   LatLng? _currentLocation;
   String myLocation = '';
   double latitude = 0;
@@ -181,7 +182,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
       SocketServerProvider socketServerProvider) {
     return Container(
       width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
-      height: 550,
+      height: 600,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -193,7 +194,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             const Center(
               child: CustomText(
                   message: 'Attendance Form',
-                  fontSize: 25,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryButton),
             ),
@@ -202,7 +203,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             ),
             const CustomText(
                 message: 'Class',
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(
@@ -222,7 +223,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             ),
             const CustomText(
                 message: 'Type',
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(
@@ -272,7 +273,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             const SizedBox(height: 5),
             const CustomText(
                 message: 'Date',
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(height: 5),
@@ -290,7 +291,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             const SizedBox(height: 5),
             CustomText(
                 message: 'Distance: ${radius.ceil()}m',
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(height: 5),
@@ -316,7 +317,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                   children: [
                     const CustomText(
                         message: "Start Time ",
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.normal,
                         color: AppColors.primaryText),
                     const SizedBox(
@@ -347,7 +348,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                   children: [
                     const CustomText(
                         message: "End Time ",
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.normal,
                         color: AppColors.primaryText),
                     const SizedBox(
@@ -371,6 +372,25 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 )
               ],
             ),
+            const SizedBox(height: 5),
+            CustomText(
+                message: 'Late Time: ${timeLate.ceil()}m',
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: AppColors.primaryText),
+            const SizedBox(height: 5),
+            Slider(
+                thumbColor: AppColors.primaryButton.withOpacity(0.5),
+                activeColor: AppColors.primaryButton.withOpacity(0.2),
+                label: 'Time Late',
+                value: timeLate,
+                min: 5,
+                max: 120,
+                onChanged: (value) {
+                  setState(() {
+                    timeLate = value;
+                  });
+                }),
             const SizedBox(
               height: 5,
             ),
@@ -378,7 +398,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
               children: [
                 const CustomText(
                     message: 'Push Notification to everyone',
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.normal,
                     color: AppColors.primaryText),
                 const SizedBox(
@@ -433,6 +453,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                             MaterialPageRoute(
                                 builder: (builder) => AfterCreateAttendanceForm(
                                       attendanceForm: attendanceForm,
+                                      className: classes.course.courseName,
                                     )));
                       }
                     } else {
@@ -473,7 +494,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     if (_currentLocation != null) {
       return SizedBox(
           width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
-          height: 550,
+          height: 600,
           child: GoogleMap(
             zoomGesturesEnabled: true,
             indoorViewEnabled: true,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
@@ -10,12 +11,15 @@ import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 class AfterCreateAttendanceForm extends StatefulWidget {
-  const AfterCreateAttendanceForm({super.key, required this.attendanceForm});
+  const AfterCreateAttendanceForm(
+      {super.key, required this.attendanceForm, required this.className});
   final AttendanceForm? attendanceForm;
+  final String className;
 
   @override
   State<AfterCreateAttendanceForm> createState() =>
@@ -61,7 +65,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
             header(),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              height: 600,
               color: AppColors.backgroundColor,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
@@ -130,7 +134,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: 'Cross Platform Programming',
+                                      message: widget.className,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -150,7 +154,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: 'Scan face',
+                                      message: getType(data.typeAttendance),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -170,7 +174,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: '18/01/2024',
+                                      message: formatDate(data.dateOpen!),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -190,7 +194,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: '12:30 PM',
+                                      message: formatTime(data.startTime!),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -210,27 +214,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: '14:17 PM',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText
-                                          .withOpacity(0.5))
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const CustomText(
-                                      message: 'Duration:',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primaryText),
-                                  CustomText(
-                                      message: '',
+                                      message: formatTime(data.endTime!),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -250,7 +234,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryText),
                                   CustomText(
-                                      message: '10M',
+                                      message: data.radius.toString(),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryText
@@ -356,8 +340,11 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                           MaterialPageRoute(
                                               builder: (builder) =>
                                                   RealtimeCheckAttendance(
-                                                    formID: widget.attendanceForm!.formID,
-                                                    classes: widget.attendanceForm!.classes,
+                                                    formID: widget
+                                                        .attendanceForm!.formID,
+                                                    classes: widget
+                                                        .attendanceForm!
+                                                        .classes,
                                                   )));
                                     },
                                     height: 40,
@@ -375,7 +362,9 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                 ),
               ),
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
           ],
         ),
       ),
@@ -491,5 +480,30 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
         ),
       ),
     );
+  }
+
+  String formatDate(String date) {
+    if (date != '') {
+      DateTime serverDateTime = DateTime.parse(date).toLocal();
+      String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+      return formattedDate;
+    }
+    return '';
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
+  }
+
+  String getType(int result) {
+    if (result == 0) {
+      return 'Scan Face';
+    } else if (result == 1) {
+      return 'Check in class';
+    } else {
+      return 'Scan QR';
+    }
   }
 }
