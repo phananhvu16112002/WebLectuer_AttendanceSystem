@@ -223,19 +223,22 @@ Widget customForm(
   );
 }
 
-String formatDate(String date) {
-  if (date != '') {
-    DateTime serverDateTime = DateTime.parse(date).toLocal();
+String formatDate(String? date) {
+  if (date != null || date != '') {
+    DateTime serverDateTime = DateTime.parse(date!).toLocal();
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
   return '';
 }
 
-String formatTime(String time) {
-  DateTime serverDateTime = DateTime.parse(time).toLocal();
-  String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
-  return formattedTime;
+String formatTime(String? time) {
+  if (time != null || time != ""){
+    DateTime serverDateTime = DateTime.parse(time!).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
+  }
+  return "";
 }
 
 Widget cusTomText(
