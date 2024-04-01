@@ -86,6 +86,8 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
     classes = widget.classes!;
     _fetchData();
+    print("-------------------------------------");
+    print("socker is connect to server");
     Future.delayed(Duration.zero, () {
       var socketServerProvider =
           Provider.of<SocketServerProvider>(context, listen: false);
@@ -1176,87 +1178,43 @@ class _DetailPageState extends State<DetailPage> {
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          height: 350,
-          child: Table(
-            border: TableBorder.all(color: Colors.grey),
-            columnWidths: {
-              for (int i = 0; i < numberOfWeeks; i++)
-                i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
-            },
-            children: [
-              TableRow(
-                children: List.generate(
-                  numberOfWeeks,
-                  (j) => TableCell(
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      color: Colors.grey.withOpacity(0.21),
-                      child: Center(
-                        child: Tooltip(
-                          // message: (j < listData.length)
-                          //     ? formatDate(listData[j]
-                          //         .attendancedetails[j]
-                          //         .createdAt
-                          //         .toString())
-                          //     : '',
-                          message: '',
-                          child: InkWell(
-                            onTap:
-                                () {}, // Navigator to view realtime check attendance through Day.
-                            mouseCursor: SystemMouseCursors.click,
-                            child: Text(
-                              'Day ${j + 1}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              for (int i = 0; i < paginatedStudents.length; i++)
+        child: Expanded(
+          child: SizedBox(
+            height: 350,
+            child: Table(
+              border: TableBorder.all(color: Colors.grey),
+              columnWidths: {
+                for (int i = 0; i < numberOfWeeks; i++)
+                  i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
+              },
+              children: [
                 TableRow(
                   children: List.generate(
                     numberOfWeeks,
                     (j) => TableCell(
                       child: Container(
                         padding: const EdgeInsets.all(5),
-                        color: Colors.white,
+                        color: Colors.grey.withOpacity(0.21),
                         child: Center(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) =>
-                                          EditAttendanceDetail(
-                                            studentID: listData[i].studentID,
-                                            classID: listData[i]
-                                                .attendancedetails[j]
-                                                .classDetail,
-                                            formID: listData[i]
-                                                .attendancedetails[j]
-                                                .attendanceForm,
-                                            studentName:
-                                                listData[i].studentName,
-                                            classes: widget.classes!,
-                                          )));
-                            },
-                            child: Text(
-                              j < listData[i].attendancedetails.length
-                                  ? getResult(
-                                      listData[i].attendancedetails[j].result)
-                                  : '',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black,
+                          child: Tooltip(
+                            // message: (j < listData.length)
+                            //     ? formatDate(listData[j]
+                            //         .attendancedetails[j]
+                            //         .createdAt
+                            //         .toString())
+                            //     : '',
+                            message: '',
+                            child: InkWell(
+                              onTap:
+                                  () {}, // Navigator to view realtime check attendance through Day.
+                              mouseCursor: SystemMouseCursors.click,
+                              child: Text(
+                                'Day ${j + 1}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
@@ -1265,7 +1223,53 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
-            ],
+                for (int i = 0; i < paginatedStudents.length; i++)
+                  TableRow(
+                    children: List.generate(
+                      numberOfWeeks,
+                      (j) => TableCell(
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          color: Colors.white,
+                          child: Center(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) =>
+                                            EditAttendanceDetail(
+                                              studentID: listData[i].studentID,
+                                              classID: listData[i]
+                                                  .attendancedetails[j]
+                                                  .classDetail,
+                                              formID: listData[i]
+                                                  .attendancedetails[j]
+                                                  .attendanceForm,
+                                              studentName:
+                                                  listData[i].studentName,
+                                              classes: widget.classes!,
+                                            )));
+                              },
+                              child: Text(
+                                j < listData[i].attendancedetails.length
+                                    ? getResult(
+                                        listData[i].attendancedetails[j].result)
+                                    : '',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

@@ -386,6 +386,8 @@ class API {
     final url = 'http://localhost:8080/api/teacher/attendance/detail/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
+    print("-------------------------------------------------------------------------");
+    print("call api get attendance detail real time");
     try {
       final response = await http.get(Uri.parse(url), headers: headers);
       // print(jsonDecode(response.body));
