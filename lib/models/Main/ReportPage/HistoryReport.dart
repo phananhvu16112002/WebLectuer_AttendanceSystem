@@ -1,18 +1,18 @@
 class HistoryReport {
-  final int historyReportID;
-  final String topic;
-  final String problem;
-  final String message;
-  final String status;
-  final String createdAt;
+  final int? historyReportID;
+  final String? topic;
+  final String? problem;
+  final String? message;
+  final String? status;
+  final String? createdAt;
 
   HistoryReport({
-    required this.historyReportID,
-    required this.topic,
-    required this.problem,
-    required this.message,
-    required this.status,
-    required this.createdAt,
+    this.historyReportID = 0,
+    this.topic = '',
+    this.problem = '',
+    this.message = '',
+    this.status = '',
+    this.createdAt = '',
   });
 
   factory HistoryReport.fromJson(Map<String, dynamic> json) {

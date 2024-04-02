@@ -1,16 +1,16 @@
 class HistoryFeedback {
-  final int historyFeedbackID;
-  final String topic;
-  final String message;
-  final String confirmStatus;
-  final String createdAt;
+  final int? historyFeedbackID;
+  final String? topic;
+  final String? message;
+  final String? confirmStatus;
+  final String? createdAt;
 
   HistoryFeedback({
-    required this.historyFeedbackID,
-    required this.topic,
-    required this.message,
-    required this.confirmStatus,
-    required this.createdAt,
+    this.historyFeedbackID = 0,
+    this.topic = '',
+    this.message = '',
+    this.confirmStatus = '',
+    this.createdAt = '',
   });
 
   factory HistoryFeedback.fromJson(Map<String, dynamic> json) {

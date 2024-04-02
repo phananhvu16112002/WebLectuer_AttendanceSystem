@@ -216,7 +216,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                 typeAttendanceController,
                 TextInputType.none,
                 IconButton(onPressed: () {}, icon: const Icon(null)),
-                '${classes.course.courseName},${classes.teacher.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
+                '${classes.course!.courseName},${classes.teacher!.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
                 false),
             const SizedBox(
               height: 5,
@@ -431,7 +431,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                       print('Longtitude: $longtitude');
                       AttendanceForm? attendanceForm = await API(context)
                           .createFormAttendance(
-                              classes.classID,
+                              classes.classID!,
                               formatTimeOfDate(timeStart!).toString(),
                               formatTimeOfDate(timeEnd!).toString(),
                               selectedIndex,
@@ -453,7 +453,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                             MaterialPageRoute(
                                 builder: (builder) => AfterCreateAttendanceForm(
                                       attendanceForm: attendanceForm,
-                                      className: classes.course.courseName,
+                                      className: classes.course!.courseName,
                                     )));
                       }
                     } else {

@@ -97,7 +97,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _fetchData() async {
     fetchData = API(context).getStudentsWithAllAttendanceDetails(
-        classes.classID); // get Student from class
+        classes.classID!); // get Student from class
     fetchData.then((value) {
       setState(() {
         listData = value!.data;
@@ -229,7 +229,7 @@ class _DetailPageState extends State<DetailPage> {
         Provider.of<SocketServerProvider>(context, listen: false);
     final attendanceFormProvider =
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
-    int numberOfWeeks = classes.course.totalWeeks; // course through provider
+    int numberOfWeeks = classes.course!.totalWeeks; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
       const FixedColumnWidth(80),
@@ -712,11 +712,11 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes!.course.totalWeeks),
+                            widget.classes!.course!.totalWeeks),
                         customButtonDashBoard(
-                            'PDF', listData, widget.classes!.course.totalWeeks),
+                            'PDF', listData, widget.classes!.course!.totalWeeks),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes!.course.totalWeeks),
+                            widget.classes!.course!.totalWeeks),
                         const SizedBox(
                           width: 20,
                         ),
@@ -795,14 +795,14 @@ class _DetailPageState extends State<DetailPage> {
                                           RealtimeCheckAttendance(
                                               formID:
                                                   listData
-                                                      .last
+                                                      .first
                                                       .attendancedetails
-                                                      .last
+                                                      .first
                                                       .attendanceForm,
                                               classes: listData
-                                                  .last
+                                                  .first
                                                   .attendancedetails
-                                                  .last
+                                                  .first
                                                   .classDetail)));
                             },
                             height: 50,
@@ -883,11 +883,11 @@ class _DetailPageState extends State<DetailPage> {
                     child: Row(
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes!.course.totalWeeks),
+                            widget.classes!.course!.totalWeeks),
                         customButtonDashBoard(
-                            'PDF', listData, widget.classes!.course.totalWeeks),
+                            'PDF', listData, widget.classes!.course!.totalWeeks),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes!.course.totalWeeks),
+                            widget.classes!.course!.totalWeeks),
                         const SizedBox(
                           width: 20,
                         ),

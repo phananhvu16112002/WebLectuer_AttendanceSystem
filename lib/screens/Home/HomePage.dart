@@ -221,6 +221,7 @@ class _HomePageState extends State<HomePage> {
 
   PreferredSizeWidget appBar(TeacherDataProvider teacherDataProvider) {
     return AppBar(
+      leading: const Icon(null),
       backgroundColor: AppColors.colorHeader,
       flexibleSpace: Padding(
         padding:
@@ -652,12 +653,12 @@ class _HomePageState extends State<HomePage> {
                               mouseCursor: SystemMouseCursors.click,
                               child: Container(
                                 child: customClass(
-                                    data.course.courseName,
-                                    data.classType,
-                                    data.group,
-                                    data.subGroup,
-                                    data.shiftNumber,
-                                    data.roomNumber,
+                                    data.course!.courseName,
+                                    data.classType!,
+                                    data.group!,
+                                    data.subGroup!,
+                                    data.shiftNumber!,
+                                    data.roomNumber!,
                                     'assets/images/banner$randomBanner.jpg'),
                               ),
                             );

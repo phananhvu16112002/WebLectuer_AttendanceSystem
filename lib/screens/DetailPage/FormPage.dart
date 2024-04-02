@@ -29,7 +29,7 @@ class _RepositoryClassPageState extends State<FormPage> {
   }
 
   void _fetchData() async {
-    _fetchFormData = API(context).getFormForTeacher(classes.classID);
+    _fetchFormData = API(context).getFormForTeacher(classes.classID!);
     _fetchFormData.then((value) {
       setState(() {
         listData = value;

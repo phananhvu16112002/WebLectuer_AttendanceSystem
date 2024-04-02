@@ -406,7 +406,7 @@ class _ReportPageState extends State<ReportPage> {
                                                 color: AppColors.primaryText),
                                           ),
                                         ),
-                                        Container(
+                                        SizedBox(
                                           height: 160,
                                           width: 390,
                                           child: SingleChildScrollView(
@@ -418,7 +418,7 @@ class _ReportPageState extends State<ReportPage> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Container(
+                                                SizedBox(
                                                   width: 260,
                                                   child: Padding(
                                                     padding:
@@ -622,7 +622,7 @@ class _ReportPageState extends State<ReportPage> {
                                                 color: AppColors.primaryText),
                                           ),
                                         ),
-                                        Container(
+                                        SizedBox(
                                             width: 390,
                                             height: 335,
                                             child: Padding(
@@ -631,7 +631,7 @@ class _ReportPageState extends State<ReportPage> {
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.max,
                                                 children: [
-                                                  Container(
+                                                  SizedBox(
                                                     width: 195,
                                                     height: 335,
                                                     child: Column(
@@ -685,7 +685,7 @@ class _ReportPageState extends State<ReportPage> {
                                                   const SizedBox(
                                                     width: 2,
                                                   ),
-                                                  Container(
+                                                  SizedBox(
                                                     width: 185,
                                                     height: 340,
                                                     child: Column(
@@ -856,7 +856,7 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget sendFeedBack() {
-    return Container(
+    return SizedBox(
       width: 280,
       height: 630,
       child: Form(
@@ -878,7 +878,7 @@ class _ReportPageState extends State<ReportPage> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
-                      Container(
+                      SizedBox(
                         height: 30,
                         child: TextFormField(
                           readOnly: true,
@@ -908,7 +908,7 @@ class _ReportPageState extends State<ReportPage> {
                       const SizedBox(
                         height: 5,
                       ),
-                      Container(
+                      SizedBox(
                         height: 50,
                         child: SingleChildScrollView(
                           child: TextFormField(
@@ -1095,7 +1095,7 @@ class _ReportPageState extends State<ReportPage> {
       topicController.text = _attendanceReport!.feedback!.topic;
       messageController.text = _attendanceReport!.feedback!.message;
       selectedValueController.text = _attendanceReport!.feedback!.confirmStatus;
-      return Container(
+      return SizedBox(
         width: 280,
         height: 630,
         child: Form(
@@ -1118,7 +1118,7 @@ class _ReportPageState extends State<ReportPage> {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primaryText),
-                        Container(
+                        SizedBox(
                           height: 30,
                           child: TextFormField(
                             readOnly: true,
@@ -1148,7 +1148,7 @@ class _ReportPageState extends State<ReportPage> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Container(
+                        SizedBox(
                           height: 50,
                           child: SingleChildScrollView(
                             child: TextFormField(
@@ -1261,7 +1261,7 @@ class _ReportPageState extends State<ReportPage> {
                                           _reportData!.reportID,
                                           topicController.text,
                                           messageController.text,
-                                          selectedValue!);
+                                          selectedValueController.text);
                                   if (check) {
                                     await _progressDialog.hide();
                                     if (mounted) {
@@ -1384,11 +1384,7 @@ class _ReportPageState extends State<ReportPage> {
               ),
               _attendanceReport!.historyReports.isNotEmpty
                   ? historyReports()
-                  : Container(
-                      width: 280,
-                      height: 270,
-                      child: const Center(child: Text('Empty')),
-                    ), //note
+                  : Container() //note
             ],
           ),
         ),
@@ -1444,14 +1440,14 @@ class _ReportPageState extends State<ReportPage> {
                         onTap: () {
                           showHistoryReport(context, historyReport);
                         },
-                        child: Container(
+                        child: SizedBox(
                           width: 280,
                           height: 30,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               cusTomText(
-                                  '#${historyReport.historyReportID} Responed to ${historyReport.topic}',
+                                  '#${historyReport.historyReportID ?? ''} Responed to ${historyReport.topic ?? ''}',
                                   12,
                                   FontWeight.normal,
                                   AppColors.primaryText),
@@ -1460,12 +1456,12 @@ class _ReportPageState extends State<ReportPage> {
                                 height: 15,
                                 decoration: BoxDecoration(
                                     color: getColorForStatusReport(
-                                        historyReport.status),
+                                        historyReport.status ?? ''),
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(5))),
                                 child: Center(
                                   child: Text(
-                                    historyReport.status,
+                                    historyReport.status ?? '',
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 8),
                                   ),
@@ -1487,12 +1483,15 @@ class _ReportPageState extends State<ReportPage> {
       showDialog(
           context: context,
           builder: (context) {
+            print(
+                'alo alo: ${_attendanceReport!.attendanceDetail.classDetail}');
+            print('asdsad: ${historyReport.historyReportID!}');
             return Dialog(
                 backgroundColor: Colors.white,
                 child: FutureBuilder(
                     future: API(context).getDetailHistoryReport(
                         _attendanceReport!.attendanceDetail.classDetail,
-                        historyReport.historyReportID),
+                        historyReport.historyReportID!),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data != null) {
@@ -1515,7 +1514,11 @@ class _ReportPageState extends State<ReportPage> {
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       historyDetailReports(historyReportDialog),
-                                      historyFeedbacks(historyReportDialog),
+                                      historyReportDialog!.historyFeedbacks !=
+                                              null
+                                          ? historyFeedbacks(
+                                              historyReportDialog)
+                                          : Container(),
                                     ],
                                   ),
                                 ),
@@ -1523,16 +1526,16 @@ class _ReportPageState extends State<ReportPage> {
                                   height: 200,
                                   width: 600,
                                   color: Colors.white,
-                                  child: historyReportDialog!
-                                          .historyReportImages.isNotEmpty
+                                  child: historyReportDialog
+                                          .historyReportImages!.isNotEmpty
                                       ? Center(
                                           child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Row(
                                             children: historyReportDialog
-                                                .historyReportImages
+                                                .historyReportImages!
                                                 .map((e) {
-                                              return Container(
+                                              return SizedBox(
                                                   height: 300,
                                                   width: 300,
                                                   child: Image.network(
@@ -1544,7 +1547,7 @@ class _ReportPageState extends State<ReportPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Container(
+                                            SizedBox(
                                                 height: 300,
                                                 width: 300,
                                                 child: Opacity(
@@ -1576,76 +1579,79 @@ class _ReportPageState extends State<ReportPage> {
                     }));
           });
 
-  Container historyDetailReports(HistoryReportDialog? historyReportDialog) {
-    return Container(
-      height: 200,
-      width: 400,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black.withOpacity(0.3), width: 0.5),
-          borderRadius: const BorderRadius.all(Radius.circular(5))),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CustomText(
-                      message: 'History Reports',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText),
-                  Container(
-                    height: 20,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.3),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5))),
-                    child: Center(
-                        child: CustomText(
-                            message:
-                                'ID: ${historyReportDialog!.historyReportID}',
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color: AppColors.primaryText)),
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(historyReportDialog.topic, 'Topic: ',
-                  AppColors.primaryText.withOpacity(0.5)),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(historyReportDialog.problem, 'Problem: ',
-                  AppColors.primaryText.withOpacity(0.5)),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(historyReportDialog.status, 'Status: ',
-                  getColorForStatusReport(historyReportDialog.status)),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(formatDate(historyReportDialog.createdAt),
-                  'Created Date: ', AppColors.primaryText.withOpacity(0.5)),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(formatTime(historyReportDialog.createdAt),
-                  'Created Time: ', AppColors.primaryText.withOpacity(0.5)),
-              const SizedBox(
-                height: 10,
-              ),
-              customRichText2(historyReportDialog.message, 'Message: ',
-                  AppColors.primaryText.withOpacity(0.5)),
-            ],
+  Widget historyDetailReports(HistoryReportDialog? historyReportDialog) {
+    return Expanded(
+      child: Container(
+        // height: 200,
+        width: 400,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border:
+                Border.all(color: Colors.black.withOpacity(0.3), width: 0.5),
+            borderRadius: const BorderRadius.all(Radius.circular(5))),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const CustomText(
+                        message: 'History Reports',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText),
+                    Container(
+                      height: 20,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.3),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5))),
+                      child: Center(
+                          child: CustomText(
+                              message:
+                                  'ID: ${historyReportDialog!.historyReportID ?? ''}',
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: AppColors.primaryText)),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(historyReportDialog.topic ?? '', 'Topic: ',
+                    AppColors.primaryText.withOpacity(0.5)),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(historyReportDialog.problem ?? '', 'Problem: ',
+                    AppColors.primaryText.withOpacity(0.5)),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(historyReportDialog.status ?? '', 'Status: ',
+                    getColorForStatusReport(historyReportDialog.status ?? '')),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(formatDate(historyReportDialog.createdAt),
+                    'Created Date: ', AppColors.primaryText.withOpacity(0.5)),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(formatTime(historyReportDialog.createdAt),
+                    'Created Time: ', AppColors.primaryText.withOpacity(0.5)),
+                const SizedBox(
+                  height: 10,
+                ),
+                customRichText2(historyReportDialog.message ?? '', 'Message: ',
+                    AppColors.primaryText.withOpacity(0.5)),
+              ],
+            ),
           ),
         ),
       ),
@@ -1684,7 +1690,7 @@ class _ReportPageState extends State<ReportPage> {
                     child: Center(
                         child: CustomText(
                             message:
-                                'ID: ${historyReportDialog!.historyFeedbacks!.historyFeedbackID}',
+                                'ID: ${historyReportDialog!.historyFeedbacks!.historyFeedbackID ?? ''}',
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
                             color: AppColors.primaryText)),
@@ -1694,35 +1700,40 @@ class _ReportPageState extends State<ReportPage> {
               const SizedBox(
                 height: 10,
               ),
-              customRichText2(historyReportDialog.historyFeedbacks!.topic,
+              customRichText2(historyReportDialog.historyFeedbacks!.topic ?? '',
                   'Topic: ', AppColors.primaryText.withOpacity(0.5)),
               const SizedBox(
                 height: 10,
               ),
               customRichText2(
-                  historyReportDialog.historyFeedbacks!.confirmStatus,
+                  historyReportDialog.historyFeedbacks!.confirmStatus ?? '',
                   'Status: ',
                   getColorForStatusReport(
-                      historyReportDialog.historyFeedbacks!.confirmStatus)),
+                      historyReportDialog.historyFeedbacks!.confirmStatus ??
+                          '')),
               const SizedBox(
                 height: 10,
               ),
               customRichText2(
-                  formatDate(historyReportDialog.historyFeedbacks!.createdAt),
+                  formatDate(
+                      historyReportDialog.historyFeedbacks!.createdAt ?? ''),
                   'Created Date: ',
                   AppColors.primaryText.withOpacity(0.5)),
               const SizedBox(
                 height: 10,
               ),
               customRichText2(
-                  formatTime(historyReportDialog.historyFeedbacks!.createdAt),
+                  formatTime(
+                      historyReportDialog.historyFeedbacks!.createdAt ?? ''),
                   'Created Time: ',
                   AppColors.primaryText.withOpacity(0.5)),
               const SizedBox(
                 height: 10,
               ),
-              customRichText2(historyReportDialog.historyFeedbacks!.message,
-                  'Message: ', AppColors.primaryText.withOpacity(0.5)),
+              customRichText2(
+                  historyReportDialog.historyFeedbacks!.message ?? '',
+                  'Message: ',
+                  AppColors.primaryText.withOpacity(0.5)),
             ],
           ),
         ),
@@ -1743,7 +1754,7 @@ class _ReportPageState extends State<ReportPage> {
           TextSpan(
             text: message,
             style: TextStyle(
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.w100,
               color: color,
             ),
           ),

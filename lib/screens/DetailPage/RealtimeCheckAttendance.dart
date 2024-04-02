@@ -307,7 +307,7 @@ void updateData(dynamic data) {
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryText),
                     const SizedBox(
-                      height: 10,
+                      height: 5,
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width - 250,

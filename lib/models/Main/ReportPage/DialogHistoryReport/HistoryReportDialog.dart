@@ -2,24 +2,24 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/Dialog
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportImage.dart';
 
 class HistoryReportDialog {
-  final int historyReportID;
-  final String topic;
-  final String problem;
-  final String message;
-  final String status;
-  final String createdAt;
+  final int? historyReportID;
+  final String? topic;
+  final String? problem;
+  final String? message;
+  final String? status;
+  final String? createdAt;
   final HistoryFeedback? historyFeedbacks;
-  final List<HistoryReportImage> historyReportImages;
+  final List<HistoryReportImage>? historyReportImages;
 
   HistoryReportDialog({
-    required this.historyReportID,
-    required this.topic,
-    required this.problem,
-    required this.message,
-    required this.status,
-    required this.createdAt,
-    required this.historyFeedbacks,
-    required this.historyReportImages,
+    this.historyReportID = 0,
+    this.topic = '',
+    this.problem = '',
+    this.message = ' ',
+    this.status = '',
+    this.createdAt = '',
+    this.historyFeedbacks,
+    this.historyReportImages,
   });
 
   factory HistoryReportDialog.fromJson(Map<String, dynamic> json) {
