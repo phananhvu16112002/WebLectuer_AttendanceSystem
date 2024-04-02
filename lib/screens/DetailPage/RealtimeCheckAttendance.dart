@@ -79,6 +79,26 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
       absent = attendanceSummary.stats.totalAbsence;
       late = attendanceSummary.stats.totalLate;
     });
+
+    // await API(context).getAttendanceDetailRealtime(widget.formID).then((value) {
+    //   setState(() {
+    //     studentAttendance = value!.data;
+    //     listTemp = value!.data;
+    //     absentAttendance = studentAttendance
+    //         .where((element) => element.result == '0')
+    //         .toList();
+    //     lateAttendance = studentAttendance
+    //         .where((element) => element.result == '0.5')
+    //         .toList();
+    //     presentAttendance = studentAttendance
+    //         .where((element) => element.result == '1')
+    //         .toList();
+    //     all = value.stats.total;
+    //     present = value.stats.totalPresence;
+    //     absent = value.stats.totalAbsence;
+    //     late = value.stats.totalLate;
+    //   });
+    // });
   }
 
   void updateData(dynamic data) {
