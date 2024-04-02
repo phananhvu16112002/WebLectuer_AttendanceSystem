@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -46,18 +47,55 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   void initState() {
     super.initState();
     _fetchData();
-    Future.delayed(Duration.zero, () {
-      var socketServerProvider =
-          Provider.of<SocketServerProvider>(context, listen: false);
-      socketServerProvider.connectToSocketServer(widget.classes);
-      socketServerProvider.getAttendanceDetail();
-      socketServerProvider.attendanceStream.listen((data) {
+    var socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
+    var socket = socketServerProvider.socket;
+
+    socket.on('getTakeAttendance', (data) {
+      print(socket.id);
+      try {
+        print('DataData: $data');
+        var temp = jsonDecode(data);
+        var jsonData = {
+          'studentDetail': temp['studentDetail'],
+          'classDetail': temp['classDetail'],
+          'dateTimeAttendance': temp['dateTimeAttendance'],
+          'result': temp['result'].toString(),
+        };
         if (mounted) {
-          updateData(data);
+          updateData(jsonData);
         }
-      });
+      } catch (e) {
+        print('Error: $e');
+      }
     });
+    //socketServerProvider.connectToSocketServer(widget.classes);
+
+    // Future.delayed(Duration.zero, () {
+    //   var socketServerProvider =
+    //       Provider.of<SocketServerProvider>(context, listen: false);
+    //   socketServerProvider.connectToSocketServer(widget.classes);
+    //socketServerProvider.getAttendanceDetail();
+    // socketServerProvider.attendanceStream.listen((data) {
+    //   print("data from listen: ${data}");
+    //   if (mounted) {
+    //     updateData(data);
+    //   }
+    // });
+    // });
     print('InitState-----as');
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    print("dispose");
+    super.dispose();
+    var socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
+    var socket = socketServerProvider.socket;
+    socket.dispose();
+    socketServerProvider.dispose();
   }
 
   void _fetchData() async {
@@ -101,32 +139,62 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     // });
   }
 
-  void updateData(dynamic data) {
-    String studentID = data['studentDetail'];
-    for (int i = 0; i < studentAttendance.length; i++) {
-      if (studentID.contains(studentAttendance[i].studentID)) {
-        if (data['result'] == '1') {
-          setState(() {
-            absent = absent - 1;
-            present = present + 1;
-            studentAttendance[i].result = data['result'];
-            studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-            presentAttendance.add(studentAttendance[i]);
-            absentAttendance.remove(studentAttendance[i]);
-          });
-        } else if (data['result'] == '0.5') {
-          setState(() {
-            late = late + 1;
-            absent = absent - 1;
-            studentAttendance[i].result = data['result'];
-            studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-            lateAttendance.add(studentAttendance[i]);
-            absentAttendance.remove(studentAttendance[i]);
-          });
-        }
+
+void updateData(dynamic data) {
+  String studentID = data['studentDetail'];
+  for (int i = 0; i < studentAttendance.length; i++) {
+    if (studentID.contains(studentAttendance[i].studentID)) {
+      if (data['result'] == '1') {
+        absent = absent - 1;
+        present = present + 1;
+        studentAttendance[i].result = data['result'];
+        studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+        presentAttendance.add(studentAttendance[i]);
+        absentAttendance.remove(studentAttendance[i]);
+      } else if (data['result'] == '0.5') {
+        late = late + 1;
+        absent = absent - 1;
+        studentAttendance[i].result = data['result'];
+        studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+        lateAttendance.add(studentAttendance[i]);
+        absentAttendance.remove(studentAttendance[i]);
       }
     }
   }
+  if (mounted) {
+    setState(() {});
+  }
+}
+
+  // void updateData(dynamic data) {
+  //   print("absent initial: ${absent}");
+  //   print("present initial: ${present}");
+  //   print("late initial: ${late}");
+  //   String studentID = data['studentDetail'];
+  //   for (int i = 0; i < studentAttendance.length; i++) {
+  //     if (studentID.contains(studentAttendance[i].studentID)) {
+  //       if (data['result'] == '1') {
+  //         setState(() {
+  //           absent = absent - 1;
+  //           present = present + 1;
+  //           studentAttendance[i].result = data['result'];
+  //           studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+  //           presentAttendance.add(studentAttendance[i]);
+  //           absentAttendance.remove(studentAttendance[i]);
+  //         });
+  //       } else if (data['result'] == '0.5') {
+  //         setState(() {
+  //           late = late + 1;
+  //           absent = absent - 1;
+  //           studentAttendance[i].result = data['result'];
+  //           studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+  //           lateAttendance.add(studentAttendance[i]);
+  //           absentAttendance.remove(studentAttendance[i]);
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
 
   void newAllListData() {
     setState(() {
@@ -213,11 +281,14 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
 
   @override
   Widget build(BuildContext context) {
+    final socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          header(),
+          header(socketServerProvider),
           SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
@@ -791,7 +862,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     return '';
   }
 
-  Widget header() {
+  Widget header(SocketServerProvider socketServerProvider) {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 50,
@@ -810,6 +881,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                 children: [
                   InkWell(
                     onTap: () {
+                      socketServerProvider.disconnectSocketServer();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

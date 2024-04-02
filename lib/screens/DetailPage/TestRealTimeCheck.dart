@@ -33,37 +33,37 @@ class _RealtimeCheckAttendanceState extends State<TestRealTimeCheck> {
       late = attendanceSummary.late;
     });
     Future.delayed(Duration.zero, () {
-      var socketServerProvider =
+      //var socketServerProvider =
           Provider.of<SocketServerProvider>(context, listen: false);
-      socketServerProvider.connectToSocketServer('5202111_09_t000');
-      socketServerProvider.getAttendanceDetail();
-      socketServerProvider.attendanceStream.listen((data) {
-        updateData(data);
-      });
+      //socketServerProvider.connectToSocketServer('5202111_09_t000');
+      // socketServerProvider.getAttendanceDetail();
+      // socketServerProvider.attendanceStream.listen((data) {
+      //   updateData(data);
+      // });
     });
   }
 
-  void updateData(dynamic data) {
-    String studentID = data['studentDetail'];
-    print('studentID: $studentID');
+  // void updateData(dynamic data) {
+  //   String studentID = data['studentDetail'];
+  //   print('studentID: $studentID');
 
-    for (int i = 0; i < attendanceSummary.data.length; i++) {
-      if (studentID.contains(attendanceSummary.data[i].studentDetail)) {
-        if (data['result'].toString() == '1') {
-          setState(() {
-            absent = absent - 1;
-            present = present + 1;
-            attendanceSummary.data[i].result = data['result'];
-          });
-        } else if (data['result'].toString() == '0.5') {
-          setState(() {
-            late = late + 1;
-            absent = absent - 1;
-          });
-        }
-      }
-    }
-  }
+  //   for (int i = 0; i < attendanceSummary.data.length; i++) {
+  //     if (studentID.contains(attendanceSummary.data[i].studentDetail)) {
+  //       if (data['result'].toString() == '1') {
+  //         setState(() {
+  //           absent = absent - 1;
+  //           present = present + 1;
+  //           attendanceSummary.data[i].result = data['result'];
+  //         });
+  //       } else if (data['result'].toString() == '0.5') {
+  //         setState(() {
+  //           late = late + 1;
+  //           absent = absent - 1;
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
