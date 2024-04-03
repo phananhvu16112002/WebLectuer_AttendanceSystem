@@ -795,14 +795,14 @@ class _DetailPageState extends State<DetailPage> {
                                           RealtimeCheckAttendance(
                                               formID:
                                                   listData
-                                                      .first
+                                                      .last
                                                       .attendancedetails
-                                                      .first
+                                                      .last
                                                       .attendanceForm,
                                               classes: listData
-                                                  .first
+                                                  .last
                                                   .attendancedetails
-                                                  .first
+                                                  .last
                                                   .classDetail)));
                             },
                             height: 50,
