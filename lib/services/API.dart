@@ -386,7 +386,8 @@ class API {
     final url = 'http://localhost:8080/api/teacher/attendance/detail/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
-    print("-------------------------------------------------------------------------");
+    print(
+        "-------------------------------------------------------------------------");
     print("call api get attendance detail real time");
     try {
       final response = await http.get(Uri.parse(url), headers: headers);
@@ -688,7 +689,7 @@ class API {
     var headers = {'authorization': accessToken};
     try {
       final response = await http.get(Uri.parse(url), headers: headers);
-      // print(jsonDecode(response.body));
+      print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         dynamic responseData = jsonDecode(response.body);
         StudentAttendanceEdit data =
@@ -827,6 +828,64 @@ class API {
       print('Error: $e');
       return AttendanceSummary(
           data: [], all: 0, present: 0, absent: 0, late: 0);
+    }
+  }
+
+  Future<bool> editAttendanceDetail(String studentID, String classID,
+      String formID, String topic, String confirmStatus, String message) async {
+    final url =
+        'http://localhost:8080/api/teacher/attendancedetail/edit/$classID/$studentID/$formID';
+    var accessToken = await getAccessToken();
+    var request = {
+      'topic': topic,
+      'message': message,
+      'confirmStatus': confirmStatus,
+    };
+    var body = json.encode(request);
+    var headers = {
+      'authorization': accessToken,
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    try {
+      print('body:$body');
+      final response =
+          await http.put(Uri.parse(url), headers: headers, body: body);
+      // print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        String message = responseData['message'];
+        print('message: $message');
+        return true;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            String message = responseData['message'];
+            print('message retry: $message');
+            // print('Data $data');
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          print('New Access Token is empty');
+          return false;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
     }
   }
 }

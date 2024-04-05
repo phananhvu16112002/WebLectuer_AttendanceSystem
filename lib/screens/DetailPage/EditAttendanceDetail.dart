@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomRichText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
@@ -36,12 +37,40 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
   String selectedValue = 'Lectuer take attendance';
   late Future<StudentAttendanceEdit?> _fetchStudentAttendance;
   StudentAttendanceEdit? _studentAttendance;
+  late ProgressDialog _progressDialog;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _fetchData();
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
   }
 
   void _fetchData() async {
@@ -51,6 +80,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
       setState(() {
         _studentAttendance = value!;
       });
+      print('_student: ${_studentAttendance == null}');
     });
   }
 
@@ -112,9 +142,8 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                            child:  Padding(
+                                              padding: const EdgeInsets.all(8.0),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -390,7 +419,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             const CustomText(
-                                                message: 'FeedBack',
+                                                message: 'Edition',
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.primaryText),
@@ -411,7 +440,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                                                     .transparent)),
                                                     label: customRichText(
                                                         title: 'To: ',
-                                                        message: "Phan Anh Vu",
+                                                        message: widget
+                                                                .studentName ??
+                                                            '',
                                                         fontWeightTitle:
                                                             FontWeight.normal,
                                                         fontWeightMessage:
@@ -420,11 +451,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                                             .primaryText
                                                             .withOpacity(0.2),
                                                         fontSize: 12,
-                                                        colorTextMessage:
-                                                            AppColors
-                                                                .primaryText
-                                                                .withOpacity(
-                                                                    0.5))),
+                                                        colorTextMessage: AppColors
+                                                            .primaryText
+                                                            .withOpacity(0.5))),
                                               ),
                                             ),
                                             const SizedBox(
@@ -491,6 +520,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                                 },
                                                 items: <String>[
                                                   'Lectuer take attendance',
+                                                  'Take attendance late',
                                                   'Deny attendance'
                                                 ].map<DropdownMenuItem<String>>(
                                                     (String value) {
@@ -547,7 +577,70 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                                     AppColors.primaryButton,
                                                 borderColor: Colors.transparent,
                                                 textColor: Colors.white,
-                                                function: () {},
+                                                function: () async {
+                                                  _progressDialog.show();
+                                                  bool check = await API(context)
+                                                      .editAttendanceDetail(
+                                                          widget.studentID ??
+                                                              '',
+                                                          widget.classID ?? '',
+                                                          widget.formID ?? '',
+                                                          topicController
+                                                                  .text ??
+                                                              '',
+                                                          getConfirmStatus(
+                                                                  selectedValue) ??
+                                                              'Deny attendance',
+                                                          messageController
+                                                              .text);
+                                                  if (check) {
+                                                    await _progressDialog
+                                                        .hide();
+                                                    await showDialog(
+                                                        context: context,
+                                                        builder: (builder) =>
+                                                            AlertDialog(
+                                                              title: const Text(
+                                                                  'Edit Attendance Detail'),
+                                                              content: Text(
+                                                                  'Edit attendance ${widget.studentID} succcessfully'),
+                                                              actions: [
+                                                                TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                    },
+                                                                    child:
+                                                                        const Text(
+                                                                            'OK'))
+                                                              ],
+                                                            ));
+                                                  } else {
+                                                    await _progressDialog
+                                                        .hide();
+                                                    await showDialog(
+                                                        context: context,
+                                                        builder: (builder) =>
+                                                            AlertDialog(
+                                                              title: const Text(
+                                                                  'Edit Attendance Detail'),
+                                                              content: Text(
+                                                                  'Failed edit attendance ${widget.studentID}'),
+                                                              actions: [
+                                                                TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                    },
+                                                                    child:
+                                                                        const Text(
+                                                                            'OK'))
+                                                              ],
+                                                            ));
+                                                  }
+                                                },
                                                 height: 35,
                                                 width: 260,
                                                 fontSize: 15,
@@ -561,14 +654,21 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                   const SizedBox(
                                     width: 30,
                                   ),
-                                  Column(
-                                    children: [
-                                      historyEdition(),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      newReports()
-                                    ],
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      // mainAxisAlignment: ,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        historyEdition(),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        newReports(),
+                                        const SizedBox(height: 50,)
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
@@ -591,10 +691,21 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
     );
   }
 
+  String getConfirmStatus(String confirmStatus) {
+    if (confirmStatus == 'Lectuer take attendance') {
+      return 'Present';
+    } else if (confirmStatus == 'Take attendance late') {
+      return 'Late';
+    } else {
+      return 'Absent';
+    }
+  }
+
   Widget historyEdition() {
     return Container(
       width: 280,
-      height: 430,
+      height: 200,
+      // padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -608,6 +719,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -659,12 +771,12 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                 height: 15,
                                 decoration: BoxDecoration(
                                     color: getColorForStatusHistoryEdition(
-                                        historyReport.confirmStatus),
+                                        historyReport.confirmStatus ?? ''),
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(5))),
                                 child: Center(
                                   child: Text(
-                                    historyReport.confirmStatus,
+                                    historyReport.confirmStatus ?? '',
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 8),
                                   ),
@@ -733,7 +845,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         cusTomText(
-                            '${_studentAttendance!.studentDetail} has sent report ${_studentAttendance!.report!.reportID}',
+                            '${_studentAttendance!.studentDetail ?? ''} has sent report ${_studentAttendance!.report!.reportID ?? 0}',
                             12,
                             FontWeight.normal,
                             AppColors.primaryText),
@@ -742,12 +854,12 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                           height: 15,
                           decoration: BoxDecoration(
                               color: getColorForStatusHistoryEdition(
-                                  _studentAttendance!.report!.status),
+                                  _studentAttendance!.report!.status ?? ''),
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(5))),
                           child: Center(
                             child: Text(
-                              _studentAttendance!.report!.status,
+                              _studentAttendance!.report!.status ?? '',
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 8),
                             ),

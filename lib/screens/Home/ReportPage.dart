@@ -1583,7 +1583,7 @@ class _ReportPageState extends State<ReportPage> {
     return Expanded(
       child: Container(
         // height: 200,
-        width: 400,
+        // width: 400,
         decoration: BoxDecoration(
             color: Colors.white,
             border:

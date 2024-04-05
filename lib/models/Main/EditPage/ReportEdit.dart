@@ -1,34 +1,33 @@
 class ReportEdit {
-  final int reportID;
-  final String topic;
-  final String problem;
-  final String message;
-  final String status;
-  final String createdAt;
-  final bool newReport;
-  final bool important;
+  int? reportID;
+  String? topic;
+  String? problem;
+  String? message;
+  String? status;
+  String? createdAt;
+  bool? newReport;
+  bool? important;
 
-  ReportEdit({
-    required this.reportID,
-    required this.topic,
-    required this.problem,
-    required this.message,
-    required this.status,
-    required this.createdAt,
-    required this.newReport,
-    required this.important,
-  });
+  ReportEdit(
+      {this.reportID = 0,
+      this.topic = '',
+      this.problem = '',
+      this.message = '',
+      this.status = '',
+      this.createdAt = '',
+      this.newReport = false,
+      this.important = false});
 
   factory ReportEdit.fromJson(Map<String, dynamic> json) {
     return ReportEdit(
-      reportID: json['reportID'],
-      topic: json['topic'],
-      problem: json['problem'],
-      message: json['message'],
-      status: json['status'],
-      createdAt: json['createdAt'],
-      newReport: json['new'],
-      important: json['important'],
+      reportID: json['reportID'] ?? '',
+      topic: json['topic'] ?? '',
+      problem: json['problem'] ?? '',
+      message: json['message'] ?? '',
+      status: json['status'] ?? '',
+      createdAt: json['createdAt'] ?? '',
+      newReport: json['new'] ?? false,
+      important: json['important'] ?? false,
     );
   }
 }

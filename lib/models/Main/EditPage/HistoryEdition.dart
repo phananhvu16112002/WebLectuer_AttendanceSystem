@@ -1,25 +1,25 @@
 class HistoryEdition {
-  final int feedbackID;
-  final String topic;
-  final String message;
-  final String confirmStatus;
-  final String createdAt;
+   int? feedbackID;
+   String? topic;
+   String? message;
+   String? confirmStatus;
+   String? createdAt;
 
   HistoryEdition({
-    required this.feedbackID,
-    required this.topic,
-    required this.message,
-    required this.confirmStatus,
-    required this.createdAt,
+     this.feedbackID = 0,
+     this.topic = '',
+     this.message = '',
+     this.confirmStatus = '',
+     this.createdAt = '',
   });
 
   factory HistoryEdition.fromJson(Map<String, dynamic> json) {
     return HistoryEdition(
-      feedbackID: json['feedbackID'],
-      topic: json['topic'],
-      message: json['message'],
-      confirmStatus: json['confirmStatus'],
-      createdAt: json['createdAt'],
+      feedbackID: json['feedbackID'] ?? 0,
+      topic: json['topic'] ?? '',
+      message: json['message'] ?? '',
+      confirmStatus: json['confirmStatus'] ??'', 
+      createdAt: json['createdAt'] ?? '',
     );
   }
 }
