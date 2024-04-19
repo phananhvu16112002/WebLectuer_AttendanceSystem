@@ -669,8 +669,7 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     return const Center(
                         child: CircularProgressIndicator(
-                      value: 5,
-                    ));
+                            color: AppColors.primaryButton));
                   }
                   return const Center(child: Text('Data is not available'));
                 },

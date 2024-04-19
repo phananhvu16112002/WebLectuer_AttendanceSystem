@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/EditPage/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Notification/NotificationsData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/AttendanceReport.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
@@ -732,6 +733,46 @@ class API {
     }
   }
 
+  Future<NotificationsData?> getNotifications() async {
+    const url = 'http://localhost:8080/api/teacher/notifications';
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        NotificationsData data = NotificationsData.fromJson(responseData);
+        print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(url), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            dynamic responseData = jsonDecode(retryResponse.body);
+            NotificationsData data = NotificationsData.fromJson(responseData);
+            return data;
+          } else {
+            return null;
+          }
+        } else {
+          print('New Access Token is empty');
+          return null;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
   Future<AttendanceForm?> createFormAttendance(
       String classID,
       String startTime,
@@ -780,7 +821,7 @@ class API {
             // print('-- RetryResponse.body ${retryResponse.body}');
             // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
             dynamic responseData = jsonDecode(retryResponse.body);
-                  AttendanceForm data = AttendanceForm.fromJson(responseData);
+            AttendanceForm data = AttendanceForm.fromJson(responseData);
             // print('Data $data');
             return data;
           } else {

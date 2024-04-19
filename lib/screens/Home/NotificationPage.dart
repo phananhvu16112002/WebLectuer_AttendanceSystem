@@ -1,106 +1,143 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Notification/NotificationsData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Notification/ReportNotifications.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Notification.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
-class NotificationPage extends StatelessWidget {
+class NotificationPage extends StatefulWidget {
   const NotificationPage({
     super.key,
   });
 
   @override
+  State<NotificationPage> createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
+  late Future<NotificationsData?> futureNotifications;
+  NotificationsData? notificationsData;
+  List<NotificationDetail> notificationList = [
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+    NotificationDetail(
+        title:
+            'Student ABC from the cross platform programming has sent you a report',
+        role: 'Student',
+        dateSend: '8/11/2023'),
+  ];
+
+  void fetchData() async {
+    futureNotifications = API(context).getNotifications();
+    futureNotifications.then((value) {
+      setState(() {
+        notificationsData = value;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<NotificationDetail> notificationList = [
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-      NotificationDetail(
-          title:
-              'Student ABC from the cross platform programming has sent you a report',
-          role: 'Student',
-          dateSend: '8/11/2023'),
-    ];
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 10,
-              ),
-              const CustomText(
-                  message: 'Notifications',
-                  fontSize: 25,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width - 250,
-                height: 130,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: notificationsData != null
+          ? Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    customBoxInformation('All', 'assets/icons/all.jpg'),
-                    customBoxInformation('Old', 'assets/icons/old.jpg'),
-                    customBoxInformation('New', 'assets/icons/news.png'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const CustomText(
+                        message: 'Notifications',
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryText),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 250,
+                      height: 130,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          customBoxInformation('All', 'assets/icons/all.jpg',
+                              notificationsData?.total ?? 0),
+                          customBoxInformation('Old', 'assets/icons/old.jpg',
+                              notificationsData?.totalOld ?? 0),
+                          customBoxInformation('New', 'assets/icons/news.png',
+                              notificationsData?.totalNew ?? 0),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 250,
+                      height: 450,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          importantNotifications(
+                              notificationsData?.importantNews ?? []),
+                          lastestNotifications(
+                              notificationsData?.latestNews ?? []),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width - 250,
-                height: 450,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    importantNotifications(notificationList),
-                    lastestNotifications(notificationList),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+            )
+          : const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryButton),
+            ),
     );
   }
 
-  Widget customBoxInformation(String title, String imagePath) {
+  Widget customBoxInformation(String title, String imagePath, int number) {
     return InkWell(
       onTap: () {},
       mouseCursor: SystemMouseCursors.click,
@@ -131,8 +168,8 @@ class NotificationPage extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.colorInformation),
-                  const CustomText(
-                      message: '0',
+                  CustomText(
+                      message: number.toString(),
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.colorNumberInformation),
@@ -155,7 +192,7 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget importantNotifications(List notifications) {
+  Widget importantNotifications(List<ReportNotifications> notifications) {
     return Container(
       width: 610,
       height: 450,
@@ -205,23 +242,29 @@ class NotificationPage extends StatelessWidget {
             child: ListView.builder(
               itemCount: notifications.length,
               itemBuilder: (context, index) {
-                NotificationDetail data = notifications[index];
+                ReportNotifications data = notifications[index];
                 return Material(
-                  color: Colors.transparent,
+                  color: data.isImportant == 0
+                      ? AppColors.colorHeader.withOpacity(0.3)
+                      : Colors.white,
                   child: InkWell(
                     onTap: () {},
                     child: ListTile(
                       mouseCursor: SystemMouseCursors.click,
-                      title: CustomText(
-                        message: data.title,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff0161ae),
-                      ),
+                      title: Text(
+                          "Student ${data.studentID} from class ${data.classID} has sent report ${data.topic?.toLowerCase()}" ??
+                              '',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff0161ae))),
                       subtitle: Row(
                         children: [
                           CustomText(
-                            message: '{${data.role}} - ${data.dateSend}',
+                            message:
+                                '{${data.studentID}} - ${formatTime(data.createdAt ?? '')}',
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: AppColors.secondaryText,
@@ -245,7 +288,7 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget lastestNotifications(List notifications) {
+  Widget lastestNotifications(List<ReportNotifications> notifications) {
     return Container(
       width: 290,
       height: 450,
@@ -262,7 +305,7 @@ class NotificationPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             height: 61,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -303,23 +346,29 @@ class NotificationPage extends StatelessWidget {
             child: ListView.builder(
               itemCount: notifications.length,
               itemBuilder: (context, index) {
-                NotificationDetail data = notifications[index];
+                ReportNotifications data = notifications[index];
                 return Material(
-                  color: Colors.transparent,
+                  color: data.isNew == 0
+                      ? AppColors.colorHeader.withOpacity(0.3)
+                      : Colors.white,
                   child: InkWell(
                     onTap: () {},
                     child: ListTile(
                       mouseCursor: SystemMouseCursors.click,
-                      title: CustomText(
-                        message: data.title,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff0161ae),
-                      ),
+                      title: Text(
+                          "Student ${data.studentID} from class ${data.classID} has sent report ${data.topic?.toLowerCase()}" ??
+                              '',
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff0161ae))),
                       subtitle: Row(
                         children: [
                           CustomText(
-                            message: '{${data.role}} - ${data.dateSend}',
+                            message:
+                                '{${data.studentID}} - ${formatTime(data.createdAt ?? '')}',
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: AppColors.secondaryText,
@@ -341,5 +390,20 @@ class NotificationPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String formatDate(String date) {
+    if (date != '') {
+      DateTime serverDateTime = DateTime.parse(date).toLocal();
+      String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+      return formattedDate;
+    }
+    return '';
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
   }
 }

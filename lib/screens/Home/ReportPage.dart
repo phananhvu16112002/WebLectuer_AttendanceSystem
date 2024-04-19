@@ -115,561 +115,298 @@ class _ReportPageState extends State<ReportPage> {
           padding: const EdgeInsets.only(left: 20, right: 20),
           child: _attendanceReport != null
               ? SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const CustomText(
-                          message: 'Reports',
-                          fontSize: 25,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryText),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 300,
-                            height: 600,
-                            color: Colors.white,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  child: _attendanceReport != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const CustomText(
+                                message: 'Reports',
+                                fontSize: 25,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryText),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 8.0),
-                                  child: CustomText(
-                                      message: 'Students',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
                                 Container(
                                   width: 300,
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  child: Table(
-                                    columnWidths: const {
-                                      0: FixedColumnWidth(50),
-                                      1: FixedColumnWidth(70),
-                                      2: FixedColumnWidth(70),
-                                      3: FixedColumnWidth(90),
-                                    },
-                                    border: TableBorder.all(
-                                        color: AppColors.secondaryText),
-                                    children: [
-                                      TableRow(
-                                        children: [
-                                          TableCell(
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              child: const Center(
-                                                child: CustomText(
-                                                    message: 'ReportID',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              child: const Center(
-                                                child: CustomText(
-                                                    message: 'ID',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              child: const Center(
-                                                child: CustomText(
-                                                    message: 'Name',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                          TableCell(
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              child: const Center(
-                                                child: CustomText(
-                                                    message: 'Class',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      for (var student in listReportData)
-                                        TableRow(
-                                          children: [
-                                            InkWell(
-                                              mouseCursor:
-                                                  SystemMouseCursors.click,
-                                              onTap: () {
-                                                updateData(student.classID,
-                                                    student.reportID, student);
-                                                print(
-                                                    'Tapped--------------------------');
-                                              },
-                                              child: TableCell(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5),
-                                                  child: CustomText(
-                                                      message: student.reportID
-                                                          .toString(),
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {},
-                                              mouseCursor:
-                                                  SystemMouseCursors.click,
-                                              child: TableCell(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5),
-                                                  child: CustomText(
-                                                      message:
-                                                          student.studentID,
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {},
-                                              mouseCursor:
-                                                  SystemMouseCursors.click,
-                                              child: TableCell(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5),
-                                                  child: CustomText(
-                                                      message:
-                                                          student.studentName,
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {},
-                                              mouseCursor:
-                                                  SystemMouseCursors.click,
-                                              child: TableCell(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5),
-                                                  child: cusTomText(
-                                                      student.courseName,
-                                                      11,
-                                                      FontWeight.normal,
-                                                      Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          _attendanceReport != null
-                              ? Container(
-                                  width: 390,
                                   height: 600,
                                   color: Colors.white,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: CustomText(
+                                            message: 'Students',
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryText),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        width: 300,
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: Table(
+                                          columnWidths: const {
+                                            0: FixedColumnWidth(50),
+                                            1: FixedColumnWidth(70),
+                                            2: FixedColumnWidth(70),
+                                            3: FixedColumnWidth(90),
+                                          },
+                                          border: TableBorder.all(
+                                              color: AppColors.secondaryText),
+                                          children: [
+                                            TableRow(
                                               children: [
-                                                const CustomText(
-                                                    message: 'Details',
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        AppColors.primaryText),
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 65,
-                                                      height: 20,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              _attendanceReport!
-                                                                      .isNew
-                                                                  ? AppColors
-                                                                      .textApproved
-                                                                  : AppColors
-                                                                      .primaryText,
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          5))),
-                                                      child: Center(
+                                                TableCell(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    child: const Center(
+                                                      child: CustomText(
+                                                          message: 'ReportID',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    child: const Center(
+                                                      child: CustomText(
+                                                          message: 'ID',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    child: const Center(
+                                                      child: CustomText(
+                                                          message: 'Name',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    child: const Center(
+                                                      child: CustomText(
+                                                          message: 'Class',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            for (var student in listReportData)
+                                              TableRow(
+                                                children: [
+                                                  InkWell(
+                                                    mouseCursor:
+                                                        SystemMouseCursors
+                                                            .click,
+                                                    onTap: () {
+                                                      updateData(
+                                                          student.classID,
+                                                          student.reportID,
+                                                          student);
+                                                      print(
+                                                          'Tapped--------------------------');
+                                                    },
+                                                    child: TableCell(
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5),
                                                         child: CustomText(
-                                                            message:
-                                                                _attendanceReport!
-                                                                        .isNew
-                                                                    ? 'New'
-                                                                    : 'Old',
-                                                            fontSize: 12,
+                                                            message: student
+                                                                .reportID
+                                                                .toString(),
+                                                            fontSize: 11,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .normal,
                                                             color:
-                                                                Colors.white),
+                                                                Colors.black),
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 5),
-                                                    Container(
-                                                      width: 65,
-                                                      height: 20,
-                                                      decoration: const BoxDecoration(
-                                                          color: Color.fromARGB(
-                                                              113,
-                                                              190,
-                                                              188,
-                                                              188),
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5))),
-                                                      child: Center(
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {},
+                                                    mouseCursor:
+                                                        SystemMouseCursors
+                                                            .click,
+                                                    child: TableCell(
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5),
                                                         child: CustomText(
-                                                            message:
-                                                                'ID:${_attendanceReport!.reportID.toString()}',
-                                                            fontSize: 12,
+                                                            message: student
+                                                                .studentID,
+                                                            fontSize: 11,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .normal,
-                                                            color: AppColors
-                                                                .primaryText),
+                                                            color:
+                                                                Colors.black),
                                                       ),
                                                     ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 50,
-                                          width: 390,
-                                          color: const Color(0xfff6f9ff),
-                                          child: const Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 8.0, right: 8.0, top: 20),
-                                            child: CustomText(
-                                                message: 'Basic Details',
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryText),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 160,
-                                          width: 390,
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 260,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10,
-                                                            right: 10,
-                                                            top: 20,
-                                                            bottom: 20),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        customRichText(
-                                                          title: 'Name ',
-                                                          message: _reportData!
-                                                              .studentName,
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'StudentID: ',
-                                                          message: _reportData!
-                                                              .studentID,
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'Mail: ',
-                                                          message:
-                                                              '${_reportData!.studentID}@student.tdtu.edu.vn',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'Class: ',
-                                                          message: _reportData!
-                                                              .courseName,
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title:
-                                                              'Shift - Room:  ',
-                                                          message:
-                                                              '${_reportData!.shiftNumber} - ${_reportData!.roomNumber}',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        )
-                                                      ],
-                                                    ),
                                                   ),
-                                                ),
-                                                Container(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 20, right: 15),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        customRichText(
-                                                          title:
-                                                              'Report Status: ',
-                                                          message: _reportData!
-                                                              .status,
-                                                          fontWeightTitle:
-                                                              FontWeight.bold,
-                                                          fontWeightMessage:
-                                                              FontWeight.bold,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              getColorForStatusReport(
-                                                                  _reportData!
-                                                                      .status),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'Note: ',
-                                                          message:
-                                                              ' ${_attendanceReport!.attendanceDetail.note}',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title:
-                                                              'Status Attendance: ',
-                                                          message: getResult(
-                                                              _attendanceReport!
-                                                                  .attendanceDetail
-                                                                  .result),
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.bold,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              getColorForResult(getResult(
-                                                                  _attendanceReport!
-                                                                      .attendanceDetail
-                                                                      .result)),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 50,
-                                          width: 390,
-                                          color: const Color(0xfff6f9ff),
-                                          child: const Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 8.0, right: 8.0, top: 20),
-                                            child: CustomText(
-                                                message: 'About Report',
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryText),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            width: 390,
-                                            height: 335,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0, top: 8.0),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  SizedBox(
-                                                    width: 195,
-                                                    height: 335,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const CustomText(
-                                                            message:
-                                                                'Description',
-                                                            fontSize: 15,
+                                                  InkWell(
+                                                    onTap: () {},
+                                                    mouseCursor:
+                                                        SystemMouseCursors
+                                                            .click,
+                                                    child: TableCell(
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5),
+                                                        child: CustomText(
+                                                            message: student
+                                                                .studentName,
+                                                            fontSize: 11,
                                                             fontWeight:
-                                                                FontWeight.w600,
-                                                            color: AppColors
-                                                                .primaryText),
-                                                        Container(
-                                                          width: 195,
-                                                          height: 300,
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  const BorderRadius
-                                                                      .all(
-                                                                      Radius.circular(
-                                                                          5)),
-                                                              border: Border.all(
-                                                                  color: AppColors
-                                                                      .secondaryText)),
-                                                          child:
-                                                              SingleChildScrollView(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left:
-                                                                          8.0),
+                                                                FontWeight
+                                                                    .normal,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {},
+                                                    mouseCursor:
+                                                        SystemMouseCursors
+                                                            .click,
+                                                    child: TableCell(
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5),
+                                                        child: cusTomText(
+                                                            student.courseName,
+                                                            11,
+                                                            FontWeight.normal,
+                                                            Colors.black),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                _attendanceReport != null
+                                    ? Container(
+                                        width: 390,
+                                        height: 600,
+                                        color: Colors.white,
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      const CustomText(
+                                                          message: 'Details',
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: AppColors
+                                                              .primaryText),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 65,
+                                                            height: 20,
+                                                            decoration: BoxDecoration(
+                                                                color: _attendanceReport!
+                                                                        .isNew
+                                                                    ? AppColors
+                                                                        .textApproved
+                                                                    : AppColors
+                                                                        .primaryText,
+                                                                borderRadius:
+                                                                    const BorderRadius
+                                                                        .all(
+                                                                        Radius.circular(
+                                                                            5))),
+                                                            child: Center(
+                                                              child: CustomText(
+                                                                  message: _attendanceReport!
+                                                                          .isNew
+                                                                      ? 'New'
+                                                                      : 'Old',
+                                                                  fontSize: 12,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Container(
+                                                            width: 65,
+                                                            height: 20,
+                                                            decoration: const BoxDecoration(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        113,
+                                                                        190,
+                                                                        188,
+                                                                        188),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            5))),
+                                                            child: Center(
                                                               child: CustomText(
                                                                   message:
-                                                                      ' ${_reportData!.message}',
+                                                                      'ID:${_attendanceReport!.reportID.toString()}',
                                                                   fontSize: 12,
                                                                   fontWeight:
                                                                       FontWeight
@@ -678,159 +415,484 @@ class _ReportPageState extends State<ReportPage> {
                                                                       .primaryText),
                                                             ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                        ],
+                                                      )
+                                                    ],
                                                   ),
-                                                  const SizedBox(
-                                                    width: 2,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 185,
-                                                    height: 340,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        const CustomText(
-                                                            message:
-                                                                'Evidence of the problem',
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color: AppColors
-                                                                .primaryText),
-                                                        _attendanceReport!
-                                                                .reportImages
-                                                                .isNotEmpty
-                                                            ? SingleChildScrollView(
-                                                                scrollDirection:
-                                                                    Axis.horizontal,
-                                                                child: Row(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: _attendanceReport!
-                                                                      .reportImages
-                                                                      .map((e) {
-                                                                    return Center(
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            8.0),
-                                                                        child:
-                                                                            InkWell(
-                                                                          mouseCursor:
-                                                                              SystemMouseCursors.click,
-                                                                          onTap:
-                                                                              () {},
-                                                                          child:
-                                                                              Image.network(
-                                                                            e.imageURL,
-                                                                            width:
-                                                                                185,
-                                                                            height:
-                                                                                200,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  }).toList(),
-                                                                ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 50,
+                                                width: 390,
+                                                color: const Color(0xfff6f9ff),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 8.0,
+                                                      right: 8.0,
+                                                      top: 20),
+                                                  child: CustomText(
+                                                      message: 'Basic Details',
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors
+                                                          .primaryText),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 160,
+                                                width: 390,
+                                                child: SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 260,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 10,
+                                                                  right: 10,
+                                                                  top: 20,
+                                                                  bottom: 20),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              customRichText(
+                                                                title: 'Name ',
+                                                                message:
+                                                                    _reportData!
+                                                                        .studentName,
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title:
+                                                                    'StudentID: ',
+                                                                message:
+                                                                    _reportData!
+                                                                        .studentID,
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title: 'Mail: ',
+                                                                message:
+                                                                    '${_reportData!.studentID}@student.tdtu.edu.vn',
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title:
+                                                                    'Class: ',
+                                                                message:
+                                                                    _reportData!
+                                                                        .courseName,
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title:
+                                                                    'Shift - Room:  ',
+                                                                message:
+                                                                    '${_reportData!.shiftNumber} - ${_reportData!.roomNumber}',
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
                                                               )
-                                                            : Center(
-                                                                child: Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Opacity(
-                                                                      opacity:
-                                                                          0.3,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/nodata.png',
-                                                                        width:
-                                                                            150,
-                                                                        height:
-                                                                            150,
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          10,
-                                                                    ),
-                                                                    CustomText(
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 20,
+                                                                  right: 15),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              customRichText(
+                                                                title:
+                                                                    'Report Status: ',
+                                                                message:
+                                                                    _reportData!
+                                                                        .status,
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    getColorForStatusReport(
+                                                                        _reportData!
+                                                                            .status),
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title: 'Note: ',
+                                                                message:
+                                                                    ' ${_attendanceReport!.attendanceDetail.note}',
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    AppColors
+                                                                        .primaryText,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              customRichText(
+                                                                title:
+                                                                    'Status Attendance: ',
+                                                                message: getResult(
+                                                                    _attendanceReport!
+                                                                        .attendanceDetail
+                                                                        .result),
+                                                                fontWeightTitle:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontWeightMessage:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                colorText: AppColors
+                                                                    .primaryText
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                fontSize: 12,
+                                                                colorTextMessage:
+                                                                    getColorForResult(getResult(_attendanceReport!
+                                                                        .attendanceDetail
+                                                                        .result)),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 50,
+                                                width: 390,
+                                                color: const Color(0xfff6f9ff),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 8.0,
+                                                      right: 8.0,
+                                                      top: 20),
+                                                  child: CustomText(
+                                                      message: 'About Report',
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors
+                                                          .primaryText),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: 390,
+                                                  height: 335,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 8.0,
+                                                            top: 8.0),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      children: [
+                                                        SizedBox(
+                                                          width: 195,
+                                                          height: 335,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const CustomText(
+                                                                  message:
+                                                                      'Description',
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: AppColors
+                                                                      .primaryText),
+                                                              Container(
+                                                                width: 195,
+                                                                height: 300,
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius: const BorderRadius
+                                                                        .all(
+                                                                        Radius.circular(
+                                                                            5)),
+                                                                    border: Border.all(
+                                                                        color: AppColors
+                                                                            .secondaryText)),
+                                                                child:
+                                                                    SingleChildScrollView(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            8.0),
+                                                                    child: CustomText(
                                                                         message:
-                                                                            'No data',
+                                                                            ' ${_reportData!.message}',
                                                                         fontSize:
-                                                                            15,
+                                                                            12,
                                                                         fontWeight:
                                                                             FontWeight
-                                                                                .w500,
+                                                                                .normal,
                                                                         color: AppColors
-                                                                            .primaryText
-                                                                            .withOpacity(0.3))
-                                                                  ],
+                                                                            .primaryText),
+                                                                  ),
                                                                 ),
-                                                              )
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 2,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 185,
+                                                          height: 340,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              const CustomText(
+                                                                  message:
+                                                                      'Evidence of the problem',
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: AppColors
+                                                                      .primaryText),
+                                                              _attendanceReport!
+                                                                      .reportImages
+                                                                      .isNotEmpty
+                                                                  ? SingleChildScrollView(
+                                                                      scrollDirection:
+                                                                          Axis.horizontal,
+                                                                      child:
+                                                                          Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: _attendanceReport!
+                                                                            .reportImages
+                                                                            .map((e) {
+                                                                          return Center(
+                                                                            child:
+                                                                                Padding(
+                                                                              padding: const EdgeInsets.all(8.0),
+                                                                              child: InkWell(
+                                                                                mouseCursor: SystemMouseCursors.click,
+                                                                                onTap: () {},
+                                                                                child: Image.network(
+                                                                                  e.imageURL,
+                                                                                  width: 185,
+                                                                                  height: 200,
+                                                                                  fit: BoxFit.cover,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        }).toList(),
+                                                                      ),
+                                                                    )
+                                                                  : Center(
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Opacity(
+                                                                            opacity:
+                                                                                0.3,
+                                                                            child:
+                                                                                Image.asset(
+                                                                              'assets/images/nodata.png',
+                                                                              width: 150,
+                                                                              height: 150,
+                                                                              fit: BoxFit.cover,
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            height:
+                                                                                10,
+                                                                          ),
+                                                                          CustomText(
+                                                                              message: 'No data',
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              color: AppColors.primaryText.withOpacity(0.3))
+                                                                        ],
+                                                                      ),
+                                                                    )
+                                                            ],
+                                                          ),
+                                                        )
                                                       ],
                                                     ),
-                                                  )
-                                                ],
-                                              ),
-                                            )),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  width: 300,
-                                  height: 600,
-                                  color: Colors.white,
-                                  child: const Center(
-                                      child: CircularProgressIndicator()),
+                                                  )),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        width: 300,
+                                        height: 600,
+                                        color: Colors.white,
+                                        child: const Center(
+                                            child: CircularProgressIndicator()),
+                                      ),
+                                _attendanceReport != null &&
+                                        _attendanceReport!.feedback != null
+                                    ? widgetFeedback()
+                                    : sendFeedBack()
+                              ],
+                            )
+                          ],
+                        )
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Opacity(
+                                opacity: 0.3,
+                                child: Image.asset(
+                                  'assets/images/nodata.png',
+                                  width: 200,
+                                  height: 200,
                                 ),
-                          _attendanceReport != null &&
-                                  _attendanceReport!.feedback != null
-                              ? widgetFeedback()
-                              : sendFeedBack()
-                        ],
-                      )
-                    ],
-                  ),
-                )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Opacity(
-                        opacity: 0.3,
-                        child: Image.asset(
-                          'assets/images/nodata.png',
-                          width: 200,
-                          height: 200,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              CustomText(
+                                  message: 'No Data Reports',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryText.withOpacity(0.3))
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomText(
-                          message: 'No Data Reports',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primaryText.withOpacity(0.3))
-                    ],
-                  ),
+                )
+              : const Center(
+                  child:
+                      CircularProgressIndicator(color: AppColors.primaryButton),
                 )),
     );
   }
@@ -1095,7 +1157,8 @@ class _ReportPageState extends State<ReportPage> {
     if (_attendanceReport != null && _attendanceReport!.feedback != null) {
       topicController.text = _attendanceReport!.feedback!.topic ?? '';
       messageController.text = _attendanceReport!.feedback!.message ?? '';
-      selectedValueController.text = _attendanceReport!.feedback!.confirmStatus ?? 'Absent';
+      selectedValueController.text =
+          _attendanceReport!.feedback!.confirmStatus ?? 'Absent';
       return SizedBox(
         width: 280,
         height: 630,
@@ -1257,8 +1320,8 @@ class _ReportPageState extends State<ReportPage> {
                                 if (_attendanceReport!.isNew == true) {
                                   //send Feedback
                                   _progressDialog.show();
-                                  bool check = await API(context)
-                                      .submitFeedback(
+                                  bool check =
+                                      await API(context).submitFeedback(
                                           _reportData!.reportID,
                                           topicController.text,
                                           messageController.text,
@@ -1438,7 +1501,8 @@ class _ReportPageState extends State<ReportPage> {
                 child: ListView.builder(
                     itemCount: _attendanceReport!.historyReports.length,
                     itemBuilder: (context, index) {
-                      HistoryReport historyReport = _attendanceReport!.historyReports[index];
+                      HistoryReport historyReport =
+                          _attendanceReport!.historyReports[index];
                       return InkWell(
                         onTap: () {
                           showHistoryReport(context, historyReport);

@@ -3,6 +3,7 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/Attend
 class StudentData {
   List<AttendanceDetailForDetailPage> attendancedetails;
   String status;
+  String total;
   String studentID;
   String studentName;
   String studentEmail;
@@ -10,6 +11,7 @@ class StudentData {
   StudentData({
     required this.attendancedetails,
     required this.status,
+    required this.total,
     required this.studentID,
     required this.studentName,
     required this.studentEmail,
@@ -26,6 +28,7 @@ class StudentData {
     return StudentData(
       attendancedetails: attendanceDetails,
       status: json['status'],
+      total: json['total'],
       studentID: json['studentID'],
       studentName: json['studentName'],
       studentEmail: json['studentEmail'],

@@ -23,7 +23,7 @@ class _OTPPageState extends State<OTPPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   OtpFieldController otpFieldController = OtpFieldController();
-  int secondsRemaining = 10; // Initial value for 1 minute
+  int secondsRemaining = 59; // Initial value for 1 minute
   bool canResend = false;
   late Timer _timer;
   late ProgressDialog _progressDialog;
@@ -79,7 +79,7 @@ class _OTPPageState extends State<OTPPage> {
 
   void restartTimer() {
     setState(() {
-      secondsRemaining = 10;
+      secondsRemaining = 59;
       canResend = false;
     });
     startTimer(); // Start the timer again
@@ -108,7 +108,7 @@ class _OTPPageState extends State<OTPPage> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                        const BorderRadius.all(const Radius.circular(10)),
+                        const BorderRadius.all(Radius.circular(10)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withOpacity(0.2),
@@ -118,7 +118,7 @@ class _OTPPageState extends State<OTPPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height - 100,
                       width: 550,
                       child: Column(
@@ -151,7 +151,7 @@ class _OTPPageState extends State<OTPPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Container(
+                          SizedBox(
                             width: MediaQuery.of(context).size.width - 100,
                             height: 140,
                             child: Column(
@@ -175,7 +175,7 @@ class _OTPPageState extends State<OTPPage> {
                         ],
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height - 100,
                       width: 550,
                       child: Center(

@@ -100,12 +100,12 @@ class _DetailPageState extends State<DetailPage> {
         classes.classID!); // get Student from class
     fetchData.then((value) {
       setState(() {
-        listData = value!.data;
-        listTemp = value.data;
-        numberAllStudent = value.classData.total;
-        numberPassStudent = value.classData.pass;
-        numberBanStudent = value.classData.ban;
-        numberWarningStudent = value.classData.warning;
+        listData = value?.data ?? [];
+        listTemp = value?.data ?? [];
+        numberAllStudent = value?.classData.total ?? 0;
+        numberPassStudent = value?.classData.pass ?? 0;
+        numberBanStudent = value?.classData.ban ?? 0;
+        numberWarningStudent = value?.classData.warning ?? 0;
       });
     });
     print('FetchData-----');
@@ -713,8 +713,8 @@ class _DetailPageState extends State<DetailPage> {
                       children: [
                         customButtonDashBoard('Export', listData,
                             widget.classes!.course!.totalWeeks),
-                        customButtonDashBoard(
-                            'PDF', listData, widget.classes!.course!.totalWeeks),
+                        customButtonDashBoard('PDF', listData,
+                            widget.classes!.course!.totalWeeks),
                         customButtonDashBoard('Excel', listData,
                             widget.classes!.course!.totalWeeks),
                         const SizedBox(
@@ -884,8 +884,8 @@ class _DetailPageState extends State<DetailPage> {
                       children: [
                         customButtonDashBoard('Export', listData,
                             widget.classes!.course!.totalWeeks),
-                        customButtonDashBoard(
-                            'PDF', listData, widget.classes!.course!.totalWeeks),
+                        customButtonDashBoard('PDF', listData,
+                            widget.classes!.course!.totalWeeks),
                         customButtonDashBoard('Excel', listData,
                             widget.classes!.course!.totalWeeks),
                         const SizedBox(
@@ -1026,10 +1026,10 @@ class _DetailPageState extends State<DetailPage> {
           child: listData.isNotEmpty
               ? Row(
                   children: [
-                    tableIntro(listColumnWidth, paginatedStudents),
+                    tableIntro(listColumnWidth, paginatedStudents, listData),
                     tableCheckAttendance(
                         numberOfWeeks, paginatedStudents, listData),
-                    tableTotal(paginatedStudents),
+                    tableTotal(paginatedStudents, listData),
                   ],
                 )
               : Center(
@@ -1121,7 +1121,8 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget tableTotal(List<Map<String, String>> paginatedStudents) {
+  Widget tableTotal(
+      List<Map<String, String>> paginatedStudents, List<StudentData> listData) {
     return SizedBox(
       width: 100,
       height: 350,
@@ -1152,10 +1153,10 @@ class _DetailPageState extends State<DetailPage> {
                 child: Container(
                   padding: const EdgeInsets.all(5),
                   color: Colors.white,
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      '',
-                      style: TextStyle(
+                      listData[i].total,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -1276,6 +1277,26 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  Color getColorStatus(String status) {
+    if (status.contains('Warning') || status == 'Warning') {
+      return const Color.fromARGB(231, 216, 136, 38);
+    } else if (status.contains('Ban') || status == 'Ban') {
+      return AppColors.importantText;
+    } else {
+      return Colors.white;
+    }
+  }
+
+  Color getTextColor(String status) {
+    if (status.contains('Warning') || status == 'Warning') {
+      return Colors.white;
+    } else if (status.contains('Ban') || status == 'Ban') {
+      return Colors.white;
+    } else {
+      return AppColors.primaryText;
+    }
+  }
+
   String formatDate(String date) {
     if (date != '') {
       DateTime serverDateTime = DateTime.parse(date).toLocal();
@@ -1301,8 +1322,8 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Widget tableIntro(
-      listColumnWidth, List<Map<String, String>> paginatedStudents) {
+  Widget tableIntro(listColumnWidth,
+      List<Map<String, String>> paginatedStudents, List<StudentData> listData) {
     return SizedBox(
       width: 350,
       height: 350,
@@ -1368,14 +1389,14 @@ class _DetailPageState extends State<DetailPage> {
               TableCell(
                 child: Container(
                   padding: const EdgeInsets.all(5),
-                  color: Colors.white,
+                  color: getColorStatus(listData[i].status),
                   child: Center(
                     child: Text(
                       '${currentPage * itemsPerPage + i + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: getTextColor(listData[i].status),
                       ),
                     ),
                   ),
@@ -1384,14 +1405,14 @@ class _DetailPageState extends State<DetailPage> {
               TableCell(
                 child: Container(
                   padding: const EdgeInsets.all(5),
-                  color: Colors.white,
+                  color: getColorStatus(listData[i].status),
                   child: Center(
                     child: Text(
                       '${paginatedStudents[i]['studentID']}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: getTextColor(listData[i].status),
                       ),
                     ),
                   ),
@@ -1400,14 +1421,14 @@ class _DetailPageState extends State<DetailPage> {
               TableCell(
                 child: Container(
                   padding: const EdgeInsets.all(5),
-                  color: Colors.white,
+                  color: getColorStatus(listData[i].status),
                   child: Center(
                     child: Text(
                       '${paginatedStudents[i]['name']}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: getTextColor(listData[i].status),
                       ),
                     ),
                   ),
@@ -1440,29 +1461,54 @@ class _DetailPageState extends State<DetailPage> {
       listCellValue.add(excel.TextCellValue('Day $i'));
     }
     listCellValue.add(const excel.TextCellValue('Total'));
+    listCellValue.add(const excel.TextCellValue('Status'));
+
     sheet.appendRow(listCellValue);
 
     // Add data
     for (int i = 0; i < studentAttendance.length; i++) {
-      // Assuming Student has properties studentID, studentName, and studentEmail
       List<excel.CellValue> studentRow = [];
 
       studentRow.add(excel.IntCellValue(i + 1)); // No
       studentRow.add(excel.TextCellValue(studentAttendance[i].studentID));
       studentRow.add(excel.TextCellValue(studentAttendance[i].studentName));
       studentRow.add(excel.TextCellValue(studentAttendance[i].studentEmail));
+
       for (int j = 0; j < studentAttendance[i].attendancedetails.length; j++) {
         studentRow.add(excel.TextCellValue(
             studentAttendance[i].attendancedetails[j].result.toString()));
       }
+
+      for (int j = 0;
+          j < totalWeeks - studentAttendance[i].attendancedetails.length;
+          j++) {
+        studentRow.add(const excel.TextCellValue('null'));
+      }
+      studentRow.add(excel.TextCellValue(studentAttendance[i].total));
+      studentRow
+          .add(excel.TextCellValue(statusStudent(studentAttendance[i].status)));
       sheet.appendRow(studentRow);
     }
-    int totalColumns = 4 + totalWeeks + 1;
+
+    int totalColumns = 4 + totalWeeks + 1 + 1;
+
     for (int i = 1; i <= totalColumns; i++) {
       sheet.setColumnAutoFit(i);
     }
     // Save the Excel file
     excel1.save(fileName: 'My_Excel_File_Name.xlsx');
+  }
+
+  String statusStudent(String status) {
+    if (status.contains('Pass') || status == 'Pass') {
+      return 'Pass';
+    } else if (status.contains('Warning') || status == 'Warning') {
+      return 'Pass';
+    } else if (status.contains('Ban') || status == 'Ban') {
+      return 'Ban';
+    } else {
+      return 'Pass';
+    }
   }
 
   Widget customButtonDashBoard(
