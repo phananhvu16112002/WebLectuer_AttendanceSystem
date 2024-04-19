@@ -1011,11 +1011,12 @@ class _ReportPageState extends State<ReportPage> {
                             if (_formKey.currentState!.validate()) {
                               //send Feedback
                               _progressDialog.show();
+                              print('selected: $newSelectedValue');
                               bool check = await API(context).submitFeedback(
                                   _reportData!.reportID,
                                   topicControllerNew.text,
                                   messageControllerNew.text,
-                                  selectedValueControllerNew.text);
+                                  newSelectedValue);
                               if (check) {
                                 await _progressDialog.hide();
                                 if (mounted) {
@@ -1092,9 +1093,9 @@ class _ReportPageState extends State<ReportPage> {
   Widget widgetFeedback() {
     selectedValue ??= _attendanceReport!.feedback!.confirmStatus;
     if (_attendanceReport != null && _attendanceReport!.feedback != null) {
-      topicController.text = _attendanceReport!.feedback!.topic;
-      messageController.text = _attendanceReport!.feedback!.message;
-      selectedValueController.text = _attendanceReport!.feedback!.confirmStatus;
+      topicController.text = _attendanceReport!.feedback!.topic ?? '';
+      messageController.text = _attendanceReport!.feedback!.message ?? '';
+      selectedValueController.text = _attendanceReport!.feedback!.confirmStatus ?? 'Absent';
       return SizedBox(
         width: 280,
         height: 630,
@@ -1261,7 +1262,8 @@ class _ReportPageState extends State<ReportPage> {
                                           _reportData!.reportID,
                                           topicController.text,
                                           messageController.text,
-                                          selectedValueController.text);
+                                          // selectedValueController.text);
+                                          selectedValue ?? 'Absent');
                                   if (check) {
                                     await _progressDialog.hide();
                                     if (mounted) {
@@ -1397,6 +1399,7 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget historyReports() {
+    print(listHistoryReport);
     return Container(
       width: 280,
       height: 270,
@@ -1433,9 +1436,9 @@ class _ReportPageState extends State<ReportPage> {
             ),
             Expanded(
                 child: ListView.builder(
-                    itemCount: listHistoryReport.length,
+                    itemCount: _attendanceReport!.historyReports.length,
                     itemBuilder: (context, index) {
-                      HistoryReport historyReport = listHistoryReport[index];
+                      HistoryReport historyReport = _attendanceReport!.historyReports[index];
                       return InkWell(
                         onTap: () {
                           showHistoryReport(context, historyReport);
@@ -1510,6 +1513,7 @@ class _ReportPageState extends State<ReportPage> {
                                       MediaQuery.of(context).size.width - 100,
                                   color: Colors.white,
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
                                     children: [
@@ -1587,7 +1591,7 @@ class _ReportPageState extends State<ReportPage> {
         decoration: BoxDecoration(
             color: Colors.white,
             border:
-                Border.all(color: Colors.black.withOpacity(0.3), width: 0.5),
+                Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
             borderRadius: const BorderRadius.all(Radius.circular(5))),
         child: Padding(
           padding: const EdgeInsets.all(8.0),

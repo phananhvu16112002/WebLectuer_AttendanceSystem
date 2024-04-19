@@ -449,7 +449,7 @@ class _HomePageState extends State<HomePage> {
       String subGroup, int shiftNumber, String room, String imgPath) {
     return SizedBox(
         width: 380,
-        height: 200,
+        height: 210,
         child: Card(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -457,7 +457,7 @@ class _HomePageState extends State<HomePage> {
             Stack(
               children: [
                 SizedBox(
-                  width: 380,
+                  width: 375,
                   height: 100,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -468,7 +468,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 10),
+                  padding: const EdgeInsets.only(left: 5, top: 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -542,7 +542,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 225, right: 10),
+              padding: const EdgeInsets.only(left: 215, right: 10),
               child: Row(
                 children: [
                   IconButton(

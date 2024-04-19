@@ -9,6 +9,7 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_pr
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,12 +40,12 @@ class _MyAppState extends State<MyApp> {
           dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch},
         ),
         debugShowCheckedModeBanner: false,
-        title: 'Attendance System',
+        title: 'Attendance System Lecturer',
         theme: ThemeData(
           colorScheme:
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: true,
         ),
-        home: const WelcomePage());
+        home: const HomePage());
   }
 }

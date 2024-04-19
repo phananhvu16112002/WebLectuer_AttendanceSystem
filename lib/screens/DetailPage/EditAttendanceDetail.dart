@@ -142,8 +142,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            child:  Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -170,9 +171,12 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                                                 .all(
                                                                 Radius.circular(
                                                                     5))),
-                                                    child: const Center(
+                                                    child: Center(
                                                       child: CustomText(
-                                                          message: 'Present',
+                                                          message: getStatusResult(
+                                                              _studentAttendance!
+                                                                      .result ??
+                                                                  ''),
                                                           fontSize: 11,
                                                           fontWeight:
                                                               FontWeight.normal,
@@ -657,7 +661,8 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                   Align(
                                     alignment: Alignment.topCenter,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       // mainAxisAlignment: ,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
@@ -666,7 +671,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                                           height: 10,
                                         ),
                                         newReports(),
-                                        const SizedBox(height: 50,)
+                                        const SizedBox(
+                                          height: 50,
+                                        )
                                       ],
                                     ),
                                   )
@@ -920,9 +927,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
   }
 
   Color getColorForStatusHistoryEdition(String result) {
-    if (result == 'Approved') {
+    if (result == 'Present') {
       return AppColors.textApproved;
-    } else if (result == 'Pending') {
+    } else if (result == 'Late') {
       return const Color.fromARGB(231, 216, 136, 38);
     } else {
       return AppColors.importantText;

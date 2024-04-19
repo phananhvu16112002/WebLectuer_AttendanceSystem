@@ -59,9 +59,13 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
-      // myLocation = tempAddress!; //API expired;
+      // _currentLocation = const LatLng(10.7315191,106.6990618);
+
+      myLocation = tempAddress; //API expired;
       latitude = position.latitude;
       longtitude = position.longitude;
+      // latitude = 10.7315191;
+      // longtitude = 106.6990618;
       print('Latitude: ${position.latitude}');
       print('Longtitude: ${position.longitude}');
       print('Address:$tempAddress');
@@ -183,7 +187,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     return Container(
       width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
       height: 600,
-      decoration: const BoxDecoration(
+      decoration:  const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Padding(

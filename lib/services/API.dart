@@ -42,8 +42,7 @@ class API {
         return newAccessToken;
       } else if (response.statusCode == 401) {
         print('Refresh Token is expired'); // Navigation to welcomePage
-        await SecureStorage().deleteSecureData('refreshToken');
-        await SecureStorage().deleteSecureData('accessToken');
+
         // ignore: use_build_context_synchronously
         showDialog(
           context: context,
@@ -51,12 +50,14 @@ class API {
             return WillPopScope(
               onWillPop: () async {
                 // Navigate to WelcomePage when dialog is dismissed
-                Navigator.pushReplacement(
+                await Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const WelcomePage(),
                   ),
                 );
+                await SecureStorage().deleteSecureData('refreshToken');
+                await SecureStorage().deleteSecureData('accessToken');
                 return true; // Return true to allow pop
               },
               child: AlertDialog(
@@ -67,7 +68,7 @@ class API {
                     'Your session has expired. Please log in again.'),
                 actions: <Widget>[
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
                       Navigator.pushReplacement(
                         context,
@@ -75,6 +76,8 @@ class API {
                           builder: (context) => const WelcomePage(),
                         ),
                       );
+                      await SecureStorage().deleteSecureData('refreshToken');
+                      await SecureStorage().deleteSecureData('accessToken');
                     },
                     child: const Text('OK'),
                   ),
@@ -739,6 +742,7 @@ class API {
       double longtitude,
       double radius) async {
     const url = 'http://localhost:8080/api/teacher/form/submit';
+    var accessToken = await getAccessToken();
     var request = {
       'classID': classID,
       'startTime': startTime,
@@ -751,31 +755,49 @@ class API {
     };
     var body = json.encode(request);
     var headers = {
+      'authorization': accessToken,
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
-    final response =
-        await http.post(Uri.parse(url), headers: headers, body: body);
     try {
+      print('body:$body');
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
+      // print(jsonDecode(response.body));
       if (response.statusCode == 200) {
-        print('Respone.body ${response.body}');
-        print('JsonDecode:${jsonDecode(response.body)}');
-        Map<String, dynamic> data = jsonDecode(response.body);
-        try {
-          AttendanceForm attendanceForm = AttendanceForm.fromJson(data);
-          return attendanceForm;
-        } catch (e) {
-          print('Error parsing data: $e');
+        dynamic responseData = jsonDecode(response.body);
+        AttendanceForm data = AttendanceForm.fromJson(responseData);
+
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.post(Uri.parse(url), headers: headers, body: body);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+                  AttendanceForm data = AttendanceForm.fromJson(responseData);
+            // print('Data $data');
+            return data;
+          } else {
+            return null;
+          }
+        } else {
+          print('New Access Token is empty');
+          return null;
         }
       } else {
-        print('Error:${jsonDecode(response.body)['message']}');
+        print('Failed to load data. Status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {
       print('Error: $e');
       return null;
     }
-    return null;
   }
 
   Future<AttendanceDetailResponseStudent>

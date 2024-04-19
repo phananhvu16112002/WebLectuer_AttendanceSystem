@@ -1,16 +1,16 @@
 class FeedbackDetail {
-  final int feedbackID;
-  final String topic;
-  final String message;
-  final String confirmStatus;
-  final String createdAt;
+   int? feedbackID;
+   String? topic;
+   String? message;
+   String? confirmStatus;
+   String? createdAt;
 
   FeedbackDetail({
-    required this.feedbackID,
-    required this.topic,
-    required this.message,
-    required this.confirmStatus,
-    required this.createdAt,
+     this.feedbackID =0,
+     this.topic = '',
+     this.message = '',
+     this.confirmStatus = '',
+     this.createdAt = '',
   });
 
   factory FeedbackDetail.fromJson(Map<String, dynamic> json) {

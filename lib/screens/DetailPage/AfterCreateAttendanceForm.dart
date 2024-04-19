@@ -65,7 +65,8 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
             header(),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: 550,
+              // height: 550,
+              padding: const EdgeInsets.symmetric(vertical: 20),
               color: AppColors.backgroundColor,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),

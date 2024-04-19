@@ -28,7 +28,7 @@ class GetLocation {
       return Future.error("Location permission are permanently denied");
     }
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.best,
         timeLimit: const Duration(hours: 2),
         forceAndroidLocationManager: true);
     latitude = position.latitude;

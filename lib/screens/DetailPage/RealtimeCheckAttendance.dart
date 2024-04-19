@@ -117,6 +117,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
       absent = attendanceSummary.stats.totalAbsence;
       late = attendanceSummary.stats.totalLate;
     });
+    print('AttendanceSummary: $attendanceSummary');
 
     // await API(context).getAttendanceDetailRealtime(widget.formID).then((value) {
     //   setState(() {
@@ -165,36 +166,6 @@ void updateData(dynamic data) {
     setState(() {});
   }
 }
-
-  // void updateData(dynamic data) {
-  //   print("absent initial: ${absent}");
-  //   print("present initial: ${present}");
-  //   print("late initial: ${late}");
-  //   String studentID = data['studentDetail'];
-  //   for (int i = 0; i < studentAttendance.length; i++) {
-  //     if (studentID.contains(studentAttendance[i].studentID)) {
-  //       if (data['result'] == '1') {
-  //         setState(() {
-  //           absent = absent - 1;
-  //           present = present + 1;
-  //           studentAttendance[i].result = data['result'];
-  //           studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-  //           presentAttendance.add(studentAttendance[i]);
-  //           absentAttendance.remove(studentAttendance[i]);
-  //         });
-  //       } else if (data['result'] == '0.5') {
-  //         setState(() {
-  //           late = late + 1;
-  //           absent = absent - 1;
-  //           studentAttendance[i].result = data['result'];
-  //           studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-  //           lateAttendance.add(studentAttendance[i]);
-  //           absentAttendance.remove(studentAttendance[i]);
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
 
   void newAllListData() {
     setState(() {
