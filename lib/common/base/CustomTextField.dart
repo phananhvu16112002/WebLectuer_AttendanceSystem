@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    required this.textInputType,
-    required this.obscureText,
-    required this.suffixIcon,
-    required this.hintText,
-    this.validator,
-    this.onSaved,
-    this.onChanged,
-    required this.prefixIcon,
-    required this.readOnly,
-  });
+  CustomTextField(
+      {super.key,
+      required this.controller,
+      required this.textInputType,
+      required this.obscureText,
+      required this.suffixIcon,
+      required this.hintText,
+      this.validator,
+      this.onSaved,
+      this.onChanged,
+      required this.prefixIcon,
+      required this.readOnly,
+      this.width = 0,
+      this.height = 0});
 
   final TextEditingController controller;
   final TextInputType textInputType;
@@ -26,12 +27,14 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final Icon prefixIcon;
   final bool readOnly;
+  double? width;
+  double? height;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 350,
-      height: 40,
+      width: width,
+      height: height,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),

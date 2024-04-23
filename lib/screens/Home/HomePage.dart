@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
@@ -17,6 +18,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart'
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/RepositoryClassPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/SettingPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
+import 'package:weblectuer_attendancesystem_nodejs/services/Responsive.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 
@@ -76,196 +78,721 @@ class _HomePageState extends State<HomePage> {
         Provider.of<ClassDataProvider>(context, listen: false);
     final teacherDataProvider =
         Provider.of<TeacherDataProvider>(context, listen: false);
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: appBar(teacherDataProvider),
-      body: SingleChildScrollView(
-        child: Row(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: isCollapsedOpen ? 250 : 70,
-              child: isCollapsedOpen ? leftHeader() : collapsedSideBar(),
-            ),
-            Expanded(
-              child: selectedPage(classDataProvider),
-            ),
-          ],
+      appBar: AppBar(
+        leading: const Icon(null),
+        backgroundColor: AppColors.colorHeader,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Responsive(
+            mobile: _appbarMobile(size, context, teacherDataProvider),
+            tablet: _appbarTablet(size, context, teacherDataProvider),
+            desktop: _appbarDesktop(context, teacherDataProvider),
+          ),
         ),
       ),
-    );
-  }
-
-  Widget collapsedSideBar() {
-    return Container(
-      width: 80,
-      height: MediaQuery.of(context).size.height,
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = true;
-                checkNotification = false;
-                checkReport = false;
-                checkRepository = false;
-                checkCalendar = false;
-                checkSettings = false;
-              });
-            },
-            child:
-                iconCollapseSideBar(const Icon(Icons.home_outlined), checkHome),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = true;
-                checkReport = false;
-                checkRepository = false;
-                checkCalendar = false;
-                checkSettings = false;
-              });
-            },
-            child: iconCollapseSideBar(
-              const Icon(Icons.notifications_outlined),
-              checkNotification,
-            ),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = false;
-                checkReport = true;
-                checkRepository = false;
-                checkCalendar = false;
-                checkSettings = false;
-              });
-            },
-            child: iconCollapseSideBar(
-                const Icon(Icons.book_outlined), checkReport),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = false;
-                checkReport = false;
-                checkRepository = true;
-                checkCalendar = false;
-                checkSettings = false;
-              });
-            },
-            child: iconCollapseSideBar(
-              const Icon(Icons.cloud_download_outlined),
-              checkRepository,
-            ),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = false;
-                checkReport = false;
-                checkRepository = false;
-                checkCalendar = true;
-                checkSettings = false;
-              });
-            },
-            child: iconCollapseSideBar(
-              const Icon(Icons.calendar_month_outlined),
-              checkCalendar,
-            ),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = false;
-                checkReport = false;
-                checkRepository = false;
-                checkCalendar = false;
-                checkSettings = true;
-              });
-            },
-            child: iconCollapseSideBar(
-              const Icon(Icons.settings_outlined),
-              checkSettings,
-            ),
-          ),
-        ],
+      body: Responsive(
+        mobile: _bodyMobile(size, context, classDataProvider),
+        tablet: _bodyTablet(size, context, classDataProvider),
+        desktop: _bodyDesktop(context, classDataProvider, size),
       ),
     );
   }
 
-  Container iconCollapseSideBar(Icon icon, bool check) {
-    return Container(
-        width: 50,
-        height: 30,
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            border: Border.all(color: Colors.white),
-            color: check
-                ? AppColors.colorHeader.withOpacity(0.5)
-                : Colors.transparent),
-        child: icon);
+  Row _bodyMobile(
+      Size size, BuildContext context, ClassDataProvider classDataProvider) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: size.width > 650 ? 200 : 60,
+          child: size.width > 650
+              ? Container(
+                  width: 250,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5),
+                          bottomRight: Radius.circular(5))),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const CustomText(
+                            message: 'Main',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Home', const Icon(Icons.home_outlined), checkHome),
+                        const CustomText(
+                            message: 'Analyze',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Notifications',
+                            const Icon(Icons.notifications_outlined),
+                            checkNotification),
+                        itemHeader('Reports', const Icon(Icons.book_outlined),
+                            checkReport),
+                        const CustomText(
+                            message: 'Manage',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Repository Class',
+                            const Icon(Icons.cloud_download_outlined),
+                            checkRepository),
+                        itemHeader(
+                            'Calendar',
+                            const Icon(Icons.calendar_month_outlined),
+                            checkCalendar),
+                        const CustomText(
+                            message: 'Personal',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader('Settings',
+                            const Icon(Icons.settings_outlined), checkSettings),
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 60,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = true;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.home_outlined), checkHome),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = true;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.notifications_outlined),
+                          checkNotification,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = true;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.book_outlined), checkReport),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = true;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.cloud_download_outlined),
+                          checkRepository,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = true;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.calendar_month_outlined),
+                          checkCalendar,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = true;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.settings_outlined),
+                          checkSettings,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+        Expanded(
+          flex: 6,
+          child: selectedPage(classDataProvider, size, true),
+        ),
+      ],
+    );
   }
 
-  PreferredSizeWidget appBar(TeacherDataProvider teacherDataProvider) {
-    return AppBar(
-      leading: const Icon(null),
-      backgroundColor: AppColors.colorHeader,
-      flexibleSpace: Padding(
-        padding:
-            const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-        child: Row(
+  Row _bodyTablet(
+      Size size, BuildContext context, ClassDataProvider classDataProvider) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: size.width > 990 ? 200 : 60,
+          child: size.width > 990
+              ? Container(
+                  width: 250,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5),
+                          bottomRight: Radius.circular(5))),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const CustomText(
+                            message: 'Main',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Home', const Icon(Icons.home_outlined), checkHome),
+                        const CustomText(
+                            message: 'Analyze',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Notifications',
+                            const Icon(Icons.notifications_outlined),
+                            checkNotification),
+                        itemHeader('Reports', const Icon(Icons.book_outlined),
+                            checkReport),
+                        const CustomText(
+                            message: 'Manage',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Repository Class',
+                            const Icon(Icons.cloud_download_outlined),
+                            checkRepository),
+                        itemHeader(
+                            'Calendar',
+                            const Icon(Icons.calendar_month_outlined),
+                            checkCalendar),
+                        const CustomText(
+                            message: 'Personal',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader('Settings',
+                            const Icon(Icons.settings_outlined), checkSettings),
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 60,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = true;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.home_outlined), checkHome),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = true;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.notifications_outlined),
+                          checkNotification,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = true;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.book_outlined), checkReport),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = true;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.cloud_download_outlined),
+                          checkRepository,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = true;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.calendar_month_outlined),
+                          checkCalendar,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = true;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.settings_outlined),
+                          checkSettings,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+        Expanded(
+          flex: 6,
+          child: selectedPage(classDataProvider, size, false),
+        ),
+      ],
+    );
+  }
+
+  Row _bodyDesktop(
+      BuildContext context, ClassDataProvider classDataProvider, Size size) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: isCollapsedOpen ? 250 : 80,
+          child: isCollapsedOpen
+              ? Container(
+                  width: 250,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(5),
+                          bottomRight: Radius.circular(5))),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const CustomText(
+                            message: 'Main',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Home', const Icon(Icons.home_outlined), checkHome),
+                        const CustomText(
+                            message: 'Analyze',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Notifications',
+                            const Icon(Icons.notifications_outlined),
+                            checkNotification),
+                        itemHeader('Reports', const Icon(Icons.book_outlined),
+                            checkReport),
+                        const CustomText(
+                            message: 'Manage',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader(
+                            'Repository Class',
+                            const Icon(Icons.cloud_download_outlined),
+                            checkRepository),
+                        itemHeader(
+                            'Calendar',
+                            const Icon(Icons.calendar_month_outlined),
+                            checkCalendar),
+                        const CustomText(
+                            message: 'Personal',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryText),
+                        itemHeader('Settings',
+                            const Icon(Icons.settings_outlined), checkSettings),
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 80,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = true;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.home_outlined), checkHome),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = true;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.notifications_outlined),
+                          checkNotification,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = true;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                            const Icon(Icons.book_outlined), checkReport),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = true;
+                            checkCalendar = false;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.cloud_download_outlined),
+                          checkRepository,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = true;
+                            checkSettings = false;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.calendar_month_outlined),
+                          checkCalendar,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            checkHome = false;
+                            checkNotification = false;
+                            checkReport = false;
+                            checkRepository = false;
+                            checkCalendar = false;
+                            checkSettings = true;
+                          });
+                        },
+                        child: iconCollapseSideBar(
+                          const Icon(Icons.settings_outlined),
+                          checkSettings,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+        Expanded(
+          flex: 5,
+          child: selectedPage(classDataProvider, size, false),
+        ),
+      ],
+    );
+  }
+
+  Row _appbarMobile(Size size, BuildContext context,
+      TeacherDataProvider teacherDataProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () {},
+              mouseCursor: SystemMouseCursors.click,
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 50,
+                height: 50,
+              ),
+            ),
+            // SizedBox(width: size.width <= 400 ? 60 : 170),
+            // IconButton(
+            //     onPressed: () {
+            //       toggleDrawer();
+            //     },
+            //     icon: const Icon(
+            //       Icons.menu,
+            //       size: 25,
+            //       color: AppColors.textName,
+            //     ))
+          ],
+        ),
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InkWell(
-                  onTap: () {},
-                  mouseCursor: SystemMouseCursors.click,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-                const SizedBox(width: 180),
                 IconButton(
-                    onPressed: () {
-                      toggleDrawer();
-                    },
+                    onPressed: () {},
                     icon: const Icon(
-                      Icons.menu,
-                      size: 25,
-                      color: AppColors.textName,
-                    ))
+                      Icons.notifications_none_outlined,
+                    )),
+                const SizedBox(
+                  width: 10,
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.messenger_outline_sharp)),
+                const SizedBox(
+                  width: 10,
+                ),
+                MouseRegion(
+                  onHover: (event) => showMenu(
+                    color: Colors.white,
+                    context: context,
+                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
+                    items: [
+                      const PopupMenuItem(
+                        child: Text("My Profile"),
+                      ),
+                      const PopupMenuItem(
+                        child: Text("Log Out"),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          backgroundImage:
+                              AssetImage('assets/images/avatar.png'),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        CustomText(
+                            message: teacherDataProvider.userData.teacherName,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textName)
+                      ],
+                    ),
+                  ),
+                )
               ],
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  Row _appbarTablet(Size size, BuildContext context,
+      TeacherDataProvider teacherDataProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () {},
+              mouseCursor: SystemMouseCursors.click,
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 50,
+                height: 50,
+              ),
+            ),
+            SizedBox(width: size.width >= 700 ? 160 : 120),
+            // IconButton(
+            //     onPressed: () {
+            //       toggleDrawer();
+            //     },
+            //     icon: const Icon(
+            //       Icons.menu,
+            //       size: 25,
+            //       color: AppColors.textName,
+            //     ))
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CustomTextField(
+              controller: searchController,
+              textInputType: TextInputType.text,
+              obscureText: false,
+              suffixIcon:
+                  const IconButton(onPressed: null, icon: Icon(Icons.search)),
+              hintText: 'Search',
+              prefixIcon: const Icon(null),
+              readOnly: false,
+              width: 250,
+              height: 50,
+            ),
+            const SizedBox(
+              width: 10,
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomTextField(
-                    controller: searchController,
-                    textInputType: TextInputType.text,
-                    obscureText: false,
-                    suffixIcon: IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
-                    hintText: 'Search',
-                    prefixIcon: const Icon(null),
-                    readOnly: false),
-                const SizedBox(
-                  width: 60,
-                ),
                 IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.notifications_none_outlined)),
@@ -315,9 +842,118 @@ class _HomePageState extends State<HomePage> {
               ],
             )
           ],
-        ),
-      ),
+        )
+      ],
     );
+  }
+
+  Row _appbarDesktop(
+      BuildContext context, TeacherDataProvider teacherDataProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            InkWell(
+              onTap: () {},
+              mouseCursor: SystemMouseCursors.click,
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 50,
+                height: 50,
+              ),
+            ),
+            const SizedBox(width: 180),
+            IconButton(
+                onPressed: () {
+                  toggleDrawer();
+                },
+                icon: const Icon(
+                  Icons.menu,
+                  size: 25,
+                  color: AppColors.textName,
+                ))
+          ],
+        ),
+        Row(
+          children: [
+            CustomTextField(
+              controller: searchController,
+              textInputType: TextInputType.text,
+              obscureText: false,
+              suffixIcon:
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+              hintText: 'Search',
+              prefixIcon: const Icon(null),
+              readOnly: false,
+              width: 250,
+              height: 50,
+            ),
+            const SizedBox(
+              width: 60,
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none_outlined)),
+            const SizedBox(
+              width: 10,
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.messenger_outline_sharp)),
+            const SizedBox(
+              width: 10,
+            ),
+            MouseRegion(
+              onHover: (event) => showMenu(
+                color: Colors.white,
+                context: context,
+                position: const RelativeRect.fromLTRB(300, 50, 30, 100),
+                items: [
+                  const PopupMenuItem(
+                    child: Text("My Profile"),
+                  ),
+                  const PopupMenuItem(
+                    child: Text("Log Out"),
+                  ),
+                ],
+              ),
+              child: Container(
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: AssetImage('assets/images/avatar.png'),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    CustomText(
+                        message: teacherDataProvider.userData.teacherName,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textName)
+                  ],
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  Container iconCollapseSideBar(Icon icon, bool check) {
+    return Container(
+        width: 80,
+        height: 30,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: Colors.white),
+            color: check
+                ? AppColors.colorHeader.withOpacity(0.5)
+                : Colors.transparent),
+        child: icon);
   }
 
   Widget itemHeader(String title, Icon icon, bool check) {
@@ -374,61 +1010,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget leftHeader() {
-    return Container(
-      width: 250,
-      height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(5), bottomRight: Radius.circular(5))),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 5,
-            ),
-            const CustomText(
-                message: 'Main',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Home', const Icon(Icons.home_outlined), checkHome),
-            const CustomText(
-                message: 'Analyze',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Notifications',
-                const Icon(Icons.notifications_outlined), checkNotification),
-            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
-            const CustomText(
-                message: 'Manage',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Repository Class',
-                const Icon(Icons.cloud_download_outlined), checkRepository),
-            itemHeader('Calendar', const Icon(Icons.calendar_month_outlined),
-                checkCalendar),
-            const CustomText(
-                message: 'Personal',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader(
-                'Settings', const Icon(Icons.settings_outlined), checkSettings),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget selectedPage(ClassDataProvider classDataProvider) {
+  Widget selectedPage(
+      ClassDataProvider classDataProvider, Size size, bool isMobile) {
     if (checkHome) {
-      return containerHome(classDataProvider);
+      return containerHome(classDataProvider, size, isMobile);
     } else if (checkNotification) {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
@@ -441,44 +1026,66 @@ class _HomePageState extends State<HomePage> {
     } else if (checkSettings) {
       return const SettingPage();
     } else {
-      return containerHome(classDataProvider);
+      return containerHome(classDataProvider, size, isMobile);
     }
   }
 
-  Widget customClass(String className, String typeClass, String group,
-      String subGroup, int shiftNumber, String room, String imgPath) {
-    return SizedBox(
-        width: 380,
-        height: 210,
-        child: Card(
-            child: Column(
+  Widget customClass(
+      String className,
+      String typeClass,
+      String group,
+      String subGroup,
+      int shiftNumber,
+      String room,
+      String imgPath,
+      double height) {
+    return Container(
+        // width: 380,
+        // height: 600,
+        height: height,
+        decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 3,
+                  offset: const Offset(0, 5),
+                  color: Colors.black.withOpacity(0.1))
+            ],
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10))),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Stack(
-              children: [
-                SizedBox(
-                  width: 375,
-                  height: 100,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    child: Image.asset(
-                      imgPath,
-                      fit: BoxFit.cover,
+            Expanded(
+              flex: 2,
+              child: Stack(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      // width: 380,
+                      height: 100,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        child: Image.asset(
+                          imgPath,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5, top: 10),
-                  child: Row(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 265,
                               child: cusTomText(
                                   className, 18, FontWeight.bold, Colors.white),
                             ),
@@ -537,13 +1144,14 @@ class _HomePageState extends State<HomePage> {
                         },
                       )
                     ],
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 215, right: 10),
+            Expanded(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
                       onPressed: () {},
@@ -555,7 +1163,7 @@ class _HomePageState extends State<HomePage> {
               ),
             )
           ],
-        )));
+        ));
   }
 
   void _showPopupMenu(BuildContext context) {
@@ -599,9 +1207,10 @@ class _HomePageState extends State<HomePage> {
             fontSize: fontSize, fontWeight: fontWeight, color: color));
   }
 
-  Widget containerHome(ClassDataProvider classDataProvider) {
+  Widget containerHome(
+      ClassDataProvider classDataProvider, Size size, bool isMobile) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width - 250,
+      width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
@@ -629,40 +1238,42 @@ class _HomePageState extends State<HomePage> {
                       Future.delayed(Duration.zero, () {
                         classDataProvider.setAttendanceFormData(classes!);
                       });
-                      return GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 10,
-                                  childAspectRatio: 2.1,
-                                  mainAxisSpacing: 10),
-                          itemCount: classes!.length,
-                          itemBuilder: (context, index) {
-                            Class data = classes[index];
-                            var randomBanner = Random().nextInt(3);
-
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) => DetailPage(
-                                              classes: data,
-                                            )));
+                      return !isMobile
+                          ? _gridViewData(size, classes)
+                          : ListView.separated(
+                              padding: EdgeInsets.zero,
+                              itemCount: classes?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                Class data = classes?[index] ?? Class();
+                                var randomBanner = Random().nextInt(2);
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) => DetailPage(
+                                                  classes: data,
+                                                )));
+                                  },
+                                  mouseCursor: SystemMouseCursors.click,
+                                  child: customClass(
+                                      data.course!.courseName,
+                                      data.classType!,
+                                      data.group!,
+                                      data.subGroup!,
+                                      data.shiftNumber!,
+                                      data.roomNumber!,
+                                      'assets/images/banner$randomBanner.jpg',
+                                      150),
+                                );
                               },
-                              mouseCursor: SystemMouseCursors.click,
-                              child: Container(
-                                child: customClass(
-                                    data.course!.courseName,
-                                    data.classType!,
-                                    data.group!,
-                                    data.subGroup!,
-                                    data.shiftNumber!,
-                                    data.roomNumber!,
-                                    'assets/images/banner$randomBanner.jpg'),
-                              ),
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const SizedBox(
+                                  height: 10,
+                                );
+                              },
                             );
-                          });
                     }
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
@@ -679,5 +1290,42 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  GridView _gridViewData(Size size, List<Class>? classes) {
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: size.width <= 860 ? 2 : 3,
+            crossAxisSpacing: 10,
+            childAspectRatio: 16/9,
+            mainAxisSpacing: 10),
+        itemCount: classes?.length ?? 0,
+        itemBuilder: (context, index) {
+          Class data = classes?[index] ?? Class();
+          var randomBanner = Random().nextInt(2);
+
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (builder) => DetailPage(
+                            classes: data,
+                          )));
+            },
+            mouseCursor: SystemMouseCursors.click,
+            child: Container(
+              child: customClass(
+                  data.course!.courseName,
+                  data.classType!,
+                  data.group!,
+                  data.subGroup!,
+                  data.shiftNumber!,
+                  data.roomNumber!,
+                  'assets/images/banner$randomBanner.jpg',
+                  550),
+            ),
+          );
+        });
   }
 }

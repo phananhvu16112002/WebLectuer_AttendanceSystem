@@ -23,7 +23,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   OtpFieldController otpFieldController = OtpFieldController();
-  int secondsRemaining = 10; // Initial value for 1 minute
+  int secondsRemaining = 59; // Initial value for 1 minute
   bool canResend = false;
   late Timer _timer;
   late ProgressDialog _progressDialog;
@@ -100,7 +100,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                        const BorderRadius.all(const Radius.circular(10)),
+                        const BorderRadius.all(Radius.circular(10)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withOpacity(0.2),
@@ -110,7 +110,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height - 100,
                       width: 550,
                       child: Column(
@@ -143,7 +143,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Container(
+                          SizedBox(
                             width: MediaQuery.of(context).size.width - 100,
                             height: 140,
                             child: Column(
@@ -167,7 +167,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
                         ],
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height - 100,
                       width: 550,
                       child: Center(
@@ -423,7 +423,7 @@ class _ForgotPasswordOTPState extends State<ForgotPasswordOTP> {
 
   void restartTimer() {
     setState(() {
-      secondsRemaining = 10;
+      secondsRemaining = 59;
       canResend = false;
     });
     startTimer(); // Start the timer again

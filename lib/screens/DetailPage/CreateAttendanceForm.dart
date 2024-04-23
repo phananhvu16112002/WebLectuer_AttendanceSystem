@@ -59,13 +59,18 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
-      // _currentLocation = const LatLng(10.7315191,106.6990618);
+      // _currentLocation = const LatLng( 10.7312784,106.6990618);
+      // _currentLocation = const LatLng(10.734965,106.70087);
+
 
       myLocation = tempAddress; //API expired;
       latitude = position.latitude;
       longtitude = position.longitude;
-      // latitude = 10.7315191;
-      // longtitude = 106.6990618;
+      // latitude = 10.7312784;TDT
+      // longtitude = 106.6990618;TDT
+      // latitude = 37.4220936;
+      // longtitude = -122.083922;
+
       print('Latitude: ${position.latitude}');
       print('Longtitude: ${position.longitude}');
       print('Address:$tempAddress');
