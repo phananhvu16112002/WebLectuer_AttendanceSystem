@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -13,16 +14,21 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/Studen
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/widgets/app_bar_mobile_detail_page.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/NotificationPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/ReportPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/Test/ReportPage1.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:excel/excel.dart' as excel;
+import 'package:weblectuer_attendancesystem_nodejs/services/Responsive.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({
@@ -229,6 +235,8 @@ class _DetailPageState extends State<DetailPage> {
         Provider.of<SocketServerProvider>(context, listen: false);
     final attendanceFormProvider =
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
+    final teacherDataProvider =
+        Provider.of<TeacherDataProvider>(context, listen: false);
     int numberOfWeeks = classes.course!.totalWeeks; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
@@ -238,87 +246,188 @@ class _DetailPageState extends State<DetailPage> {
     for (int i = 0; i < numberOfWeeks; i++) {
       listColumnWidths.add(const FlexColumnWidth(2));
     }
+
+    List<TableColumnWidth> listColumnWidthsMobile = [
+      const FixedColumnWidth(25),
+      const FixedColumnWidth(63),
+      const IntrinsicColumnWidth(),
+    ];
+    for (int i = 0; i < numberOfWeeks; i++) {
+      listColumnWidthsMobile.add(const FlexColumnWidth(2));
+    }
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: appBar(socketServerProvider),
-      body: SingleChildScrollView(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: isCollapsedOpen ? 250 : 70,
-              child: isCollapsedOpen ? leftHeader() : collapsedSideBar(),
-            ),
-            Expanded(
-              child: selectedPage(
-                  numberOfWeeks,
-                  listColumnWidths,
-                  studentClassesDataProvider,
-                  attendanceFormProvider,
-                  listTemp,
-                  searchTextChanged,
-                  newSetStateTable,
-                  isSelectedSection),
-            ),
-          ],
+      appBar: AppBar(
+        leading: const Icon(null),
+        backgroundColor: AppColors.colorHeader,
+        flexibleSpace: Padding(
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+          child: Responsive(
+            mobile: AppBarMobileDetailPage(
+                socketServerProvider: socketServerProvider,
+                context: context,
+                teacherDataProvider: teacherDataProvider),
+            tablet: _appbarTablet(
+                socketServerProvider, context, size, teacherDataProvider),
+            desktop: _appbarDesktop(
+                socketServerProvider, teacherDataProvider, context),
+          ),
         ),
+      ),
+      body: Responsive(
+        mobile: _bodyMobile(
+            context,
+            size,
+            numberOfWeeks,
+            listColumnWidthsMobile,
+            studentClassesDataProvider,
+            attendanceFormProvider),
+        tablet: _bodyTablet(size, context, numberOfWeeks, listColumnWidths,
+            studentClassesDataProvider, attendanceFormProvider),
+        desktop: _bodyDesktop(context, size, numberOfWeeks, listColumnWidths,
+            studentClassesDataProvider, attendanceFormProvider),
       ),
     );
   }
 
-  //AppBar-------------------------------------------
-  PreferredSizeWidget appBar(SocketServerProvider socketServerProvider) {
-    return AppBar(
-      leading: const Icon(null),
-      backgroundColor: AppColors.colorHeader,
-      flexibleSpace: Padding(
-        padding:
-            const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-        child: Row(
+  SingleChildScrollView _bodyMobile(
+      BuildContext context,
+      Size size,
+      int numberOfWeeks,
+      List<TableColumnWidth> listColumnWidthsMobile,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormProvider) {
+    return SingleChildScrollView(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: isCollapsedOpen ? 200 : 60,
+            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+          ),
+          Expanded(
+            flex: size.width <= 1200 ? 6 : 5,
+            child: selectedPage(
+                numberOfWeeks,
+                listColumnWidthsMobile,
+                studentClassesDataProvider,
+                attendanceFormProvider,
+                listTemp,
+                searchTextChanged,
+                newSetStateTable,
+                isSelectedSection,
+                size,
+                true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SingleChildScrollView _bodyTablet(
+      Size size,
+      BuildContext context,
+      int numberOfWeeks,
+      List<TableColumnWidth> listColumnWidths,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormProvider) {
+    if (size.width < 1080) {
+      setState(() {
+        isCollapsedOpen = false;
+      });
+    } else {
+      setState(() {
+        isCollapsedOpen = true;
+      });
+    }
+    return SingleChildScrollView(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: isCollapsedOpen ? 200 : 60,
+            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+          ),
+          Expanded(
+            flex: size.width <= 1200 ? 6 : 5,
+            child: selectedPage(
+                numberOfWeeks,
+                listColumnWidths,
+                studentClassesDataProvider,
+                attendanceFormProvider,
+                listTemp,
+                searchTextChanged,
+                newSetStateTable,
+                isSelectedSection,
+                size,
+                false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row _appbarTablet(
+      SocketServerProvider socketServerProvider,
+      BuildContext context,
+      Size size,
+      TeacherDataProvider teacherDataProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    socketServerProvider.disconnectSocketServer();
-                    Navigator.pop(context);
-                  },
-                  mouseCursor: SystemMouseCursors.click,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-                const SizedBox(width: 180),
-                IconButton(
-                    onPressed: () {
-                      toggleDrawer();
-                    },
-                    icon: const Icon(
-                      Icons.menu,
-                      size: 25,
-                      color: AppColors.textName,
-                    ))
-              ],
+            InkWell(
+              onTap: () {
+                socketServerProvider.disconnectSocketServer();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => const HomePage()));
+              },
+              mouseCursor: SystemMouseCursors.click,
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 50,
+                height: 50,
+              ),
+            ),
+            SizedBox(width: size.width >= 700 ? 160 : 120),
+            IconButton(
+                onPressed: () {
+                  toggleDrawer();
+                },
+                icon: const Icon(
+                  Icons.menu,
+                  size: 25,
+                  color: AppColors.textName,
+                ))
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CustomTextField(
+              controller: searchController,
+              textInputType: TextInputType.text,
+              obscureText: false,
+              suffixIcon:
+                  const IconButton(onPressed: null, icon: Icon(Icons.search)),
+              hintText: 'Search',
+              prefixIcon: const Icon(null),
+              readOnly: false,
+              width: 250,
+              height: 50,
+            ),
+            const SizedBox(
+              width: 10,
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomTextField(
-                    controller: searchController,
-                    textInputType: TextInputType.text,
-                    obscureText: false,
-                    suffixIcon: IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
-                    hintText: 'Search',
-                    onChanged: (value) {},
-                    prefixIcon: const Icon(null),
-                    readOnly: false),
-                const SizedBox(
-                  width: 60,
-                ),
                 IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.notifications_none_outlined)),
@@ -346,18 +455,18 @@ class _DetailPageState extends State<DetailPage> {
                     ],
                   ),
                   child: Container(
-                    child: const Row(
+                    child: Row(
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           backgroundColor: Colors.transparent,
                           backgroundImage:
                               AssetImage('assets/images/avatar.png'),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         CustomText(
-                            message: 'Anh Vu',
+                            message: teacherDataProvider.userData.teacherName,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textName)
@@ -368,11 +477,228 @@ class _DetailPageState extends State<DetailPage> {
               ],
             )
           ],
+        )
+      ],
+    );
+  }
+
+  SingleChildScrollView _bodyDesktop(
+      BuildContext context,
+      Size size,
+      int numberOfWeeks,
+      List<TableColumnWidth> listColumnWidths,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormProvider) {
+    return SingleChildScrollView(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: isCollapsedOpen ? 250 : 80,
+            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+          ),
+          Expanded(
+            flex: size.width <= 1200 ? 6 : 5,
+            child: selectedPage(
+                numberOfWeeks,
+                listColumnWidths,
+                studentClassesDataProvider,
+                attendanceFormProvider,
+                listTemp,
+                searchTextChanged,
+                newSetStateTable,
+                isSelectedSection,
+                size,
+                false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _leftHeader(BuildContext context) {
+    return Container(
+      width: 250,
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(5), bottomRight: Radius.circular(5))),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            const CustomText(
+                message: 'Class Detail',
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText),
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
+                child: InkWell(
+              onTap: () {
+                setState(() {
+                  checkHome = false;
+                  checkNotification = false;
+                  checkReport = false;
+                  checkForm = false;
+                  checkAttendanceForm = true;
+                });
+              },
+              child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 32),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.primaryText),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Center(
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      'Create Attendance Form',
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                    ),
+                  )),
+            )),
+            const SizedBox(
+              height: 5,
+            ),
+            const CustomText(
+                message: 'Analyze',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader('Dashboard', const Icon(Icons.home_outlined), checkHome),
+            const CustomText(
+                message: 'Manage',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader('Notifications',
+                const Icon(Icons.notifications_outlined), checkNotification),
+            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
+            itemHeader('Forms', const Icon(Icons.edit_document), checkForm),
+          ],
         ),
       ),
     );
   }
-  //AppBar-------------------------------------------------
+
+  Row _appbarDesktop(SocketServerProvider socketServerProvider,
+      TeacherDataProvider teacherDataProvider, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            InkWell(
+              onTap: () {
+                socketServerProvider.disconnectSocketServer();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => const HomePage()));
+              },
+              mouseCursor: SystemMouseCursors.click,
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 50,
+                height: 50,
+              ),
+            ),
+            const SizedBox(width: 180),
+            // IconButton(
+            //     onPressed: () {
+            //       toggleDrawer();
+            //     },
+            //     icon: const Icon(
+            //       Icons.menu,
+            //       size: 25,
+            //       color: AppColors.textName,
+            //     ))
+          ],
+        ),
+        Row(
+          children: [
+            CustomTextField(
+              controller: searchController,
+              textInputType: TextInputType.text,
+              obscureText: false,
+              suffixIcon:
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+              hintText: 'Search',
+              prefixIcon: const Icon(null),
+              readOnly: false,
+              width: 250,
+              height: 50,
+            ),
+            const SizedBox(
+              width: 60,
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none_outlined)),
+            const SizedBox(
+              width: 10,
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.messenger_outline_sharp)),
+            const SizedBox(
+              width: 10,
+            ),
+            MouseRegion(
+              onHover: (event) => showMenu(
+                color: Colors.white,
+                context: context,
+                position: const RelativeRect.fromLTRB(300, 50, 30, 100),
+                items: [
+                  const PopupMenuItem(
+                    child: Text("My Profile"),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => const WelcomePage()));
+                    },
+                    child: const Text("Log Out"),
+                  ),
+                ],
+              ),
+              child: Container(
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: AssetImage('assets/images/avatar.png'),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    CustomText(
+                        message: teacherDataProvider.userData.teacherName,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textName)
+                  ],
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
 
   //SideBar------------------------------------------------
   Widget collapsedSideBar() {
@@ -383,6 +709,20 @@ class _DetailPageState extends State<DetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkForm = false;
+                checkAttendanceForm = true;
+              });
+            },
+            child: iconCollapseSideBar(
+                const Icon(Icons.lte_plus_mobiledata), checkHome),
+          ),
           const SizedBox(height: 20),
           InkWell(
             onTap: () {
@@ -518,78 +858,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget leftHeader() {
-    return Container(
-      width: 250,
-      height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(5), bottomRight: Radius.circular(5))),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomText(
-                message: 'Class Detail',
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 10,
-            ),
-            Center(
-              child: CustomButton(
-                buttonName: 'Create Form Attendance',
-                backgroundColorButton: checkAttendanceForm
-                    ? const Color.fromARGB(62, 226, 240, 253)
-                    : Colors.transparent,
-                borderColor: Colors.black,
-                textColor: AppColors.textName,
-                function: () {
-                  setState(() {
-                    checkHome = false;
-                    checkNotification = false;
-                    checkReport = false;
-                    checkForm = false;
-                    checkAttendanceForm = true;
-                  });
-                },
-                height: 40,
-                width: 200,
-                fontSize: 12,
-                colorShadow: Colors.transparent,
-                borderRadius: 5,
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            const CustomText(
-                message: 'Analyze',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Dashboard', const Icon(Icons.home_outlined), checkHome),
-            const CustomText(
-                message: 'Manage',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondaryText),
-            itemHeader('Notifications',
-                const Icon(Icons.notifications_outlined), checkNotification),
-            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
-            itemHeader('Forms', const Icon(Icons.edit_document), checkForm),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget selectedPage(
       int numberOfWeeks,
       dynamic listColumnWidth,
@@ -598,17 +866,33 @@ class _DetailPageState extends State<DetailPage> {
       List<StudentData> listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
-      String isSelectedSection) {
+      String isSelectedSection,
+      Size size,
+      bool isMobile) {
     if (checkHome) {
-      return containerHome(
-          numberOfWeeks,
-          listColumnWidth,
-          studentClassesDataProvider,
-          attendanceFormDataProvider,
-          listData,
-          functionSearch,
-          newSetStateTable,
-          isSelectedSection);
+      if (isMobile) {
+        return homeMobile(
+            numberOfWeeks,
+            listColumnWidth,
+            studentClassesDataProvider,
+            attendanceFormDataProvider,
+            listData,
+            functionSearch,
+            newSetStateTable,
+            isSelectedSection,
+            size);
+      } else {
+        return containerHome(
+            numberOfWeeks,
+            listColumnWidth,
+            studentClassesDataProvider,
+            attendanceFormDataProvider,
+            listData,
+            functionSearch,
+            newSetStateTable,
+            isSelectedSection,
+            size);
+      }
     } else if (checkNotification) {
       return const NotificationPage();
     } else if (checkReport) {
@@ -624,15 +908,29 @@ class _DetailPageState extends State<DetailPage> {
     } else if (checkViewAttendance) {
       return Container();
     } else {
-      return containerHome(
-          numberOfWeeks,
-          listColumnWidth,
-          studentClassesDataProvider,
-          attendanceFormDataProvider,
-          listData,
-          (querySearch) => null,
-          (title) => null,
-          isSelectedSection);
+      if (isMobile) {
+        return homeMobile(
+            numberOfWeeks,
+            listColumnWidth,
+            studentClassesDataProvider,
+            attendanceFormDataProvider,
+            listData,
+            functionSearch,
+            newSetStateTable,
+            isSelectedSection,
+            size);
+      } else {
+        return containerHome(
+            numberOfWeeks,
+            listColumnWidth,
+            studentClassesDataProvider,
+            attendanceFormDataProvider,
+            listData,
+            functionSearch,
+            newSetStateTable,
+            isSelectedSection,
+            size);
+      }
     }
   }
   //SideBar------------------------------------------------
@@ -647,8 +945,9 @@ class _DetailPageState extends State<DetailPage> {
       List<StudentData>? listData,
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
-      String isSelectedSection) {
-    return listData!.isNotEmpty
+      String isSelectedSection,
+      Size size) {
+    return listData != null && listData.isNotEmpty
         ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
             height: MediaQuery.of(context).size.height,
@@ -670,58 +969,106 @@ class _DetailPageState extends State<DetailPage> {
                     height: 10,
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 250,
+                    width: MediaQuery.of(context).size.width,
                     height: 130,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        customBoxInformation(
-                            'All',
-                            'assets/icons/student.png',
-                            numberAllStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Pass',
-                            'assets/icons/present.png',
-                            numberPassStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Ban',
-                            'assets/icons/absent.png',
-                            numberBanStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Warning',
-                            'assets/icons/pending.png',
-                            numberWarningStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                      ],
-                    ),
+                    child: size.width > 900
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              customBoxInformation(
+                                  'All',
+                                  'assets/icons/student.png',
+                                  numberAllStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Pass',
+                                  'assets/icons/present.png',
+                                  numberPassStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Ban',
+                                  'assets/icons/absent.png',
+                                  numberBanStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Warning',
+                                  'assets/icons/pending.png',
+                                  numberWarningStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                            ],
+                          )
+                        : GridView.count(
+                            padding: EdgeInsets.zero,
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                            childAspectRatio: 30 / 20,
+                            children: [
+                              customBoxInformation(
+                                  'All',
+                                  'assets/icons/student.png',
+                                  numberAllStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Pass',
+                                  'assets/icons/present.png',
+                                  numberPassStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Ban',
+                                  'assets/icons/absent.png',
+                                  numberBanStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Warning',
+                                  'assets/icons/pending.png',
+                                  numberWarningStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                            ],
+                          ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 250,
+                    width: MediaQuery.of(context).size.width,
                     height: 40,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes!.course!.totalWeeks),
-                        customButtonDashBoard('PDF', listData,
-                            widget.classes!.course!.totalWeeks),
+                            widget.classes!.course!.totalWeeks, false),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes!.course!.totalWeeks),
+                            widget.classes!.course!.totalWeeks, false),
                         const SizedBox(
                           width: 20,
                         ),
                         Container(
-                          width: 450,
+                          width: size.width >= 910 ? 400 : 200,
                           height: 40,
                           decoration: BoxDecoration(
                             boxShadow: [
@@ -780,7 +1127,7 @@ class _DetailPageState extends State<DetailPage> {
                           ),
                         ),
                         const SizedBox(
-                          width: 20,
+                          width: 15,
                         ),
                         CustomButton(
                             buttonName: 'View Attendance',
@@ -806,7 +1153,7 @@ class _DetailPageState extends State<DetailPage> {
                                                   .classDetail)));
                             },
                             height: 50,
-                            width: 150,
+                            width: size.width <= 1180 ? 130 : 150,
                             fontSize: 12,
                             colorShadow: Colors.white,
                             borderRadius: 8)
@@ -816,7 +1163,8 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  tableStudent(listColumnWidth, numberOfWeeks, listData),
+                  tableStudent(
+                      listColumnWidth, numberOfWeeks, listData, size, false),
                 ],
               ),
             ),
@@ -845,32 +1193,56 @@ class _DetailPageState extends State<DetailPage> {
                     width: MediaQuery.of(context).size.width - 250,
                     height: 130,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        customBoxInformation(
-                            'All',
-                            'assets/icons/student.png',
-                            numberAllStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Pass',
-                            'assets/icons/present.png',
-                            numberPassStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Ban',
-                            'assets/icons/absent.png',
-                            numberBanStudent,
-                            newSetStateTable,
-                            isSelectedSection),
-                        customBoxInformation(
-                            'Warning',
-                            'assets/icons/pending.png',
-                            numberWarningStudent,
-                            newSetStateTable,
-                            isSelectedSection),
+                        Expanded(
+                          child: customBoxInformation(
+                              'All',
+                              'assets/icons/student.png',
+                              numberAllStudent,
+                              newSetStateTable,
+                              isSelectedSection,
+                              size,
+                              false),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: customBoxInformation(
+                              'Pass',
+                              'assets/icons/present.png',
+                              numberPassStudent,
+                              newSetStateTable,
+                              isSelectedSection,
+                              size,
+                              false),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: customBoxInformation(
+                              'Ban',
+                              'assets/icons/absent.png',
+                              numberBanStudent,
+                              newSetStateTable,
+                              isSelectedSection,
+                              size,
+                              false),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: customBoxInformation(
+                              'Warning',
+                              'assets/icons/pending.png',
+                              numberWarningStudent,
+                              newSetStateTable,
+                              isSelectedSection,
+                              size,
+                              false),
+                        ),
                       ],
                     ),
                   ),
@@ -878,16 +1250,15 @@ class _DetailPageState extends State<DetailPage> {
                     height: 20,
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 250,
+                    width: MediaQuery.of(context).size.width,
                     height: 40,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customButtonDashBoard('Export', listData,
-                            widget.classes!.course!.totalWeeks),
-                        customButtonDashBoard('PDF', listData,
-                            widget.classes!.course!.totalWeeks),
-                        customButtonDashBoard('Excel', listData,
-                            widget.classes!.course!.totalWeeks),
+                        customButtonDashBoard('Export', listData ?? [],
+                            widget.classes!.course!.totalWeeks, false),
+                        customButtonDashBoard('Excel', listData ?? [],
+                            widget.classes!.course!.totalWeeks, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -965,15 +1336,17 @@ class _DetailPageState extends State<DetailPage> {
                                       builder: (builder) =>
                                           RealtimeCheckAttendance(
                                             formID: listData
-                                                .last
-                                                .attendancedetails
-                                                .last
-                                                .attendanceForm,
+                                                    ?.last
+                                                    .attendancedetails
+                                                    .last
+                                                    .attendanceForm ??
+                                                '',
                                             classes: listData
-                                                .last
-                                                .attendancedetails
-                                                .last
-                                                .classDetail,
+                                                    ?.last
+                                                    .attendancedetails
+                                                    .last
+                                                    .classDetail ??
+                                                '',
                                           )));
                             },
                             height: 50,
@@ -987,15 +1360,399 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  tableStudent(listColumnWidth, numberOfWeeks, listData),
+                  tableStudent(listColumnWidth, numberOfWeeks, listData ?? [],
+                      size, false),
                 ],
               ),
             ),
           );
   }
 
-  Widget tableStudent(
-      listColumnWidth, int numberOfWeeks, List<StudentData> listData) {
+  Widget homeMobile(
+      int numberOfWeeks,
+      dynamic listColumnWidth,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceFormDataProvider attendanceFormDataProvider,
+      List<StudentData>? listData,
+      Function(String querySearch) functionSearch,
+      Function(String title) newSetStateTable,
+      String isSelectedSection,
+      Size size) {
+    return listData != null && listData.isNotEmpty
+        ? SizedBox(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const CustomText(
+                    message: 'Dashboard',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 12 / 5,
+                      children: [
+                        customBoxInformation(
+                            'All',
+                            'assets/icons/student.png',
+                            numberAllStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Pass',
+                            'assets/icons/present.png',
+                            numberPassStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Ban',
+                            'assets/icons/absent.png',
+                            numberBanStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Warning',
+                            'assets/icons/pending.png',
+                            numberWarningStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        customButtonDashBoard('Export', listData,
+                            widget.classes!.course!.totalWeeks, true),
+                        customButtonDashBoard('Excel', listData,
+                            widget.classes!.course!.totalWeeks, true),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: const Color.fromRGBO(0, 0, 0, 1)
+                                  .withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                            color: Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                          ),
+                          child: TextFormField(
+                            onChanged: (value) {
+                              functionSearch(value);
+                            },
+                            readOnly: false,
+                            controller: searchInDashboardController,
+                            keyboardType: TextInputType.text,
+                            style: const TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                            ),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(20),
+                              suffixIcon: Icon(
+                                Icons.search,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                              hintText: 'Search Student',
+                              hintStyle: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(73, 0, 0, 0),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.transparent),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: AppColors.primaryButton),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        CustomButton(
+                            buttonName: 'View Attendance',
+                            backgroundColorButton: const Color(0xff2d71b1),
+                            borderColor: Colors.transparent,
+                            textColor: Colors.white,
+                            function: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          RealtimeCheckAttendance(
+                                              formID:
+                                                  listData
+                                                      .last
+                                                      .attendancedetails
+                                                      .last
+                                                      .attendanceForm,
+                                              classes: listData
+                                                  .last
+                                                  .attendancedetails
+                                                  .last
+                                                  .classDetail)));
+                            },
+                            height: 40,
+                            width: size.width <= 440 ? 80 : 100,
+                            fontSize: 8,
+                            colorShadow: Colors.white,
+                            borderRadius: 8)
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  tableStudent(
+                      listColumnWidth, numberOfWeeks, listData, size, true),
+                ],
+              ),
+            ),
+          )
+        : SizedBox(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const CustomText(
+                    message: 'Dashboard',
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: GridView.count(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 12 / 5,
+                      children: [
+                        customBoxInformation(
+                            'All',
+                            'assets/icons/student.png',
+                            numberAllStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Pass',
+                            'assets/icons/present.png',
+                            numberPassStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Ban',
+                            'assets/icons/absent.png',
+                            numberBanStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                        customBoxInformation(
+                            'Warning',
+                            'assets/icons/pending.png',
+                            numberWarningStudent,
+                            newSetStateTable,
+                            isSelectedSection,
+                            size,
+                            true),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        customButtonDashBoard('Export', listData ?? [],
+                            widget.classes!.course!.totalWeeks, true),
+                        customButtonDashBoard('Excel', listData ?? [],
+                            widget.classes!.course!.totalWeeks, true),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: const Color.fromRGBO(0, 0, 0, 1)
+                                  .withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                            color: Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                          ),
+                          child: TextFormField(
+                            onChanged: (value) {
+                              functionSearch(value);
+                            },
+                            readOnly: false,
+                            controller: searchInDashboardController,
+                            keyboardType: TextInputType.text,
+                            style: const TextStyle(
+                              color: AppColors.primaryText,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                            ),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(20),
+                              suffixIcon: Icon(
+                                Icons.search,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                              hintText: 'Search Student',
+                              hintStyle: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(73, 0, 0, 0),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.transparent),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                                borderSide: BorderSide(
+                                    width: 1, color: AppColors.primaryButton),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        CustomButton(
+                            buttonName: 'View Attendance',
+                            backgroundColorButton: const Color(0xff2d71b1),
+                            borderColor: Colors.transparent,
+                            textColor: Colors.white,
+                            function: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          RealtimeCheckAttendance(
+                                              formID:
+                                                  listData
+                                                          ?.last
+                                                          .attendancedetails
+                                                          .last
+                                                          .attendanceForm ??
+                                                      '',
+                                              classes: listData
+                                                      ?.last
+                                                      .attendancedetails
+                                                      .last
+                                                      .classDetail ??
+                                                  '')));
+                            },
+                            height: 40,
+                            width: size.width <= 440 ? 80 : 100,
+                            fontSize: 8,
+                            colorShadow: Colors.white,
+                            borderRadius: 8)
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  tableStudent(listColumnWidth, numberOfWeeks, listData ?? [],
+                      size, true),
+                ],
+              ),
+            ),
+          );
+  }
+
+  Widget tableStudent(listColumnWidth, int numberOfWeeks,
+      List<StudentData> listData, Size size, bool isMobile) {
     final students = List.generate(
       listData.length,
       (index) => {
@@ -1012,50 +1769,83 @@ class _DetailPageState extends State<DetailPage> {
 
     List<Map<String, String>> paginatedStudents = getPaginatedStudents();
     itemsRecent = paginatedStudents.length;
-    if (currentPage > 0) {
-      print('Recent Items: ${itemsRecent + itemsPerPage * (currentPage)}');
-    } else {
-      print('Item Recent $itemsRecent');
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: MediaQuery.of(context).size.width - 100,
+          width: MediaQuery.of(context).size.width,
           height: 300,
           child: listData.isNotEmpty
-              ? Row(
+              ? Column(
                   children: [
-                    tableIntro(listColumnWidth, paginatedStudents, listData),
-                    tableCheckAttendance(
-                        numberOfWeeks, paginatedStudents, listData),
-                    tableTotal(paginatedStudents, listData),
+                    !isMobile
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: size.width <= 885 ? 4 : 2,
+                                child: tableIntro(listColumnWidth,
+                                    paginatedStudents, listData, false),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: tableCheckAttendance(numberOfWeeks,
+                                    paginatedStudents, listData, false),
+                              ),
+                              Expanded(
+                                  child: tableTotal(
+                                      paginatedStudents, listData, false)),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 6,
+                                child: tableIntro(listColumnWidth,
+                                    paginatedStudents, listData, true),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: tableCheckAttendance(numberOfWeeks,
+                                    paginatedStudents, listData, true),
+                              ),
+                              Expanded(
+                                  child: tableTotal(
+                                      paginatedStudents, listData, true)),
+                            ],
+                          ),
+                    const SizedBox(height: 10),
+                    showPage(students)
                   ],
                 )
-              : Center(
-                  child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: Opacity(
-                        opacity: 0.3,
-                        child: Image.asset('assets/images/nodata.png'),
+              : SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Center(
+                      child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 50,
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    CustomText(
-                        message: 'No Student Record',
-                        fontSize: 15,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primaryText.withOpacity(0.3))
-                  ],
-                )),
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: Opacity(
+                          opacity: 0.3,
+                          child: Image.asset('assets/images/nodata.png'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomText(
+                          message: 'No Student Record',
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.primaryText.withOpacity(0.3))
+                    ],
+                  )),
+                ),
         ),
-        showPage(students)
       ],
     );
   }
@@ -1121,11 +1911,10 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget tableTotal(
-      List<Map<String, String>> paginatedStudents, List<StudentData> listData) {
+  Widget tableTotal(List<Map<String, String>> paginatedStudents,
+      List<StudentData> listData, bool isMobile) {
     return SizedBox(
       width: 100,
-      height: 350,
       child: Table(
         border: TableBorder.all(color: Colors.grey),
         children: [
@@ -1134,11 +1923,11 @@ class _DetailPageState extends State<DetailPage> {
               child: Container(
                 padding: const EdgeInsets.all(5),
                 color: Colors.grey.withOpacity(0.21),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'Total',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: isMobile ? 9 : 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -1156,8 +1945,8 @@ class _DetailPageState extends State<DetailPage> {
                   child: Center(
                     child: Text(
                       listData[i].total,
-                      style: const TextStyle(
-                        fontSize: 11,
+                      style: TextStyle(
+                        fontSize: isMobile ? 9 : 11,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -1171,52 +1960,47 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Expanded tableCheckAttendance(
-    int numberOfWeeks,
-    List<Map<String, String>> paginatedStudents,
-    List<StudentData> listData,
-  ) {
-    return Expanded(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Expanded(
-          child: SizedBox(
-            height: 350,
-            child: Table(
-              border: TableBorder.all(color: Colors.grey),
-              columnWidths: {
-                for (int i = 0; i < numberOfWeeks; i++)
-                  i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
-              },
-              children: [
-                TableRow(
-                  children: List.generate(
-                    numberOfWeeks,
-                    (j) => TableCell(
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        color: Colors.grey.withOpacity(0.21),
-                        child: Center(
-                          child: Tooltip(
-                            // message: (j < listData.length)
-                            //     ? formatDate(listData[j]
-                            //         .attendancedetails[j]
-                            //         .createdAt
-                            //         .toString())
-                            //     : '',
-                            message: '',
-                            child: InkWell(
-                              onTap:
-                                  () {}, // Navigator to view realtime check attendance through Day.
-                              mouseCursor: SystemMouseCursors.click,
-                              child: Text(
-                                'Day ${j + 1}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
+  Widget tableCheckAttendance(
+      int numberOfWeeks,
+      List<Map<String, String>> paginatedStudents,
+      List<StudentData> listData,
+      bool isMobile) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        child: Table(
+          border: TableBorder.all(color: Colors.grey),
+          columnWidths: {
+            for (int i = 0; i < numberOfWeeks; i++)
+              i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
+          },
+          children: [
+            TableRow(
+              children: List.generate(
+                numberOfWeeks,
+                (j) => TableCell(
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    color: Colors.grey.withOpacity(0.21),
+                    child: Center(
+                      child: Tooltip(
+                        // message: (j < listData.length)
+                        //     ? formatDate(listData[j]
+                        //         .attendancedetails[j]
+                        //         .createdAt
+                        //         .toString())
+                        //     : '',
+                        message: '',
+                        child: InkWell(
+                          onTap:
+                              () {}, // Navigator to view realtime check attendance through Day.
+                          mouseCursor: SystemMouseCursors.click,
+                          child: Text(
+                            'Day ${j + 1}',
+                            style: TextStyle(
+                              fontSize: isMobile ? 9 : 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -1224,54 +2008,52 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
-                for (int i = 0; i < paginatedStudents.length; i++)
-                  TableRow(
-                    children: List.generate(
-                      numberOfWeeks,
-                      (j) => TableCell(
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          color: Colors.white,
-                          child: Center(
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) =>
-                                            EditAttendanceDetail(
-                                              studentID: listData[i].studentID,
-                                              classID: listData[i]
-                                                  .attendancedetails[j]
-                                                  .classDetail,
-                                              formID: listData[i]
-                                                  .attendancedetails[j]
-                                                  .attendanceForm,
-                                              studentName:
-                                                  listData[i].studentName,
-                                              classes: widget.classes!,
-                                            )));
-                              },
-                              child: Text(
-                                j < listData[i].attendancedetails.length
-                                    ? getResult(
-                                        listData[i].attendancedetails[j].result)
-                                    : '',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.black,
-                                ),
-                              ),
+              ),
+            ),
+            for (int i = 0; i < paginatedStudents.length; i++)
+              TableRow(
+                children: List.generate(
+                  numberOfWeeks,
+                  (j) => TableCell(
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      color: Colors.white,
+                      child: Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (builder) => EditAttendanceDetail(
+                                          studentID: listData[i].studentID,
+                                          classID: listData[i]
+                                              .attendancedetails[j]
+                                              .classDetail,
+                                          formID: listData[i]
+                                              .attendancedetails[j]
+                                              .attendanceForm,
+                                          studentName: listData[i].studentName,
+                                          classes: widget.classes!,
+                                        )));
+                          },
+                          child: Text(
+                            j < listData[i].attendancedetails.length
+                                ? getResult(
+                                    listData[i].attendancedetails[j].result)
+                                : '',
+                            style: TextStyle(
+                              fontSize: isMobile ? 9 : 11,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1322,11 +2104,14 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Widget tableIntro(listColumnWidth,
-      List<Map<String, String>> paginatedStudents, List<StudentData> listData) {
+  Widget tableIntro(
+      listColumnWidth,
+      List<Map<String, String>> paginatedStudents,
+      List<StudentData> listData,
+      bool isMobile) {
     return SizedBox(
       width: 350,
-      height: 350,
+      // height: 350,
       child: Table(
         columnWidths: {
           for (var index in listColumnWidth.asMap().keys)
@@ -1339,11 +2124,11 @@ class _DetailPageState extends State<DetailPage> {
               child: Container(
                 padding: const EdgeInsets.all(5),
                 color: const Color(0xff1770f0).withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'STT',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: isMobile ? 9 : 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -1355,11 +2140,11 @@ class _DetailPageState extends State<DetailPage> {
               child: Container(
                 padding: const EdgeInsets.all(5),
                 color: const Color(0xff1770f0).withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'StudentID',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: isMobile ? 9 : 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -1371,11 +2156,11 @@ class _DetailPageState extends State<DetailPage> {
               child: Container(
                 padding: const EdgeInsets.all(5),
                 color: const Color(0xff1770f0).withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'Name',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: isMobile ? 9 : 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -1394,7 +2179,7 @@ class _DetailPageState extends State<DetailPage> {
                     child: Text(
                       '${currentPage * itemsPerPage + i + 1}',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: isMobile ? 9 : 11,
                         fontWeight: FontWeight.bold,
                         color: getTextColor(listData[i].status),
                       ),
@@ -1410,7 +2195,7 @@ class _DetailPageState extends State<DetailPage> {
                     child: Text(
                       '${paginatedStudents[i]['studentID']}',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: isMobile ? 9 : 11,
                         fontWeight: FontWeight.bold,
                         color: getTextColor(listData[i].status),
                       ),
@@ -1424,9 +2209,11 @@ class _DetailPageState extends State<DetailPage> {
                   color: getColorStatus(listData[i].status),
                   child: Center(
                     child: Text(
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
                       '${paginatedStudents[i]['name']}',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: isMobile ? 9 : 11,
                         fontWeight: FontWeight.bold,
                         color: getTextColor(listData[i].status),
                       ),
@@ -1511,15 +2298,15 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Widget customButtonDashBoard(
-      String nameButton, List<StudentData> listTemp, int totalWeeks) {
+  Widget customButtonDashBoard(String nameButton, List<StudentData> listTemp,
+      int totalWeeks, bool isMobile) {
     return InkWell(
       onTap: () {
         exportToExcel(listTemp, totalWeeks);
       },
       mouseCursor: SystemMouseCursors.click,
       child: Container(
-        width: 80,
+        width: isMobile ? 60 : 80,
         height: 40,
         decoration: BoxDecoration(
             color:
@@ -1531,7 +2318,7 @@ class _DetailPageState extends State<DetailPage> {
         child: Center(
           child: CustomText(
               message: nameButton,
-              fontSize: 12,
+              fontSize: isMobile ? 10 : 12,
               fontWeight: FontWeight.normal,
               color: nameButton == 'Export'
                   ? Colors.white
@@ -1571,8 +2358,14 @@ Widget customWeek(String nameButton) {
   );
 }
 
-Widget customBoxInformation(String title, String imagePath, int count,
-    Function(String title) function, String isSelectedSection) {
+Widget customBoxInformation(
+    String title,
+    String imagePath,
+    int count,
+    Function(String title) function,
+    String isSelectedSection,
+    Size size,
+    bool isMobile) {
   return InkWell(
     onTap: () {
       function(title);
@@ -1580,7 +2373,7 @@ Widget customBoxInformation(String title, String imagePath, int count,
     mouseCursor: SystemMouseCursors.click,
     child: Container(
       width: 200,
-      height: 91,
+      padding: EdgeInsets.symmetric(vertical: size.width < 680 ? 5 : 8),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -1595,36 +2388,37 @@ Widget customBoxInformation(String title, String imagePath, int count,
                   ? AppColors.primaryButton
                   : Colors.white)),
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
+        padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 CustomText(
                     message: title,
-                    fontSize: 18,
+                    fontSize: size.width <= 685 ? 14 : 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.colorInformation),
                 CustomText(
                     message: '$count',
-                    fontSize: 18,
+                    fontSize: size.width <= 685 ? 12 : 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.colorNumberInformation),
-                const CustomText(
+                CustomText(
                     message: 'Student',
-                    fontSize: 12,
+                    fontSize: size.width <= 685 ? 10 : 12,
                     fontWeight: FontWeight.w500,
                     color: AppColors.secondaryText)
               ],
             ),
             Image.asset(
               imagePath,
-              width: 60,
-              height: 60,
+              width: size.width <= 740 ? 40 : 60,
+              height: size.width <= 740 ? 40 : 60,
             )
           ],
         ),

@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_mobile.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_tablet.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
@@ -67,7 +69,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadToken();
   }
@@ -86,8 +87,15 @@ class _HomePageState extends State<HomePage> {
         flexibleSpace: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Responsive(
-            mobile: _appbarMobile(size, context, teacherDataProvider),
-            tablet: _appbarTablet(size, context, teacherDataProvider),
+            mobile: AppBarMobile(
+                size: size,
+                context: context,
+                teacherDataProvider: teacherDataProvider),
+            tablet: AppbarTablet(
+                searchController: searchController,
+                size: size,
+                context: context,
+                teacherDataProvider: teacherDataProvider),
             desktop: _appbarDesktop(context, teacherDataProvider),
           ),
         ),
@@ -477,172 +485,8 @@ class _HomePageState extends State<HomePage> {
           duration: const Duration(milliseconds: 200),
           width: isCollapsedOpen ? 250 : 80,
           child: isCollapsedOpen
-              ? Container(
-                  width: 250,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(5),
-                          bottomRight: Radius.circular(5))),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const CustomText(
-                            message: 'Main',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondaryText),
-                        itemHeader(
-                            'Home', const Icon(Icons.home_outlined), checkHome),
-                        const CustomText(
-                            message: 'Analyze',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondaryText),
-                        itemHeader(
-                            'Notifications',
-                            const Icon(Icons.notifications_outlined),
-                            checkNotification),
-                        itemHeader('Reports', const Icon(Icons.book_outlined),
-                            checkReport),
-                        const CustomText(
-                            message: 'Manage',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondaryText),
-                        itemHeader(
-                            'Repository Class',
-                            const Icon(Icons.cloud_download_outlined),
-                            checkRepository),
-                        itemHeader(
-                            'Calendar',
-                            const Icon(Icons.calendar_month_outlined),
-                            checkCalendar),
-                        const CustomText(
-                            message: 'Personal',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondaryText),
-                        itemHeader('Settings',
-                            const Icon(Icons.settings_outlined), checkSettings),
-                      ],
-                    ),
-                  ),
-                )
-              : Container(
-                  width: 80,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = true;
-                            checkNotification = false;
-                            checkReport = false;
-                            checkRepository = false;
-                            checkCalendar = false;
-                            checkSettings = false;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                            const Icon(Icons.home_outlined), checkHome),
-                      ),
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = false;
-                            checkNotification = true;
-                            checkReport = false;
-                            checkRepository = false;
-                            checkCalendar = false;
-                            checkSettings = false;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                          const Icon(Icons.notifications_outlined),
-                          checkNotification,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = false;
-                            checkNotification = false;
-                            checkReport = true;
-                            checkRepository = false;
-                            checkCalendar = false;
-                            checkSettings = false;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                            const Icon(Icons.book_outlined), checkReport),
-                      ),
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = false;
-                            checkNotification = false;
-                            checkReport = false;
-                            checkRepository = true;
-                            checkCalendar = false;
-                            checkSettings = false;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                          const Icon(Icons.cloud_download_outlined),
-                          checkRepository,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = false;
-                            checkNotification = false;
-                            checkReport = false;
-                            checkRepository = false;
-                            checkCalendar = true;
-                            checkSettings = false;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                          const Icon(Icons.calendar_month_outlined),
-                          checkCalendar,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            checkHome = false;
-                            checkNotification = false;
-                            checkReport = false;
-                            checkRepository = false;
-                            checkCalendar = false;
-                            checkSettings = true;
-                          });
-                        },
-                        child: iconCollapseSideBar(
-                          const Icon(Icons.settings_outlined),
-                          checkSettings,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              ? _leftHeader(context)
+              : _collapsedSideBar(context),
         ),
         Expanded(
           flex: 5,
@@ -652,202 +496,170 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row _appbarMobile(Size size, BuildContext context,
-      TeacherDataProvider teacherDataProvider) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            InkWell(
-              onTap: () {},
-              mouseCursor: SystemMouseCursors.click,
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 50,
-                height: 50,
-              ),
+  Container _collapsedSideBar(BuildContext context) {
+    return Container(
+      width: 80,
+      height: MediaQuery.of(context).size.height,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = true;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child:
+                iconCollapseSideBar(const Icon(Icons.home_outlined), checkHome),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = true;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.notifications_outlined),
+              checkNotification,
             ),
-            // SizedBox(width: size.width <= 400 ? 60 : 170),
-            // IconButton(
-            //     onPressed: () {
-            //       toggleDrawer();
-            //     },
-            //     icon: const Icon(
-            //       Icons.menu,
-            //       size: 25,
-            //       color: AppColors.textName,
-            //     ))
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.notifications_none_outlined,
-                    )),
-                const SizedBox(
-                  width: 10,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.messenger_outline_sharp)),
-                const SizedBox(
-                  width: 10,
-                ),
-                MouseRegion(
-                  onHover: (event) => showMenu(
-                    color: Colors.white,
-                    context: context,
-                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
-                    items: [
-                      const PopupMenuItem(
-                        child: Text("My Profile"),
-                      ),
-                      const PopupMenuItem(
-                        child: Text("Log Out"),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          backgroundImage:
-                              AssetImage('assets/images/avatar.png'),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        CustomText(
-                            message: teacherDataProvider.userData.teacherName,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textName)
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            )
-          ],
-        )
-      ],
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = true;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+                const Icon(Icons.book_outlined), checkReport),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = true;
+                checkCalendar = false;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.cloud_download_outlined),
+              checkRepository,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = true;
+                checkSettings = false;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.calendar_month_outlined),
+              checkCalendar,
+            ),
+          ),
+          const SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              setState(() {
+                checkHome = false;
+                checkNotification = false;
+                checkReport = false;
+                checkRepository = false;
+                checkCalendar = false;
+                checkSettings = true;
+              });
+            },
+            child: iconCollapseSideBar(
+              const Icon(Icons.settings_outlined),
+              checkSettings,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Row _appbarTablet(Size size, BuildContext context,
-      TeacherDataProvider teacherDataProvider) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Container _leftHeader(BuildContext context) {
+    return Container(
+      width: 250,
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(5), bottomRight: Radius.circular(5))),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InkWell(
-              onTap: () {},
-              mouseCursor: SystemMouseCursors.click,
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 50,
-                height: 50,
-              ),
-            ),
-            SizedBox(width: size.width >= 700 ? 160 : 120),
-            // IconButton(
-            //     onPressed: () {
-            //       toggleDrawer();
-            //     },
-            //     icon: const Icon(
-            //       Icons.menu,
-            //       size: 25,
-            //       color: AppColors.textName,
-            //     ))
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            CustomTextField(
-              controller: searchController,
-              textInputType: TextInputType.text,
-              obscureText: false,
-              suffixIcon:
-                  const IconButton(onPressed: null, icon: Icon(Icons.search)),
-              hintText: 'Search',
-              prefixIcon: const Icon(null),
-              readOnly: false,
-              width: 250,
-              height: 50,
-            ),
             const SizedBox(
-              width: 10,
+              height: 10,
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.notifications_none_outlined)),
-                const SizedBox(
-                  width: 10,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.messenger_outline_sharp)),
-                const SizedBox(
-                  width: 10,
-                ),
-                MouseRegion(
-                  onHover: (event) => showMenu(
-                    color: Colors.white,
-                    context: context,
-                    position: const RelativeRect.fromLTRB(300, 50, 30, 100),
-                    items: [
-                      const PopupMenuItem(
-                        child: Text("My Profile"),
-                      ),
-                      const PopupMenuItem(
-                        child: Text("Log Out"),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          backgroundImage:
-                              AssetImage('assets/images/avatar.png'),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        CustomText(
-                            message: teacherDataProvider.userData.teacherName,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textName)
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            )
+            const CustomText(
+                message: 'Main',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader('Home', const Icon(Icons.home_outlined), checkHome),
+            const CustomText(
+                message: 'Analyze',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader('Notifications',
+                const Icon(Icons.notifications_outlined), checkNotification),
+            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
+            const CustomText(
+                message: 'Manage',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader('Repository Class',
+                const Icon(Icons.cloud_download_outlined), checkRepository),
+            itemHeader('Calendar', const Icon(Icons.calendar_month_outlined),
+                checkCalendar),
+            const CustomText(
+                message: 'Personal',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText),
+            itemHeader(
+                'Settings', const Icon(Icons.settings_outlined), checkSettings),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
-  Row _appbarDesktop(
+  Widget _appbarDesktop(
       BuildContext context, TeacherDataProvider teacherDataProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -913,8 +725,14 @@ class _HomePageState extends State<HomePage> {
                   const PopupMenuItem(
                     child: Text("My Profile"),
                   ),
-                  const PopupMenuItem(
-                    child: Text("Log Out"),
+                  PopupMenuItem(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => const WelcomePage()));
+                    },
+                    child: const Text("Log Out"),
                   ),
                 ],
               ),
@@ -1040,8 +858,6 @@ class _HomePageState extends State<HomePage> {
       String imgPath,
       double height) {
     return Container(
-        // width: 380,
-        // height: 600,
         height: height,
         decoration: BoxDecoration(
             boxShadow: [
@@ -1054,115 +870,115 @@ class _HomePageState extends State<HomePage> {
             borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(10),
                 bottomRight: Radius.circular(10))),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Stack(
-                children: [
-                  Expanded(
-                    child: SizedBox(
+        child: Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 2,
+                child: Stack(
+                  children: [
+                    SizedBox(
                       // width: 380,
-                      height: 100,
+                      height: 150,
                       child: ClipRRect(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
                         child: Image.asset(
                           imgPath,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              child: cusTomText(
-                                  className, 18, FontWeight.bold, Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              children: [
-                                CustomText(
-                                    message:
-                                        'Group: $group - Sub: $subGroup | ',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                                CustomText(
-                                    message: 'Type: $typeClass',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              children: [
-                                CustomText(
-                                    message: 'Shift: $shiftNumber | ',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                                CustomText(
-                                    message: 'Room: $room',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ],
-                            )
-                          ],
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                child: cusTomText(className, 18,
+                                    FontWeight.bold, Colors.white),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  CustomText(
+                                      message:
+                                          'Group: $group - Sub: $subGroup | ',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                  CustomText(
+                                      message: 'Type: $typeClass',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  CustomText(
+                                      message: 'Shift: $shiftNumber | ',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                  CustomText(
+                                      message: 'Room: $room',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ],
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuButton(
-                        iconColor: Colors.white,
-                        onSelected: (value) {},
-                        itemBuilder: (BuildContext bc) {
-                          return const [
-                            PopupMenuItem(
-                              value: '/repository',
-                              child: Text("Repository"),
-                            ),
-                            PopupMenuItem(
-                              value: '/delete',
-                              child: Text("Delete"),
-                            ),
-                          ];
-                        },
-                      )
-                    ],
-                  )
-                ],
+                        PopupMenuButton(
+                          iconColor: Colors.white,
+                          onSelected: (value) {},
+                          itemBuilder: (BuildContext bc) {
+                            return const [
+                              PopupMenuItem(
+                                value: '/repository',
+                                child: Text("Repository"),
+                              ),
+                              PopupMenuItem(
+                                value: '/delete',
+                                child: Text("Delete"),
+                              ),
+                            ];
+                          },
+                        )
+                      ],
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.person_2_outlined)),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.document_scanner_outlined))
-                ],
-              ),
-            )
-          ],
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.person_2_outlined)),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.document_scanner_outlined))
+                  ],
+                ),
+              )
+            ],
+          ),
         ));
   }
 
@@ -1192,10 +1008,6 @@ class _HomePageState extends State<HomePage> {
     );
 
     Overlay.of(context).insert(overlayEntry!);
-  }
-
-  void _removePopupMenu() {
-    overlayEntry?.remove();
   }
 
   Widget cusTomText(
@@ -1228,63 +1040,62 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(
               height: 10,
             ),
-            Expanded(
-              child: FutureBuilder(
-                future: API(context).getClassForTeacher(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data != null) {
-                      List<Class>? classes = snapshot.data;
-                      Future.delayed(Duration.zero, () {
-                        classDataProvider.setAttendanceFormData(classes!);
-                      });
-                      return !isMobile
-                          ? _gridViewData(size, classes)
-                          : ListView.separated(
-                              padding: EdgeInsets.zero,
-                              itemCount: classes?.length ?? 0,
-                              itemBuilder: (context, index) {
-                                Class data = classes?[index] ?? Class();
-                                var randomBanner = Random().nextInt(2);
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (builder) => DetailPage(
-                                                  classes: data,
-                                                )));
-                                  },
-                                  mouseCursor: SystemMouseCursors.click,
-                                  child: customClass(
-                                      data.course!.courseName,
-                                      data.classType!,
-                                      data.group!,
-                                      data.subGroup!,
-                                      data.shiftNumber!,
-                                      data.roomNumber!,
-                                      'assets/images/banner$randomBanner.jpg',
-                                      150),
-                                );
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) {
-                                return const SizedBox(
-                                  height: 10,
-                                );
-                              },
-                            );
-                    }
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryButton));
+            FutureBuilder(
+              future: API(context).getClassForTeacher(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null) {
+                    List<Class>? classes = snapshot.data;
+                    Future.delayed(Duration.zero, () {
+                      classDataProvider.setAttendanceFormData(classes!);
+                    });
+                    return !isMobile
+                        ? Expanded(child: _gridViewData(size, classes))
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            itemCount: classes?.length ?? 0,
+                            itemBuilder: (context, index) {
+                              Class data = classes?[index] ?? Class();
+                              var randomBanner = Random().nextInt(2);
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (builder) => DetailPage(
+                                                classes: data,
+                                              )));
+                                },
+                                mouseCursor: SystemMouseCursors.click,
+                                child: customClass(
+                                    data.course!.courseName,
+                                    data.classType!,
+                                    data.group!,
+                                    data.subGroup!,
+                                    data.shiftNumber!,
+                                    data.roomNumber!,
+                                    'assets/images/banner$randomBanner.jpg',
+                                    150),
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return const SizedBox(
+                                height: 10,
+                              );
+                            },
+                          );
                   }
-                  return const Center(child: Text('Data is not available'));
-                },
-              ),
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.primaryButton));
+                }
+                return const Center(child: Text('Data is not available'));
+              },
             ),
           ],
         ),
@@ -1297,7 +1108,7 @@ class _HomePageState extends State<HomePage> {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: size.width <= 860 ? 2 : 3,
             crossAxisSpacing: 10,
-            childAspectRatio: 16/9,
+            childAspectRatio: 16 / 9,
             mainAxisSpacing: 10),
         itemCount: classes?.length ?? 0,
         itemBuilder: (context, index) {
