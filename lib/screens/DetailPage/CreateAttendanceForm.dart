@@ -31,7 +31,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   TextEditingController endTimeController = TextEditingController();
   bool checkPushNotification = false;
   bool formCreated = false;
-  double radius = 0;
+  double radius = 50;
   double timeLate = 5;
   LatLng? _currentLocation;
   String myLocation = '';
@@ -62,7 +62,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
       // _currentLocation = const LatLng( 10.7312784,106.6990618);
       // _currentLocation = const LatLng(10.734965,106.70087);
 
-
       myLocation = tempAddress; //API expired;
       latitude = position.latitude;
       longtitude = position.longitude;
@@ -79,13 +78,13 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
   Future<void> selectTimeStart(BuildContext context) async {
     final TimeOfDay? time = await showTimePicker(
+        initialEntryMode: TimePickerEntryMode.input,
         barrierColor: Colors.black.withOpacity(0.2),
         helpText: 'Select Start Time For Attendance',
         builder: (context, child) {
           return Theme(
-            data: ThemeData(
-              dialogBackgroundColor: AppColors.primaryButton,
-            ),
+            data: ThemeData.light(useMaterial3: false)
+                .copyWith(primaryColor: Colors.white),
             child: child!,
           );
         },
@@ -103,13 +102,13 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
   Future<void> selectTimeEnd(BuildContext context) async {
     final TimeOfDay? time = await showTimePicker(
+        initialEntryMode: TimePickerEntryMode.input,
         barrierColor: Colors.black.withOpacity(0.2),
         helpText: 'Select Start Time For Attendance',
         builder: (context, child) {
           return Theme(
-            data: ThemeData(
-              dialogBackgroundColor: AppColors.primaryButton,
-            ),
+            data: ThemeData.light(useMaterial3: false)
+                .copyWith(primaryColor: Colors.white),
             child: child!,
           );
         },
@@ -171,15 +170,19 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
       child: Padding(
-          padding:
-              const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+          padding: const EdgeInsets.all(10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              infoForm(
-                  context, attendanceFormDataProvider, socketServerProvider),
-              googleMaps(context)
+              Expanded(
+                child: infoForm(
+                    context, attendanceFormDataProvider, socketServerProvider),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(child: googleMaps(context))
             ],
           )),
     );
@@ -189,311 +192,359 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
       BuildContext context,
       AttendanceFormDataProvider attendanceFormDataProvider,
       SocketServerProvider socketServerProvider) {
-    return Container(
-      width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
-      height: 600,
-      decoration:  const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: CustomText(
-                  message: 'Attendance Form',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryButton),
+    return Expanded(
+      child: Container(
+        width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
+        // height: 600,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10),
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            const CustomText(
-                message: 'Class',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 5,
-            ),
-            customTextField(
-                560,
-                40,
-                true,
-                typeAttendanceController,
-                TextInputType.none,
-                IconButton(onPressed: () {}, icon: const Icon(null)),
-                '${classes.course!.courseName},${classes.teacher!.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
-                false),
-            const SizedBox(
-              height: 5,
-            ),
-            const CustomText(
-                message: 'Type',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 5,
-            ),
-            Container(
-              width: 560,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                    width: 1, color: AppColors.primaryText.withOpacity(0.2)),
-              ),
-              child: DropdownButton(
-                underline: Container(),
-                value: dropdownvalue,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: AppColors.primaryText.withOpacity(0.5),
-                ),
-                items: items.map((String items) {
-                  return DropdownMenuItem(
-                      value: items,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: SizedBox(
-                          width: 380,
-                          child: Text(
-                            items,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.primaryText.withOpacity(0.5),
-                                fontWeight: FontWeight.normal),
-                          ),
-                        ),
-                      ));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedIndex = items.indexOf(newValue!);
-                    dropdownvalue = newValue;
-                  });
-                  print("Selected index: $selectedIndex");
-                },
-              ),
-            ),
-            const SizedBox(height: 5),
-            const CustomText(
-                message: 'Date',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.primaryText),
-            const SizedBox(height: 5),
-            customTextField(
-                560,
-                40,
-                true,
-                typeAttendanceController,
-                TextInputType.none,
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.calendar_month_rounded)),
-                formatDate(date.toString()),
-                false),
-            const SizedBox(height: 5),
-            CustomText(
-                message: 'Distance: ${radius.ceil()}m',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.primaryText),
-            const SizedBox(height: 5),
-            Slider(
-                thumbColor: AppColors.primaryButton.withOpacity(0.5),
-                activeColor: AppColors.primaryButton.withOpacity(0.2),
-                label: 'Distance',
-                value: radius,
-                min: 0,
-                max: 100,
-                onChanged: (value) {
-                  setState(() {
-                    radius = value;
-                  });
-                }),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
+            boxShadow: [
+              BoxShadow(
+                  color: AppColors.primaryText.withOpacity(0.2),
+                  blurRadius: 2,
+                  offset: const Offset(0, 1))
+            ]),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CustomText(
-                        message: "Start Time ",
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customTextField(
-                        150,
-                        40,
-                        true,
-                        startTimeController,
-                        TextInputType.datetime,
-                        IconButton(
-                            onPressed: () => selectTimeStart(context),
-                            icon: const Icon(Icons.watch_later_outlined)),
-                        timeStart != null
-                            ? formatTime(
-                                formatTimeOfDate(timeStart!).toString())
-                            : formatTime(
-                                formatTimeOfDate(TimeOfDay.now()).toString()),
-                        true),
-                  ],
+                const Center(
+                  child: CustomText(
+                      message: 'Attendance Form',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryButton),
                 ),
                 const SizedBox(
-                  width: 50,
+                  height: 5,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CustomText(
-                        message: "End Time ",
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customTextField(
-                        150,
-                        40,
-                        true,
-                        startTimeController,
-                        TextInputType.datetime,
-                        IconButton(
-                            onPressed: () => selectTimeEnd(context),
-                            icon: const Icon(Icons.watch_later_outlined)),
-                        timeEnd != null
-                            ? formatTime(formatTimeOfDate(timeEnd!).toString())
-                            : formatTime(
-                                formatTimeOfDate(TimeOfDay.now()).toString()),
-                        true),
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(height: 5),
-            CustomText(
-                message: 'Late Time: ${timeLate.ceil()}m',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.primaryText),
-            const SizedBox(height: 5),
-            Slider(
-                thumbColor: AppColors.primaryButton.withOpacity(0.5),
-                activeColor: AppColors.primaryButton.withOpacity(0.2),
-                label: 'Time Late',
-                value: timeLate,
-                min: 5,
-                max: 120,
-                onChanged: (value) {
-                  setState(() {
-                    timeLate = value;
-                  });
-                }),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
                 const CustomText(
-                    message: 'Push Notification to everyone',
+                    message: 'Class',
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                     color: AppColors.primaryText),
                 const SizedBox(
-                  width: 10,
+                  height: 10,
                 ),
-                Switch(
-                    activeColor: Colors.green,
-                    activeTrackColor: Colors.black.withOpacity(0.05),
-                    splashRadius: 10,
-                    value: checkPushNotification,
+                customTextField(
+                    double.infinity,
+                    40,
+                    true,
+                    typeAttendanceController,
+                    TextInputType.none,
+                    IconButton(onPressed: () {}, icon: const Icon(null)),
+                    '${classes.course!.courseName},${classes.teacher!.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
+                    false),
+                const SizedBox(
+                  height: 10,
+                ),
+                const CustomText(
+                    message: 'Type',
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.primaryText),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      width: 1,
+                      color: AppColors.primaryText.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: DropdownButton(
+                            underline: Container(),
+                            value: dropdownvalue,
+                            icon: const Icon(null), // Loại bỏ icon ở đây
+                            items: items.map((String items) {
+                              return DropdownMenuItem(
+                                value: items,
+                                child: SizedBox(
+                                  // width: 450,
+                                  child: Text(
+                                    items,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          AppColors.primaryText.withOpacity(0.5),
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedIndex = items.indexOf(newValue!);
+                                dropdownvalue = newValue;
+                              });
+                              print("Selected index: $selectedIndex");
+                            },
+                          ),
+                        ),
+                        const Icon(Icons.keyboard_arrow_down_outlined),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const CustomText(
+                    message: 'Date',
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.primaryText),
+                const SizedBox(
+                  height: 10,
+                ),
+                customTextField(
+                    double.infinity,
+                    40,
+                    true,
+                    typeAttendanceController,
+                    TextInputType.none,
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.calendar_month_rounded)),
+                    formatDate(date.toString()),
+                    false),
+                const SizedBox(
+                  height: 10,
+                ),
+                CustomText(
+                    message: 'Distance: ${radius.ceil()}m',
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.primaryText),
+                const SizedBox(
+                  height: 10,
+                ),
+                Slider(
+                    thumbColor: AppColors.primaryButton.withOpacity(0.5),
+                    activeColor: AppColors.primaryButton.withOpacity(0.2),
+                    label: 'Distance',
+                    value: radius,
+                    min: 50,
+                    max: 300,
                     onChanged: (value) {
                       setState(() {
-                        checkPushNotification = value;
+                        radius = value;
                       });
-                    })
+                    }),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const CustomText(
+                            message: "Start Time ",
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.primaryText,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          customTextField(
+                            200,
+                            40,
+                            true,
+                            startTimeController,
+                            TextInputType.datetime,
+                            IconButton(
+                              onPressed: () => selectTimeStart(context),
+                              icon: const Icon(Icons.watch_later_outlined),
+                            ),
+                            timeStart != null
+                                ? formatTime(
+                                    formatTimeOfDate(timeStart!).toString())
+                                : formatTime(
+                                    formatTimeOfDate(TimeOfDay.now()).toString()),
+                            true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 50,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const CustomText(
+                            message: "End Time ",
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.primaryText,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          customTextField(
+                            200,
+                            40,
+                            true,
+                            startTimeController,
+                            TextInputType.datetime,
+                            IconButton(
+                              onPressed: () => selectTimeEnd(context),
+                              icon: const Icon(Icons.watch_later_outlined),
+                            ),
+                            timeEnd != null
+                                ? formatTime(
+                                    formatTimeOfDate(timeEnd!).toString())
+                                : formatTime(
+                                    formatTimeOfDate(TimeOfDay.now()).toString()),
+                            true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                CustomText(
+                    message: 'Late Time: ${timeLate.ceil()}m',
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.primaryText),
+                const SizedBox(
+                  height: 10,
+                ),
+                Slider(
+                    thumbColor: AppColors.primaryButton.withOpacity(0.5),
+                    activeColor: AppColors.primaryButton.withOpacity(0.2),
+                    label: 'Time Late',
+                    value: timeLate,
+                    min: 5,
+                    max: 120,
+                    onChanged: (value) {
+                      setState(() {
+                        timeLate = value;
+                      });
+                    }),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    const CustomText(
+                        message: 'Push Notification to everyone',
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primaryText),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Switch(
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.black.withOpacity(0.05),
+                        splashRadius: 10,
+                        value: checkPushNotification,
+                        onChanged: (value) {
+                          setState(() {
+                            checkPushNotification = value;
+                          });
+                        })
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: CustomButton(
+                      buttonName: "Create",
+                      backgroundColorButton: AppColors.primaryButton,
+                      borderColor: Colors.white,
+                      textColor: Colors.white,
+                      function: () async {
+                        bool check = checkDuplicateTime();
+                        if (check) {
+                          print('Longtitude: $longtitude');
+                          AttendanceForm? attendanceForm = await API(context)
+                              .createFormAttendance(
+                                  classes.classID!,
+                                  formatTimeOfDate(timeStart!).toString(),
+                                  formatTimeOfDate(timeEnd!).toString(),
+                                  selectedIndex,
+                                  myLocation,
+                                  latitude,
+                                  longtitude,
+                                  radius);
+          
+                          final currentContext = context;
+                          Future.delayed(Duration.zero, () {
+                            attendanceFormDataProvider
+                                .setAttendanceFormData(attendanceForm!);
+                            socketServerProvider
+                                .sendAttendanceForm(attendanceForm);
+                          });
+                          //QR View have properties data so add data from provider and display QR Code on screen
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                                currentContext,
+                                MaterialPageRoute(
+                                    builder: (builder) =>
+                                        AfterCreateAttendanceForm(
+                                          attendanceForm: attendanceForm,
+                                          className: classes.course!.courseName,
+                                        )));
+                          }
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: const Text('Error'),
+                                content: const Text(
+                                    'Please check startTime and endTime'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                      height: 50,
+                      width: 350,
+                      fontSize: 20,
+                      colorShadow: Colors.white,
+                      borderRadius: 10),
+                )
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Center(
-              child: CustomButton(
-                  buttonName: "Create",
-                  backgroundColorButton: AppColors.primaryButton,
-                  borderColor: Colors.white,
-                  textColor: Colors.white,
-                  function: () async {
-                    bool check = checkDuplicateTime();
-                    if (check) {
-                      print('Longtitude: $longtitude');
-                      AttendanceForm? attendanceForm = await API(context)
-                          .createFormAttendance(
-                              classes.classID!,
-                              formatTimeOfDate(timeStart!).toString(),
-                              formatTimeOfDate(timeEnd!).toString(),
-                              selectedIndex,
-                              myLocation,
-                              latitude,
-                              longtitude,
-                              radius);
-
-                      final currentContext = context;
-                      Future.delayed(Duration.zero, () {
-                        attendanceFormDataProvider
-                            .setAttendanceFormData(attendanceForm!);
-                        socketServerProvider.sendAttendanceForm(attendanceForm);
-                      });
-                      //QR View have properties data so add data from provider and display QR Code on screen
-                      if (mounted) {
-                        Navigator.pushReplacement(
-                            currentContext,
-                            MaterialPageRoute(
-                                builder: (builder) => AfterCreateAttendanceForm(
-                                      attendanceForm: attendanceForm,
-                                      className: classes.course!.courseName,
-                                    )));
-                      }
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: const Text('Error'),
-                            content: const Text(
-                                'Please check startTime and endTime'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  height: 50,
-                  width: 350,
-                  fontSize: 20,
-                  colorShadow: Colors.white,
-                  borderRadius: 10),
-            )
-          ],
+          ),
         ),
       ),
     );
@@ -501,40 +552,43 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
 
   Widget googleMaps(BuildContext context) {
     if (_currentLocation != null) {
-      return SizedBox(
-          width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
-          height: 600,
-          child: GoogleMap(
-            zoomGesturesEnabled: true,
-            indoorViewEnabled: true,
-            initialCameraPosition:
-                CameraPosition(target: _currentLocation!, zoom: 18),
-            markers: {
-              Marker(
-                icon: BitmapDescriptor.defaultMarker,
-                markerId: const MarkerId('currentLocation'),
-                position: _currentLocation!,
-                infoWindow: const InfoWindow(title: 'My Location'),
-              ),
-            },
-            zoomControlsEnabled: false,
-            myLocationButtonEnabled: true,
-            mapToolbarEnabled: false,
-            myLocationEnabled: true,
-            mapType: MapType.normal,
-            onMapCreated: (controller) {
-              googleMapController = controller;
-            },
-            circles: {
-              Circle(
-                  circleId: const CircleId('ID1'),
-                  radius: radius,
-                  fillColor: AppColors.primaryButton.withOpacity(0.2),
-                  strokeColor: AppColors.primaryButton.withOpacity(0.1),
-                  strokeWidth: 5,
-                  center: _currentLocation!)
-            },
-          ));
+      return Expanded(
+        child: SizedBox(
+            width: (MediaQuery.of(context).size.width - 250) / 2 - 10,
+            // height: 600,
+            child: GoogleMap(
+              zoomGesturesEnabled: true,
+              indoorViewEnabled: true,
+              initialCameraPosition:
+                  CameraPosition(target: _currentLocation!, zoom: 18),
+              markers: {
+                Marker(
+                  draggable: false,
+                  icon: BitmapDescriptor.defaultMarker,
+                  markerId: const MarkerId('currentLocation'),
+                  position: _currentLocation!,
+                  infoWindow: const InfoWindow(title: 'My Location'),
+                ),
+              },
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: true,
+              mapToolbarEnabled: false,
+              myLocationEnabled: true,
+              mapType: MapType.normal,
+              onMapCreated: (controller) {
+                googleMapController = controller;
+              },
+              circles: {
+                Circle(
+                    circleId: const CircleId('ID1'),
+                    radius: radius,
+                    fillColor: AppColors.primaryButton.withOpacity(0.2),
+                    strokeColor: AppColors.primaryButton.withOpacity(0.1),
+                    strokeWidth: 5,
+                    center: _currentLocation!)
+              },
+            )),
+      );
     } else {
       return const Center(
         child: CircularProgressIndicator(),

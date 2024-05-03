@@ -18,8 +18,10 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/Dialog
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
 
 class API {
+  String baseURL = Constants.baseURL;
   BuildContext context;
   API(this.context);
 
@@ -31,8 +33,8 @@ class API {
   }
 
   Future<String> refreshAccessToken(String refreshToken) async {
-    const url =
-        'http://localhost:8080/api/token/refreshAccessToken'; // 10.0.2.2
+    String url =
+        'http://$baseURL:8080/api/token/refreshAccessToken'; // 10.0.2.2
     var headers = {'authorization': refreshToken};
 
     try {
@@ -103,8 +105,9 @@ class API {
     }
   }
 
-  Future<List<Class>> getClassForTeacher() async {
-    const URL = 'http://localhost:8080/api/teacher/classes'; //10.0.2.2
+  Future<List<Class>> getClassForTeacher(int page) async {
+    String URL =
+        'http://$baseURL:8080/api/teacher/classes/page/$page'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
@@ -192,7 +195,7 @@ class API {
   }
 
   Future<void> uploadFileExcel(File file) async {
-    const URL = 'http://localhost:8080/';
+    String URL = 'http://$baseURL:8080/';
     var request = http.MultipartRequest('POST', Uri.parse(URL));
     var multipartFile = await http.MultipartFile.fromPath('excel', file.path);
     request.files.add(multipartFile);
@@ -205,7 +208,7 @@ class API {
   }
 
   Future<List<ReportData>> getReports() async {
-    const URL = 'http://localhost:8080/api/teacher/reports'; //10.0.2.2
+    String URL = 'http://$baseURL:8080/api/teacher/reports'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
@@ -296,7 +299,7 @@ class API {
   Future<HistoryReportDialog?> getDetailHistoryReport(
       String classID, int historyReports) async {
     final url =
-        'http://localhost:8080/api/teacher/historyreports/detail/$historyReports/$classID';
+        'http://$baseURL:8080/api/teacher/historyreports/detail/$historyReports/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -343,7 +346,7 @@ class API {
   Future<AttendanceReport?> getReportStudentClass(
       String classID, int reportID) async {
     final url =
-        'http://localhost:8080/api/teacher/reports/detail/$reportID/$classID';
+        'http://$baseURL:8080/api/teacher/reports/detail/$reportID/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -387,7 +390,7 @@ class API {
   }
 
   Future<AttendanceModel?> getAttendanceDetailRealtime(String formID) async {
-    final url = 'http://localhost:8080/api/teacher/attendance/detail/$formID';
+    final url = 'http://$baseURL:8080/api/teacher/attendance/detail/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     print(
@@ -435,7 +438,7 @@ class API {
 
   Future<bool> submitFeedback(
       int reportID, String topic, String message, String status) async {
-    const url = 'http://localhost:8080/api/teacher/feedback/submit';
+    String url = 'http://$baseURL:8080/api/teacher/feedback/submit';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
@@ -493,7 +496,7 @@ class API {
 
   Future<bool> editFeedback(
       int reportID, String topic, String message, String confirmStatus) async {
-    final url = 'http://localhost:8080/api/teacher/feedback/edit/$reportID';
+    final url = 'http://$baseURL:8080/api/teacher/feedback/edit/$reportID';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
@@ -551,7 +554,7 @@ class API {
 
   Future<List<FormData>> getFormForTeacher(String classID) async {
     final URL =
-        'http://localhost:8080/api/teacher/classes/detail/$classID/forms'; //10.0.2.2
+        'http://$baseURL:8080/api/teacher/classes/detail/$classID/forms'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {
@@ -642,7 +645,7 @@ class API {
 
   Future<ClassModel?> getStudentsWithAllAttendanceDetails(
       String classID) async {
-    final url = 'http://localhost:8080/api/teacher/classes/detail/$classID';
+    final url = 'http://$baseURL:8080/api/teacher/classes/detail/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -688,7 +691,7 @@ class API {
   Future<StudentAttendanceEdit?> getAttendanceDetailStudent(
       String classID, String studentID, String formID) async {
     final url =
-        'http://localhost:8080/api/teacher/attendancedetail/$classID/$studentID/$formID';
+        'http://$baseURL:8080/api/teacher/attendancedetail/$classID/$studentID/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -734,7 +737,7 @@ class API {
   }
 
   Future<NotificationsData?> getNotifications() async {
-    const url = 'http://localhost:8080/api/teacher/notifications';
+    String url = 'http://$baseURL:8080/api/teacher/notifications';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -782,7 +785,7 @@ class API {
       double latitude,
       double longtitude,
       double radius) async {
-    const url = 'http://localhost:8080/api/teacher/form/submit';
+    String url = 'http://$baseURL:8080/api/teacher/form/submit';
     var accessToken = await getAccessToken();
     var request = {
       'classID': classID,
@@ -843,7 +846,7 @@ class API {
 
   Future<AttendanceDetailResponseStudent>
       getStudentClassAttendanceDetail() async {
-    const url = 'http://localhost:8080/test/api/getStudentFakeAPI';
+    String url = 'http://$baseURL:8080/test/api/getStudentFakeAPI';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -870,8 +873,8 @@ class API {
   }
 
   Future<AttendanceSummary> getAttendanceSummary() async {
-    const url =
-        'http://localhost:8080/test/api/fakeAttendanceDetailsRecordWith7PresenceAnd2Late';
+    String url =
+        'http://$baseURL:8080/test/api/fakeAttendanceDetailsRecordWith7PresenceAnd2Late';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -897,12 +900,71 @@ class API {
   Future<bool> editAttendanceDetail(String studentID, String classID,
       String formID, String topic, String confirmStatus, String message) async {
     final url =
-        'http://localhost:8080/api/teacher/attendancedetail/edit/$classID/$studentID/$formID';
+        'http://$baseURL:8080/api/teacher/attendancedetail/edit/$classID/$studentID/$formID';
     var accessToken = await getAccessToken();
     var request = {
       'topic': topic,
       'message': message,
       'confirmStatus': confirmStatus,
+    };
+    var body = json.encode(request);
+    var headers = {
+      'authorization': accessToken,
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    try {
+      print('body:$body');
+      final response =
+          await http.put(Uri.parse(url), headers: headers, body: body);
+      // print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        String message = responseData['message'];
+        print('message: $message');
+        return true;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            String message = responseData['message'];
+            print('message retry: $message');
+            // print('Data $data');
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          print('New Access Token is empty');
+          return false;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> editAttendanceForm(String classID, String formID,
+      String startTime, String endTime, int type, double radius) async {
+    final url =
+        'http://$baseURL:8080/api/teacher/edit/attendanceform/$classID/$formID';
+    var accessToken = await getAccessToken();
+    var request = {
+      'startTime': startTime,
+      'endTime': endTime,
+      'type': type,
+      'distance': radius
     };
     var body = json.encode(request);
     var headers = {

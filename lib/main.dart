@@ -3,13 +3,18 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_detail_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_form_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 void main() {
@@ -20,7 +25,10 @@ void main() {
     ChangeNotifierProvider(create: (_) => SocketServerProvider()),
     ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
     ChangeNotifierProvider(create: (_) => ClassDataProvider()),
-    ChangeNotifierProvider(create: (_) => TeacherDataProvider())
+    ChangeNotifierProvider(create: (_) => TeacherDataProvider()),
+    ChangeNotifierProvider(create: (_) => SelectedPageProvider()),
+    ChangeNotifierProvider(create: (_) => EditAttendanceDetailProvider()),
+    ChangeNotifierProvider(create: (_) => EditAttendanceFormProvider()),
   ], child: const MyApp()));
 }
 
@@ -47,6 +55,6 @@ class _MyAppState extends State<MyApp> {
               ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
           useMaterial3: false,
         ),
-        home: const HomePage());
+        home:HomePage());
   }
 }

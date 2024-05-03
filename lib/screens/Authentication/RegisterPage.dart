@@ -66,6 +66,7 @@ class _SignInPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     // html.window.history.pushState({}, 'Register', 'Register');
+    Size size = MediaQuery.of(context).size;
     final teacherDataProvider =
         Provider.of<TeacherDataProvider>(context, listen: false);
     return Scaffold(
@@ -159,265 +160,280 @@ class _SignInPageState extends State<RegisterPage> {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(5))),
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
                               child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 0,
-                                    ),
-                                    const Center(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          CustomText(
-                                              message: 'Register your account to',
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryText),
-                                          CustomText(
-                                              message: 'continue',
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryText),
-                                        ],
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 0,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    const CustomText(
-                                        message: 'UserID:',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryText),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    customTextFormField(
-                                      usernameController,
-                                      TextInputType.text,
-                                      'Enter your userID',
-                                      const IconButton(
-                                          onPressed: null,
-                                          icon: Icon(null)),
-                                      false,
-                                      validateUsername,
-                                      (value) {},
-                                      Icon(Icons.email_outlined,
-                                          color: AppColors.primaryText
-                                              .withOpacity(0.5)),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const CustomText(
-                                        message: 'Email:',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryText),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    customTextFormField(
-                                        emailController,
-                                        TextInputType.emailAddress,
-                                        'Enter your email',
+                                      const Center(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            CustomText(
+                                                message:
+                                                    'Register your account to',
+                                                fontSize: 25,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryText),
+                                            CustomText(
+                                                message: 'continue',
+                                                fontSize: 25,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryText),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      const CustomText(
+                                          message: 'UserID:',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryText),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      customTextFormField(
+                                        usernameController,
+                                        TextInputType.text,
+                                        'Enter your userID',
                                         const IconButton(
-                                            onPressed: null,
-                                            icon: Icon(null)),
+                                            onPressed: null, icon: Icon(null)),
                                         false,
-                                        validateUseremail, (value) {
-                                      teacherDataProvider.setTeacherEmail(value);
-                                    },
+                                        validateUsername,
+                                        (value) {},
                                         Icon(Icons.email_outlined,
                                             color: AppColors.primaryText
-                                                .withOpacity(0.5))),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const CustomText(
-                                        message: 'Password:',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryText),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    customTextFormField(
-                                        passwordController,
-                                        TextInputType.visiblePassword,
-                                        'Enter your password',
-                                        IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                checkObscurePassword =
-                                                    !checkObscurePassword;
-                                              });
-                                            },
-                                            icon: Icon(
-                                                checkObscurePassword
-                                                    ? Icons.visibility_off
-                                                    : Icons.visibility_outlined,
-                                                color: Colors.black
-                                                    .withOpacity(0.5))),
-                                        checkObscurePassword,
-                                        validatePassword,
-                                        (value) {},
-                                        Icon(Icons.password_outlined,
-                                            color: AppColors.primaryText
-                                                .withOpacity(0.5))),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const CustomText(
-                                        message: 'Confirm Password:',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryText),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    customTextFormField(
-                                        confirmPasswordController,
-                                        TextInputType.visiblePassword,
-                                        'Confirm Password',
-                                        IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                checkObscureConfirm =
-                                                    !checkObscureConfirm;
-                                              });
-                                            },
-                                            icon: Icon(
-                                                checkObscureConfirm
-                                                    ? Icons.visibility_off
-                                                    : Icons.visibility_outlined,
-                                                color: Colors.black
-                                                    .withOpacity(0.5))),
-                                        checkObscureConfirm,
-                                        validateConfirmPassword,
-                                        (value) {},
-                                        Icon(Icons.password_outlined,
-                                            color: AppColors.primaryText
-                                                .withOpacity(0.5))),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Center(
-                                      child: CustomButton(
-                                          buttonName: 'Register',
-                                          backgroundColorButton:
-                                              AppColors.primaryButton,
-                                          borderColor: Colors.white,
-                                          textColor: Colors.white,
-                                          function: () async {
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              if (passwordController.text ==
-                                                  confirmPasswordController
-                                                      .text) {
-                                                _progressDialog.show();
-                                
-                                                String result =
-                                                    await Authenticate()
-                                                        .registerUser(
-                                                            usernameController
-                                                                .text,
-                                                            emailController.text,
-                                                            passwordController
-                                                                .text);
-                                                if (result == '' &&
-                                                    result.isEmpty) {
-                                                  if (mounted) {
-                                                    await Navigator
-                                                        .pushReplacement(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation,
-                                                                secondaryAnimation) =>
-                                                            const OTPPage(),
-                                                        transitionDuration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    1000),
-                                                        transitionsBuilder:
-                                                            (context,
-                                                                animation,
-                                                                secondaryAnimation,
-                                                                child) {
-                                                          var curve = Curves
-                                                              .easeInOutCubic;
-                                                          var tween = Tween(
-                                                                  begin:
-                                                                      const Offset(
-                                                                          1.0,
-                                                                          0.0),
-                                                                  end:
-                                                                      Offset.zero)
-                                                              .chain(CurveTween(
-                                                                  curve: curve));
-                                                          var offsetAnimation =
-                                                              animation
-                                                                  .drive(tween);
-                                                          return SlideTransition(
-                                                            position:
-                                                                offsetAnimation,
-                                                            child: child,
-                                                          );
-                                                        },
-                                                      ),
-                                                    );
-                                                    _progressDialog.hide();
-                                                  }
-                                                } else {
-                                                  if (mounted) {
-                                                    await _showDialog(
-                                                        context, result);
-                                                    _progressDialog.hide();
+                                                .withOpacity(0.5)),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const CustomText(
+                                          message: 'Email:',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryText),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      customTextFormField(
+                                          emailController,
+                                          TextInputType.emailAddress,
+                                          'Enter your email',
+                                          const IconButton(
+                                              onPressed: null,
+                                              icon: Icon(null)),
+                                          false,
+                                          validateUseremail, (value) {
+                                        teacherDataProvider
+                                            .setTeacherEmail(value);
+                                      },
+                                          Icon(Icons.email_outlined,
+                                              color: AppColors.primaryText
+                                                  .withOpacity(0.5))),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const CustomText(
+                                          message: 'Password:',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryText),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      customTextFormField(
+                                          passwordController,
+                                          TextInputType.visiblePassword,
+                                          'Enter your password',
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  checkObscurePassword =
+                                                      !checkObscurePassword;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                  checkObscurePassword
+                                                      ? Icons.visibility_off
+                                                      : Icons
+                                                          .visibility_outlined,
+                                                  color: Colors.black
+                                                      .withOpacity(0.5))),
+                                          checkObscurePassword,
+                                          validatePassword,
+                                          (value) {},
+                                          Icon(Icons.password_outlined,
+                                              color: AppColors.primaryText
+                                                  .withOpacity(0.5))),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const CustomText(
+                                          message: 'Confirm Password:',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryText),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      customTextFormField(
+                                          confirmPasswordController,
+                                          TextInputType.visiblePassword,
+                                          'Confirm Password',
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  checkObscureConfirm =
+                                                      !checkObscureConfirm;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                  checkObscureConfirm
+                                                      ? Icons.visibility_off
+                                                      : Icons
+                                                          .visibility_outlined,
+                                                  color: Colors.black
+                                                      .withOpacity(0.5))),
+                                          checkObscureConfirm,
+                                          validateConfirmPassword,
+                                          (value) {},
+                                          Icon(Icons.password_outlined,
+                                              color: AppColors.primaryText
+                                                  .withOpacity(0.5))),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Center(
+                                        child: CustomButton(
+                                            buttonName: 'Register',
+                                            backgroundColorButton:
+                                                AppColors.primaryButton,
+                                            borderColor: Colors.white,
+                                            textColor: Colors.white,
+                                            function: () async {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                if (passwordController.text ==
+                                                    confirmPasswordController
+                                                        .text) {
+                                                  _progressDialog.show();
+
+                                                  String result =
+                                                      await Authenticate()
+                                                          .registerUser(
+                                                              usernameController
+                                                                  .text,
+                                                              emailController
+                                                                  .text,
+                                                              passwordController
+                                                                  .text);
+                                                  if (result == '' &&
+                                                      result.isEmpty) {
+                                                    if (mounted) {
+                                                      await Navigator
+                                                          .pushReplacement(
+                                                        context,
+                                                        PageRouteBuilder(
+                                                          pageBuilder: (context,
+                                                                  animation,
+                                                                  secondaryAnimation) =>
+                                                              const OTPPage(),
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      1000),
+                                                          transitionsBuilder:
+                                                              (context,
+                                                                  animation,
+                                                                  secondaryAnimation,
+                                                                  child) {
+                                                            var curve = Curves
+                                                                .easeInOutCubic;
+                                                            var tween = Tween(
+                                                                    begin:
+                                                                        const Offset(
+                                                                            1.0,
+                                                                            0.0),
+                                                                    end: Offset
+                                                                        .zero)
+                                                                .chain(CurveTween(
+                                                                    curve:
+                                                                        curve));
+                                                            var offsetAnimation =
+                                                                animation.drive(
+                                                                    tween);
+                                                            return SlideTransition(
+                                                              position:
+                                                                  offsetAnimation,
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        ),
+                                                      );
+                                                      _progressDialog.hide();
+                                                    }
+                                                  } else {
+                                                    if (mounted) {
+                                                      await _showDialog(
+                                                          context, result);
+                                                      _progressDialog.hide();
+                                                    }
                                                   }
                                                 }
                                               }
-                                            }
-                                          },
-                                          height: 40,
-                                          width: 145,
-                                          fontSize: 13,
-                                          colorShadow: Colors.transparent,
-                                          borderRadius: 5),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const CustomText(
-                                            message: "Already have an account ? ",
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.primaryText),
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (builder) =>
-                                                        const SignInPage()));
-                                          },
-                                          mouseCursor: SystemMouseCursors.click,
-                                          child: const CustomText(
-                                              message: 'Login',
+                                            },
+                                            height: 50,
+                                            width: size.width > 930 ? 200 : 180,
+                                            fontSize:
+                                                size.width > 930 ? 15 : 13,
+                                            colorShadow: Colors.white,
+                                            borderRadius: 10),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const CustomText(
+                                              message:
+                                                  "Already have an account ? ",
                                               fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.importantText),
-                                        )
-                                      ],
-                                    ),
-                                  ],
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.primaryText),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          const SignInPage()));
+                                            },
+                                            mouseCursor:
+                                                SystemMouseCursors.click,
+                                            child: const CustomText(
+                                                message: 'Login',
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.importantText),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -521,7 +537,7 @@ class _SignInPageState extends State<RegisterPage> {
             fontSize: 15),
         obscureText: obscureText,
         decoration: InputDecoration(
-             border: OutlineInputBorder(
+            border: OutlineInputBorder(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 borderSide:
                     BorderSide(width: 1, color: Colors.black.withOpacity(0.2))),

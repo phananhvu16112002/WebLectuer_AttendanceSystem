@@ -65,7 +65,6 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
             header(),
             Container(
               width: MediaQuery.of(context).size.width,
-              // height: 550,
               padding: const EdgeInsets.symmetric(vertical: 20),
               color: AppColors.backgroundColor,
               child: Padding(
@@ -79,9 +78,8 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                       ),
                       Center(
                         child: Container(
-                          width: (MediaQuery.of(context).size.width - 250) / 2 -
-                              20,
-                          height: qrcode.isNotEmpty ? 600 : 500,
+                          width: (MediaQuery.of(context).size.width - 250) / 2,
+                          // height: qrcode.isNotEmpty ? 600 : 500,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius:
@@ -127,185 +125,216 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                   thickness: 0.5,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'Class:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: widget.className,
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'Class:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      widget.className,
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                            .withOpacity(0.5),
+                                      ),
+                                    ))
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'Type:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: getType(data.typeAttendance),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'Type:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        textAlign: TextAlign.end,
+                                        getType(data.typeAttendance),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'Date:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: formatDate(data.dateOpen!),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'Date:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        textAlign: TextAlign.end,
+                                        formatDate(data.dateOpen ??
+                                            DateTime.now().toString()),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'StartTime:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: formatTime(data.startTime!),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'StartTime:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        textAlign: TextAlign.end,
+                                        formatTime(data.startTime ??
+                                            DateTime.now().toString()),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'EndTime:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: formatTime(data.endTime!),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'EndTime:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        textAlign: TextAlign.end,
+                                        formatTime(data.endTime ??
+                                            DateTime.now().toString()),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const CustomText(
-                                        message: 'Distance:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    CustomText(
-                                        message: data.radius.toString(),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText
-                                            .withOpacity(0.5))
+                                    Expanded(
+                                      child: const CustomText(
+                                          message: 'Distance:',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        textAlign: TextAlign.end,
+                                        data.radius.toString(),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const CustomText(
-                                        message: 'QR Code:',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText),
-                                    const SizedBox(
-                                      width: 100,
-                                    ),
                                     if (qrcode.isNotEmpty)
-                                      InkWell(
-                                        mouseCursor: SystemMouseCursors.zoomIn,
-                                        onTap: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return Dialog(
-                                                    child: SizedBox(
-                                                  height: 300,
-                                                  width: 300,
-                                                  child: Center(
-                                                    child: QrImageView(
-                                                      version: 10,
-                                                      data: qrcode,
-                                                      size: 250,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              0),
-                                                      embeddedImage:
-                                                          const AssetImage(
-                                                              'assets/images/logo.png'),
-                                                      eyeStyle:
-                                                          const QrEyeStyle(
-                                                              eyeShape:
-                                                                  QrEyeShape
-                                                                      .square,
-                                                              color:
-                                                                  Colors.black),
+                                      Align(
+                                        child: InkWell(
+                                          mouseCursor:
+                                              SystemMouseCursors.zoomIn,
+                                          onTap: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                      child: SizedBox(
+                                                    height: 300,
+                                                    width: 300,
+                                                    child: Center(
+                                                      child: QrImageView(
+                                                        version: 10,
+                                                        data: qrcode,
+                                                        size: 250,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        embeddedImage:
+                                                            const AssetImage(
+                                                                'assets/images/logo.png'),
+                                                        eyeStyle:
+                                                            const QrEyeStyle(
+                                                                eyeShape:
+                                                                    QrEyeShape
+                                                                        .square,
+                                                                color: Colors
+                                                                    .black),
+                                                      ),
                                                     ),
-                                                  ),
-                                                ));
-                                              });
-                                        },
-                                        child: QrImageView(
-                                          version: 10,
-                                          data: qrcode,
-                                          size: 150,
-                                          padding: const EdgeInsets.all(0),
-                                          embeddedImage: const AssetImage(
-                                              'assets/images/logo.png'),
-                                          eyeStyle: const QrEyeStyle(
-                                              eyeShape: QrEyeShape.square,
-                                              color: Colors.black),
+                                                  ));
+                                                });
+                                          },
+                                          child: QrImageView(
+                                            version: 10,
+                                            data: qrcode,
+                                            size: 180,
+                                            padding: const EdgeInsets.all(0),
+                                            embeddedImage: const AssetImage(
+                                                'assets/images/logo.png'),
+                                            eyeStyle: const QrEyeStyle(
+                                                eyeShape: QrEyeShape.square,
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       )
-                                    else
-                                      Container()
                                   ],
                                 ),
                                 const SizedBox(
@@ -327,7 +356,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                                     const HomePage()),
                                             (route) => false);
                                       },
-                                      height: 35,
+                                      height: 40,
                                       width: 290,
                                       fontSize: 15,
                                       colorShadow: Colors.transparent,
@@ -355,7 +384,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                                           .classes,
                                                     )));
                                       },
-                                      height: 35,
+                                      height: 40,
                                       width: 290,
                                       fontSize: 15,
                                       colorShadow: Colors.transparent,
@@ -411,30 +440,11 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                       height: 50,
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 25,
-                        color: AppColors.textName,
-                      ))
                 ],
               ),
             ),
             Row(
               children: [
-                CustomTextField(
-                    controller: searchController,
-                    textInputType: TextInputType.text,
-                    obscureText: false,
-                    suffixIcon: IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
-                    hintText: 'Search',
-                    prefixIcon: const Icon(null),
-                    readOnly: false),
-                const SizedBox(
-                  width: 60,
-                ),
                 IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.notifications_none_outlined)),

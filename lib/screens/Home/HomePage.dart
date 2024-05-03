@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_mobile.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_tablet.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
@@ -42,6 +44,7 @@ class _HomePageState extends State<HomePage> {
   final storage = SecureStorage();
 
   OverlayEntry? overlayEntry;
+  int page = 1;
 
   bool isCollapsedOpen = true;
   late String name;
@@ -80,6 +83,7 @@ class _HomePageState extends State<HomePage> {
     final teacherDataProvider =
         Provider.of<TeacherDataProvider>(context, listen: false);
     Size size = MediaQuery.of(context).size;
+    final selectedPageProvider = Provider.of<SelectedPageProvider>(context);
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(null),
@@ -101,15 +105,21 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Responsive(
-        mobile: _bodyMobile(size, context, classDataProvider),
-        tablet: _bodyTablet(size, context, classDataProvider),
-        desktop: _bodyDesktop(context, classDataProvider, size),
+        mobile:
+            _bodyMobile(size, context, classDataProvider, selectedPageProvider),
+        tablet:
+            _bodyTablet(size, context, classDataProvider, selectedPageProvider),
+        desktop: _bodyDesktop(
+            context, classDataProvider, size, selectedPageProvider),
       ),
     );
   }
 
   Row _bodyMobile(
-      Size size, BuildContext context, ClassDataProvider classDataProvider) {
+      Size size,
+      BuildContext context,
+      ClassDataProvider classDataProvider,
+      SelectedPageProvider selectedPageProvider) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -286,14 +296,18 @@ class _HomePageState extends State<HomePage> {
         ),
         Expanded(
           flex: 6,
-          child: selectedPage(classDataProvider, size, true),
+          child:
+              selectedPage(classDataProvider, size, true, selectedPageProvider),
         ),
       ],
     );
   }
 
   Row _bodyTablet(
-      Size size, BuildContext context, ClassDataProvider classDataProvider) {
+      Size size,
+      BuildContext context,
+      ClassDataProvider classDataProvider,
+      SelectedPageProvider selectedPageProvider) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -470,14 +484,15 @@ class _HomePageState extends State<HomePage> {
         ),
         Expanded(
           flex: 6,
-          child: selectedPage(classDataProvider, size, false),
+          child: selectedPage(
+              classDataProvider, size, false, selectedPageProvider),
         ),
       ],
     );
   }
 
-  Row _bodyDesktop(
-      BuildContext context, ClassDataProvider classDataProvider, Size size) {
+  Row _bodyDesktop(BuildContext context, ClassDataProvider classDataProvider,
+      Size size, SelectedPageProvider selectedPageProvider) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -490,7 +505,8 @@ class _HomePageState extends State<HomePage> {
         ),
         Expanded(
           flex: 5,
-          child: selectedPage(classDataProvider, size, false),
+          child: selectedPage(
+              classDataProvider, size, false, selectedPageProvider),
         ),
       ],
     );
@@ -828,10 +844,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget selectedPage(
-      ClassDataProvider classDataProvider, Size size, bool isMobile) {
+  Widget selectedPage(ClassDataProvider classDataProvider, Size size,
+      bool isMobile, SelectedPageProvider selectedPageProvider) {
     if (checkHome) {
-      return containerHome(classDataProvider, size, isMobile);
+      return containerHome(
+          classDataProvider, size, isMobile, selectedPageProvider);
     } else if (checkNotification) {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
@@ -844,142 +861,153 @@ class _HomePageState extends State<HomePage> {
     } else if (checkSettings) {
       return const SettingPage();
     } else {
-      return containerHome(classDataProvider, size, isMobile);
+      return containerHome(
+          classDataProvider, size, isMobile, selectedPageProvider);
     }
   }
 
   Widget customClass(
-      String className,
-      String typeClass,
-      String group,
-      String subGroup,
-      int shiftNumber,
-      String room,
-      String imgPath,
-      double height) {
+    String className,
+    String typeClass,
+    String group,
+    String subGroup,
+    int shiftNumber,
+    String room,
+    String imgPath,
+    double height,
+  ) {
     return Container(
-        height: height,
-        decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                  blurRadius: 3,
-                  offset: const Offset(0, 5),
-                  color: Colors.black.withOpacity(0.1))
-            ],
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10))),
-        child: Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      // width: 380,
-                      height: 150,
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        child: Image.asset(
-                          imgPath,
-                          fit: BoxFit.fill,
+      height: height,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 3,
+            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.1),
+          )
+        ],
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    child: Image.asset(
+                      imgPath,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        className,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                child: cusTomText(className, 18,
-                                    FontWeight.bold, Colors.white),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  CustomText(
-                                      message:
-                                          'Group: $group - Sub: $subGroup | ',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                  CustomText(
-                                      message: 'Type: $typeClass',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  CustomText(
-                                      message: 'Shift: $shiftNumber | ',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                  CustomText(
-                                      message: 'Room: $room',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                ],
-                              )
-                            ],
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            'Group: $group - Sub: $subGroup | ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
                           ),
+                          Text(
+                            'Type: $typeClass',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            'Shift: $shiftNumber | ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Room: $room',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: PopupMenuButton(
+                    icon: Icon(Icons.more_vert, color: Colors.white),
+                    onSelected: (value) {},
+                    itemBuilder: (BuildContext bc) {
+                      return [
+                        PopupMenuItem(
+                          value: '/repository',
+                          child: Text("Repository"),
                         ),
-                        PopupMenuButton(
-                          iconColor: Colors.white,
-                          onSelected: (value) {},
-                          itemBuilder: (BuildContext bc) {
-                            return const [
-                              PopupMenuItem(
-                                value: '/repository',
-                                child: Text("Repository"),
-                              ),
-                              PopupMenuItem(
-                                value: '/delete',
-                                child: Text("Delete"),
-                              ),
-                            ];
-                          },
-                        )
-                      ],
-                    )
-                  ],
-                ),
+                        PopupMenuItem(
+                          value: '/delete',
+                          child: Text("Delete"),
+                        ),
+                      ];
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.person_2_outlined),
               ),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.person_2_outlined)),
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.document_scanner_outlined))
-                  ],
-                ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.document_scanner_outlined),
               )
             ],
-          ),
-        ));
+          )
+        ],
+      ),
+    );
   }
 
   void _showPopupMenu(BuildContext context) {
@@ -1014,90 +1042,119 @@ class _HomePageState extends State<HomePage> {
       String message, double fontSize, FontWeight fontWeight, Color color) {
     return Text(message,
         overflow: TextOverflow.ellipsis,
-        maxLines: null,
+        maxLines: 1,
         style: GoogleFonts.inter(
             fontSize: fontSize, fontWeight: fontWeight, color: color));
   }
 
-  Widget containerHome(
-      ClassDataProvider classDataProvider, Size size, bool isMobile) {
+  Widget containerHome(ClassDataProvider classDataProvider, Size size,
+      bool isMobile, SelectedPageProvider selectedPageProvider) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomText(
-                message: 'Home',
-                fontSize: 25,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryText),
-            const SizedBox(
-              height: 10,
-            ),
-            FutureBuilder(
-              future: API(context).getClassForTeacher(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data != null) {
-                    List<Class>? classes = snapshot.data;
-                    Future.delayed(Duration.zero, () {
-                      classDataProvider.setAttendanceFormData(classes!);
-                    });
-                    return !isMobile
-                        ? Expanded(child: _gridViewData(size, classes))
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: classes?.length ?? 0,
-                            itemBuilder: (context, index) {
-                              Class data = classes?[index] ?? Class();
-                              var randomBanner = Random().nextInt(2);
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (builder) => DetailPage(
-                                                classes: data,
-                                              )));
-                                },
-                                mouseCursor: SystemMouseCursors.click,
-                                child: customClass(
-                                    data.course!.courseName,
-                                    data.classType!,
-                                    data.group!,
-                                    data.subGroup!,
-                                    data.shiftNumber!,
-                                    data.roomNumber!,
-                                    'assets/images/banner$randomBanner.jpg',
-                                    150),
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return const SizedBox(
-                                height: 10,
-                              );
-                            },
-                          );
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              const CustomText(
+                  message: 'Home',
+                  fontSize: 25,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryText),
+              const SizedBox(
+                height: 10,
+              ),
+              FutureBuilder(
+                future: API(context).getClassForTeacher(page),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data != null) {
+                      List<Class>? classes = snapshot.data;
+                      Future.delayed(Duration.zero, () {
+                        classDataProvider.setAttendanceFormData(classes!);
+                      });
+                      return !isMobile
+                          ? Column(
+                              children: [
+                                _gridViewData(size, classes),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                _buildPaginationButtons(),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
+                                  itemCount: classes?.length ?? 0,
+                                  itemBuilder: (context, index) {
+                                    Class data = classes?[index] ?? Class();
+                                    var randomBanner = Random().nextInt(2);
+                                    return InkWell(
+                                      onTap: () {
+                                        selectedPageProvider
+                                            .setCheckAttendanceDetail(false);
+                                        selectedPageProvider.setCheckHome(true);
+                                        selectedPageProvider
+                                            .setCheckNoti(false);
+                                        selectedPageProvider
+                                            .setCheckReport(false);
+                                        selectedPageProvider
+                                            .setCheckForm(false);
+                                        selectedPageProvider
+                                            .setCheckEditAttendanceForm(false);
+                                        selectedPageProvider
+                                            .setCheckAttendanceForm(false);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (builder) =>
+                                                    DetailPage(
+                                                      classes: data,
+                                                    )));
+                                      },
+                                      mouseCursor: SystemMouseCursors.click,
+                                      child: customClass(
+                                          data.course!.courseName,
+                                          data.classType!,
+                                          data.group!,
+                                          data.subGroup!,
+                                          data.shiftNumber!,
+                                          data.roomNumber!,
+                                          'assets/images/banner$randomBanner.jpg',
+                                          150),
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return const SizedBox(
+                                      height: 10,
+                                    );
+                                  },
+                                ),
+                                _buildPaginationButtons(),
+                              ],
+                            );
+                    }
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    return const Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.primaryButton));
                   }
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  return const Center(
-                      child: CircularProgressIndicator(
-                          color: AppColors.primaryButton));
-                }
-                return const Center(child: Text('Data is not available'));
-              },
-            ),
-          ],
+                  return const Center(child: Text('Data is not available'));
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1105,11 +1162,12 @@ class _HomePageState extends State<HomePage> {
 
   GridView _gridViewData(Size size, List<Class>? classes) {
     return GridView.builder(
+        shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: size.width <= 860 ? 2 : 3,
-            crossAxisSpacing: 10,
+            crossAxisSpacing: 15,
             childAspectRatio: 16 / 9,
-            mainAxisSpacing: 10),
+            mainAxisSpacing: 15),
         itemCount: classes?.length ?? 0,
         itemBuilder: (context, index) {
           Class data = classes?[index] ?? Class();
@@ -1127,16 +1185,63 @@ class _HomePageState extends State<HomePage> {
             mouseCursor: SystemMouseCursors.click,
             child: Container(
               child: customClass(
-                  data.course!.courseName,
-                  data.classType!,
-                  data.group!,
-                  data.subGroup!,
-                  data.shiftNumber!,
-                  data.roomNumber!,
+                  data.course?.courseName ?? '',
+                  data.classType ?? '',
+                  data.group ?? '',
+                  data.subGroup ?? '',
+                  data.shiftNumber ?? 0,
+                  data.roomNumber ?? '',
                   'assets/images/banner$randomBanner.jpg',
                   550),
             ),
           );
         });
+  }
+
+  Widget _buildPaginationButtons() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            if (page > 1) {
+              setState(() {
+                page--;
+              });
+            }
+          },
+          child: Text(
+            'Previous',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        CustomText(
+            message: '$page/3',
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: AppColors.primaryText),
+        SizedBox(width: 10),
+        ElevatedButton(
+          // style: const ButtonStyle(
+          //   backgroundColor: MaterialStatePropertyAll(Colors.white),
+          // ),
+          onPressed: () {
+            setState(() {
+              page++;
+            });
+          },
+          child: Text(
+            'Next',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

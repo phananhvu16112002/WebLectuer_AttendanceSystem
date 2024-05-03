@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
+import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomRichText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/main.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_form_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/edit_attendance_form.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class FormPage extends StatefulWidget {
@@ -39,6 +46,9 @@ class _RepositoryClassPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedPage = Provider.of<SelectedPageProvider>(context);
+    final editAttendanceFormProvider =
+        Provider.of<EditAttendanceFormProvider>(context);
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -70,157 +80,193 @@ class _RepositoryClassPageState extends State<FormPage> {
                     itemCount: listData.length,
                     itemBuilder: (context, index) {
                       final form = listData[index];
-                      return customForm(
-                          form.formID,
-                          form.radius,
-                          form.latitude,
-                          form.longitude,
-                          form.dateOpen,
-                          form.type,
-                          form.startTime,
-                          form.endTime);
+                      return _customBox(
+                          form, selectedPage, editAttendanceFormProvider);
                     })),
           ],
         ),
       ),
     );
   }
-}
 
-Widget customForm(
-  String formID,
-  int radius,
-  double latitude,
-  double longitude,
-  String? dateOpen,
-  int typeAttendance,
-  String? startTime,
-  String? endTime,
-) {
-  return Container(
-    width: 380,
-    height: 370,
-    decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(
-            color: AppColors.primaryText.withOpacity(0.1), width: 0.2),
-        boxShadow: [
-          BoxShadow(
-              color: AppColors.primaryText.withOpacity(0.2),
-              blurRadius: 2,
-              offset: const Offset(0, 1))
-        ]),
-    child: Padding(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+  Container _customBox(FormData form, SelectedPageProvider selectedPageProvider,
+      EditAttendanceFormProvider editAttendanceFormProvider) {
+    return Container(
+      width: 380,
+      // height: 370,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(
+              color: AppColors.primaryText.withOpacity(0.1), width: 0.2),
+          boxShadow: [
+            BoxShadow(
+                color: AppColors.primaryText.withOpacity(0.2),
+                blurRadius: 2,
+                offset: const Offset(0, 1))
+          ]),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                    width: 280,
-                    child: cusTomText('FormID: $formID', 12, FontWeight.w500,
-                        AppColors.primaryText)),
-                InkWell(
-                    onTap: () {},
-                    mouseCursor: SystemMouseCursors.click,
-                    child: const Icon(Icons.more_vert))
+                    width: 340,
+                    child: cusTomText('FormID: ${form.formID}', 15,
+                        FontWeight.w500, AppColors.primaryText)),
               ],
             ),
-          ),
-          Divider(
-            color: AppColors.primaryText.withOpacity(0.2),
-            thickness: 0.5,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(
-                  message: 'Radius: $radius',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              CustomText(
-                  message: 'Latitude: $latitude - Longitude: $longitude',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              CustomText(
-                  message: 'Date: ${dateOpen!}',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              CustomText(
-                  message: typeAttendance == 1
-                      ? 'Type: Scan face'
-                      : 'Type: Check in class',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  CustomText(
-                      message: 'StartTime: ${formatTime(startTime!)}',
+            Divider(
+              color: AppColors.primaryText.withOpacity(0.2),
+              thickness: 0.5,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 8,
+                ),
+                customRichText(
+                    title: 'Date: ',
+                    message: formatDate(form.dateOpen),
+                    fontWeightTitle: FontWeight.w600,
+                    fontWeightMessage: FontWeight.w400,
+                    colorText: AppColors.primaryText,
+                    fontSize: 15,
+                    colorTextMessage: AppColors.primaryText),
+                const SizedBox(
+                  height: 15,
+                ),
+                customRichText(
+                    title: 'Type: ',
+                    message: form.type == 1 ? 'Scan face' : 'Check in class',
+                    fontWeightTitle: FontWeight.w600,
+                    fontWeightMessage: FontWeight.w400,
+                    colorText: AppColors.primaryText,
+                    fontSize: 15,
+                    colorTextMessage: AppColors.primaryText),
+                const SizedBox(
+                  height: 15,
+                ),
+                customRichText(
+                    title: 'Radius: ',
+                    message: form.radius.toString(),
+                    fontWeightTitle: FontWeight.w600,
+                    fontWeightMessage: FontWeight.w400,
+                    colorText: AppColors.primaryText,
+                    fontSize: 15,
+                    colorTextMessage: AppColors.primaryText),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    customRichText(
+                        title: 'Latitude: ',
+                        message: form.latitude.toString(),
+                        fontWeightTitle: FontWeight.w600,
+                        fontWeightMessage: FontWeight.w400,
+                        colorText: AppColors.primaryText,
+                        fontSize: 15,
+                        colorTextMessage: AppColors.primaryText),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    customRichText(
+                        title: 'Longitude: ',
+                        message: form.longitude.toString(),
+                        fontWeightTitle: FontWeight.w600,
+                        fontWeightMessage: FontWeight.w400,
+                        colorText: AppColors.primaryText,
+                        fontSize: 15,
+                        colorTextMessage: AppColors.primaryText),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    customRichText(
+                        title: 'StartTime: ',
+                        message: formatTime(form.startTime),
+                        fontWeightTitle: FontWeight.w600,
+                        fontWeightMessage: FontWeight.w400,
+                        colorText: AppColors.primaryText,
+                        fontSize: 15,
+                        colorTextMessage: AppColors.primaryText),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    customRichText(
+                        title: 'EndTime: ',
+                        message: formatTime(form.endTime),
+                        fontWeightTitle: FontWeight.w600,
+                        fontWeightMessage: FontWeight.w400,
+                        colorText: AppColors.primaryText,
+                        fontSize: 15,
+                        colorTextMessage: AppColors.primaryText),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const customRichText(
+                    title: 'Push notification to everyone: ',
+                    message: 'ON',
+                    fontWeightTitle: FontWeight.w600,
+                    fontWeightMessage: FontWeight.w400,
+                    colorText: AppColors.primaryText,
+                    fontSize: 15,
+                    colorTextMessage: AppColors.primaryText),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: CustomButton(
+                      buttonName: 'Edit',
+                      backgroundColorButton:
+                          AppColors.primaryButton.withOpacity(0.7),
+                      borderColor: Colors.white,
+                      textColor: Colors.white,
+                      function: () {
+                        selectedPageProvider.setCheckEditAttendanceForm(true);
+                        selectedPageProvider.setCheckAttendanceForm(false);
+                        selectedPageProvider.setCheckHome(false);
+                        selectedPageProvider.setCheckNoti(false);
+                        selectedPageProvider.setCheckReport(false);
+                        selectedPageProvider.setCheckForm(false);
+                        editAttendanceFormProvider.setAttendanceForm(
+                            AttendanceForm(
+                                formID: form.formID,
+                                classes: classes.classID ?? '',
+                                startTime: form.startTime,
+                                endTime: form.endTime,
+                                dateOpen: form.dateOpen,
+                                status: form.status,
+                                typeAttendance: form.type,
+                                location: '',
+                                latitude: form.latitude,
+                                longtitude: form.longitude,
+                                radius: double.parse(form.radius.toString())));
+                      },
+                      height: 40,
+                      width: 185,
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryText),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  CustomText(
-                      message: 'EndTime: ${formatTime(endTime!)}',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryText),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const CustomText(
-                  message: 'Push Notification to everyone: ON',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText),
-              const SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: CustomButton(
-                    buttonName: 'Edit',
-                    backgroundColorButton:
-                        AppColors.primaryButton.withOpacity(0.7),
-                    borderColor: Colors.white,
-                    textColor: Colors.white,
-                    function: () {},
-                    height: 30,
-                    width: 185,
-                    fontSize: 12,
-                    colorShadow: Colors.transparent,
-                    borderRadius: 5),
-              )
-            ],
-          )
-        ],
+                      colorShadow: Colors.transparent,
+                      borderRadius: 5),
+                )
+              ],
+            )
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 String formatDate(String? date) {
@@ -233,7 +279,7 @@ String formatDate(String? date) {
 }
 
 String formatTime(String? time) {
-  if (time != null || time != ""){
+  if (time != null || time != "") {
     DateTime serverDateTime = DateTime.parse(time!).toLocal();
     String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;

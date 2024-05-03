@@ -16,12 +16,12 @@ class EditAttendanceDetail extends StatefulWidget {
   const EditAttendanceDetail(
       {super.key,
       required this.studentID,
-      required this.classID,
+      // required this.classID,
       required this.formID,
       required this.studentName,
       required this.classes});
   final String? studentID;
-  final String? classID;
+  // final String? classID;
   final String? formID;
   final String? studentName;
   final Class? classes;
@@ -75,7 +75,9 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
 
   void _fetchData() async {
     _fetchStudentAttendance = API(context).getAttendanceDetailStudent(
-        widget.classID!, widget.studentID!, widget.formID!);
+        widget.classes?.classID ?? '',
+        widget.studentID ?? '',
+        widget.formID ?? '');
     _fetchStudentAttendance.then((value) {
       setState(() {
         _studentAttendance = value!;
@@ -86,616 +88,589 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _studentAttendance != null
-          ? Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: AppColors.backgroundColor,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 0, right: 0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      header(),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const CustomText(
-                                  message: 'Edit',
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.primaryText),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 390,
-                                    height: 550,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: AppColors.primaryText
-                                                .withOpacity(0.1),
-                                            width: 0.5),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: AppColors.primaryText
-                                                  .withOpacity(0.2),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 1))
-                                        ]),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  const CustomText(
-                                                      message: 'Details',
-                                                      fontSize: 20,
+    return _studentAttendance != null
+        ? Container(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            color: AppColors.backgroundColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const CustomText(
+                            message: 'Edit',
+                            fontSize: 25,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryText),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                // width: 390,
+                                // height: 550,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: AppColors.primaryText
+                                            .withOpacity(0.1),
+                                        width: 0.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 1))
+                                    ]),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const CustomText(
+                                                  message: 'Details',
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primaryText),
+                                              Container(
+                                                width: 65,
+                                                height: 20,
+                                                decoration: BoxDecoration(
+                                                    color: chooseColor(
+                                                        getStatusResult(
+                                                            _studentAttendance!
+                                                                    .result ??
+                                                                '')),
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                5))),
+                                                child: Center(
+                                                  child: CustomText(
+                                                      message: getStatusResult(
+                                                          _studentAttendance!
+                                                                  .result ??
+                                                              ''),
+                                                      fontSize: 11,
                                                       fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .primaryText),
-                                                  Container(
-                                                    width: 65,
-                                                    height: 20,
-                                                    decoration: BoxDecoration(
-                                                        color: chooseColor(
-                                                            getStatusResult(
-                                                                _studentAttendance!
-                                                                        .result ??
-                                                                    '')),
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                .all(
-                                                                Radius.circular(
-                                                                    5))),
-                                                    child: Center(
-                                                      child: CustomText(
-                                                          message: getStatusResult(
-                                                              _studentAttendance!
-                                                                      .result ??
-                                                                  ''),
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          color: Colors.white),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 50,
-                                            width: 390,
-                                            color: const Color(0xfff6f9ff),
-                                            child: const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 8.0,
-                                                  right: 8.0,
-                                                  top: 20),
-                                              child: CustomText(
-                                                  message: 'Basic Details',
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primaryText),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 150,
-                                            width: 390,
-                                            child: Row(
-                                              // mainAxisAlignment:
-                                              //     MainAxisAlignment.spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 260,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10,
-                                                            right: 10,
-                                                            top: 20,
-                                                            bottom: 20),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        customRichText(
-                                                          title: 'Name: ',
-                                                          message: widget
-                                                                  .studentName ??
-                                                              '',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'StudentID: ',
-                                                          message:
-                                                              _studentAttendance!
-                                                                      .studentDetail ??
-                                                                  '',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'Mail: ',
-                                                          message:
-                                                              '${_studentAttendance!.studentDetail ?? ''}@student.tdtu.edu.vn',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title: 'Class: ',
-                                                          message: widget
-                                                                  .classes!
-                                                                  .course!
-                                                                  .courseName ??
-                                                              '',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        customRichText(
-                                                          title:
-                                                              'Shift - Room:  ',
-                                                          message:
-                                                              '${widget.classes!.shiftNumber ?? 0} - ${widget.classes!.roomNumber ?? ''}',
-                                                          fontWeightTitle:
-                                                              FontWeight.w600,
-                                                          fontWeightMessage:
-                                                              FontWeight.normal,
-                                                          colorText: AppColors
-                                                              .primaryText
-                                                              .withOpacity(0.3),
-                                                          fontSize: 12,
-                                                          colorTextMessage:
-                                                              AppColors
-                                                                  .primaryText,
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
+                                                          FontWeight.normal,
+                                                      color: Colors.white),
                                                 ),
-                                              ],
-                                            ),
+                                              )
+                                            ],
                                           ),
-                                          Container(
-                                            height: 50,
-                                            width: 390,
-                                            color: const Color(0xfff6f9ff),
-                                            child: const Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 8.0,
-                                                  right: 8.0,
-                                                  top: 20),
-                                              child: CustomText(
-                                                  message:
-                                                      'Eividence of the problem',
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primaryText),
-                                            ),
-                                          ),
-                                          _studentAttendance!.url == '' ||
-                                                  _studentAttendance!.url ==
-                                                      null
-                                              ? SizedBox(
-                                                  width: 390,
-                                                  height: 335,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: Opacity(
-                                                      opacity: 0.3,
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Image.asset(
-                                                            'assets/images/nodata.png',
-                                                            width: 200,
-                                                            height: 200,
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          const CustomText(
-                                                              message:
-                                                                  'No Image Evidence',
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: AppColors
-                                                                  .primaryText)
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ))
-                                              : Image.network(
-                                                  _studentAttendance!.url!,
-                                                  width: 390,
-                                                  height: 335,
-                                                )
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 30,
-                                  ),
-                                  Container(
-                                      width: 260,
-                                      height: 550,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: AppColors.primaryText
-                                                  .withOpacity(0.1),
-                                              width: 0.2),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: AppColors.primaryText
-                                                    .withOpacity(0.2),
-                                                blurRadius: 2,
-                                                offset: const Offset(0, 1))
-                                          ]),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, top: 10, right: 10),
-                                        child: Column(
+                                      Container(
+                                        // height: 50,
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 20),
+                                        color: const Color(0xfff6f9ff),
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: CustomText(
+                                              message: 'Basic Details',
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryText),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        // height: 150,
+                                        // width: 390,
+                                        child: Row(
+                                          // mainAxisAlignment:
+                                          //     MainAxisAlignment.spaceBetween,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            const CustomText(
-                                                message: 'Edition',
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryText),
                                             SizedBox(
-                                              height: 30,
-                                              child: TextFormField(
-                                                readOnly: true,
-                                                enabled: false,
-                                                decoration: InputDecoration(
-                                                    filled: true,
-                                                    fillColor:
-                                                        const Color.fromARGB(
-                                                            53, 226, 240, 253),
-                                                    disabledBorder:
-                                                        const OutlineInputBorder(
-                                                            borderSide: BorderSide(
-                                                                color: Colors
-                                                                    .transparent)),
-                                                    label: customRichText(
-                                                        title: 'To: ',
-                                                        message: widget
-                                                                .studentName ??
-                                                            '',
-                                                        fontWeightTitle:
-                                                            FontWeight.normal,
-                                                        fontWeightMessage:
-                                                            FontWeight.normal,
-                                                        colorText: AppColors
-                                                            .primaryText
-                                                            .withOpacity(0.2),
-                                                        fontSize: 12,
-                                                        colorTextMessage: AppColors
-                                                            .primaryText
-                                                            .withOpacity(0.5))),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            SizedBox(
-                                              height: 40,
-                                              child: SingleChildScrollView(
-                                                child: TextFormField(
-                                                  controller: topicController,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      color: AppColors
-                                                          .primaryText),
-                                                  maxLines: null,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintStyle: TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight
-                                                              .normal,
-                                                          color: AppColors
-                                                              .primaryText
-                                                              .withOpacity(
-                                                                  0.2)),
-                                                      filled: true,
-                                                      fillColor:
-                                                          const Color.fromARGB(
-                                                              53,
-                                                              226,
-                                                              240,
-                                                              253),
-                                                      disabledBorder:
-                                                          const OutlineInputBorder(
-                                                              borderSide: BorderSide(
-                                                                  color: Colors
-                                                                      .transparent)),
-                                                      hintText: 'Topic'),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            Container(
-                                              height: 30,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: const Color.fromARGB(
-                                                    53, 226, 240, 253),
-                                              ),
-                                              child: DropdownButton<String>(
-                                                value: selectedValue,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    selectedValue = value!;
-                                                  });
-                                                },
-                                                items: <String>[
-                                                  'Lectuer take attendance',
-                                                  'Take attendance late',
-                                                  'Deny attendance'
-                                                ].map<DropdownMenuItem<String>>(
-                                                    (String value) {
-                                                  return DropdownMenuItem<
-                                                      String>(
-                                                    value: value,
-                                                    child: Text(value),
-                                                  );
-                                                }).toList(),
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: AppColors.primaryText,
-                                                ),
-                                                underline: Container(),
-                                                isExpanded: true,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            Container(
-                                              height: 320,
-                                              width: 280,
-                                              decoration: const BoxDecoration(
-                                                  color: Color.fromARGB(
-                                                      53, 226, 240, 253)),
+                                              // width: 260,
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 10),
-                                                child: TextFormField(
-                                                  maxLines: null,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 20,
+                                                    bottom: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    customRichText(
+                                                      title: 'Name: ',
+                                                      message:
+                                                          widget.studentName ??
+                                                              '',
+                                                      fontWeightTitle:
+                                                          FontWeight.w600,
+                                                      fontWeightMessage:
                                                           FontWeight.normal,
-                                                      color: AppColors
-                                                          .primaryText),
-                                                  controller: messageController,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText: 'Message',
-                                                  ),
+                                                      colorText: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.3),
+                                                      fontSize: 12,
+                                                      colorTextMessage:
+                                                          AppColors.primaryText,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    customRichText(
+                                                      title: 'StudentID: ',
+                                                      message: _studentAttendance!
+                                                              .studentDetail ??
+                                                          '',
+                                                      fontWeightTitle:
+                                                          FontWeight.w600,
+                                                      fontWeightMessage:
+                                                          FontWeight.normal,
+                                                      colorText: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.3),
+                                                      fontSize: 12,
+                                                      colorTextMessage:
+                                                          AppColors.primaryText,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    customRichText(
+                                                      title: 'Mail: ',
+                                                      message:
+                                                          '${_studentAttendance!.studentDetail ?? ''}@student.tdtu.edu.vn',
+                                                      fontWeightTitle:
+                                                          FontWeight.w600,
+                                                      fontWeightMessage:
+                                                          FontWeight.normal,
+                                                      colorText: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.3),
+                                                      fontSize: 12,
+                                                      colorTextMessage:
+                                                          AppColors.primaryText,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    customRichText(
+                                                      title: 'Class: ',
+                                                      message: widget
+                                                              .classes!
+                                                              .course!
+                                                              .courseName ??
+                                                          '',
+                                                      fontWeightTitle:
+                                                          FontWeight.w600,
+                                                      fontWeightMessage:
+                                                          FontWeight.normal,
+                                                      colorText: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.3),
+                                                      fontSize: 12,
+                                                      colorTextMessage:
+                                                          AppColors.primaryText,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    customRichText(
+                                                      title: 'Shift - Room:  ',
+                                                      message:
+                                                          '${widget.classes!.shiftNumber ?? 0} - ${widget.classes!.roomNumber ?? ''}',
+                                                      fontWeightTitle:
+                                                          FontWeight.w600,
+                                                      fontWeightMessage:
+                                                          FontWeight.normal,
+                                                      colorText: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.3),
+                                                      fontSize: 12,
+                                                      colorTextMessage:
+                                                          AppColors.primaryText,
+                                                    )
+                                                  ],
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
-                                            CustomButton(
-                                                buttonName: 'Send',
-                                                backgroundColorButton:
-                                                    AppColors.primaryButton,
-                                                borderColor: Colors.transparent,
-                                                textColor: Colors.white,
-                                                function: () async {
-                                                  _progressDialog.show();
-                                                  bool check = await API(context)
-                                                      .editAttendanceDetail(
-                                                          widget.studentID ??
-                                                              '',
-                                                          widget.classID ?? '',
-                                                          widget.formID ?? '',
-                                                          topicController
-                                                                  .text ??
-                                                              '',
-                                                          getConfirmStatus(
-                                                                  selectedValue) ??
-                                                              'Deny attendance',
-                                                          messageController
-                                                              .text);
-                                                  if (check) {
-                                                    await _progressDialog
-                                                        .hide();
-                                                    await showDialog(
-                                                        context: context,
-                                                        builder: (builder) =>
-                                                            AlertDialog(
-                                                              title: const Text(
-                                                                  'Edit Attendance Detail'),
-                                                              content: Text(
-                                                                  'Edit attendance ${widget.studentID} succcessfully'),
-                                                              actions: [
-                                                                TextButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    child:
-                                                                        const Text(
-                                                                            'OK'))
-                                                              ],
-                                                            ));
-                                                  } else {
-                                                    await _progressDialog
-                                                        .hide();
-                                                    await showDialog(
-                                                        context: context,
-                                                        builder: (builder) =>
-                                                            AlertDialog(
-                                                              title: const Text(
-                                                                  'Edit Attendance Detail'),
-                                                              content: Text(
-                                                                  'Failed edit attendance ${widget.studentID}'),
-                                                              actions: [
-                                                                TextButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    child:
-                                                                        const Text(
-                                                                            'OK'))
-                                                              ],
-                                                            ));
-                                                  }
-                                                },
-                                                height: 35,
-                                                width: 260,
-                                                fontSize: 15,
-                                                colorShadow: AppColors
-                                                    .primaryButton
-                                                    .withOpacity(0.7),
-                                                borderRadius: 5)
                                           ],
                                         ),
-                                      )),
-                                  const SizedBox(
-                                    width: 30,
+                                      ),
+                                      Container(
+                                        // height: 50,
+                                        // width: 390,
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 20),
+
+                                        color: const Color(0xfff6f9ff),
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: CustomText(
+                                              message:
+                                                  'Eividence of the problem',
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryText),
+                                        ),
+                                      ),
+                                      _studentAttendance!.url == '' ||
+                                              _studentAttendance!.url == null
+                                          ? SizedBox(
+                                              width: 390,
+                                              height: 335,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: Opacity(
+                                                  opacity: 0.3,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Image.asset(
+                                                        'assets/images/nodata.png',
+                                                        width: 200,
+                                                        height: 200,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      const CustomText(
+                                                          message:
+                                                              'No Image Evidence',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: AppColors
+                                                              .primaryText)
+                                                    ],
+                                                  ),
+                                                ),
+                                              ))
+                                          : Image.network(
+                                              _studentAttendance!.url!,
+                                              width: 390,
+                                              height: 335,
+                                            )
+                                    ],
                                   ),
-                                  Align(
-                                    alignment: Alignment.topCenter,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            Expanded(
+                              child: Container(
+                                  // width: 260,
+                                  // height: 550,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: AppColors.primaryText
+                                              .withOpacity(0.1),
+                                          width: 0.2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: AppColors.primaryText
+                                                .withOpacity(0.2),
+                                            blurRadius: 2,
+                                            offset: const Offset(0, 1))
+                                      ]),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, top: 10, right: 10),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      // mainAxisAlignment: ,
-                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        historyEdition(),
+                                        const CustomText(
+                                            message: 'Edition',
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryText),
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        newReports(),
+                                        SizedBox(
+                                          height: 30,
+                                          child: TextFormField(
+                                            readOnly: true,
+                                            enabled: false,
+                                            decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: const Color.fromARGB(
+                                                    53, 226, 240, 253),
+                                                disabledBorder:
+                                                    const OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .transparent)),
+                                                label: customRichText(
+                                                    title: 'To: ',
+                                                    message:
+                                                        widget.studentName ??
+                                                            '',
+                                                    fontWeightTitle:
+                                                        FontWeight.normal,
+                                                    fontWeightMessage:
+                                                        FontWeight.normal,
+                                                    colorText: AppColors
+                                                        .primaryText
+                                                        .withOpacity(0.2),
+                                                    fontSize: 12,
+                                                    colorTextMessage: AppColors
+                                                        .primaryText
+                                                        .withOpacity(0.5))),
+                                          ),
+                                        ),
                                         const SizedBox(
-                                          height: 50,
+                                          height: 10,
+                                        ),
+                                        SizedBox(
+                                          height: 40,
+                                          child: SingleChildScrollView(
+                                            child: TextFormField(
+                                              controller: topicController,
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: AppColors.primaryText),
+                                              maxLines: null,
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  hintStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      color: AppColors
+                                                          .primaryText
+                                                          .withOpacity(0.2)),
+                                                  filled: true,
+                                                  fillColor:
+                                                      const Color.fromARGB(
+                                                          53, 226, 240, 253),
+                                                  disabledBorder:
+                                                      const OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .transparent)),
+                                                  hintText: 'Topic'),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          height: 30,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            color: const Color.fromARGB(
+                                                53, 226, 240, 253),
+                                          ),
+                                          child: DropdownButton<String>(
+                                            value: selectedValue,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedValue = value!;
+                                              });
+                                            },
+                                            items: <String>[
+                                              'Lectuer take attendance',
+                                              'Take attendance late',
+                                              'Deny attendance'
+                                            ].map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                              color: AppColors.primaryText,
+                                            ),
+                                            underline: Container(),
+                                            isExpanded: true,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          height: 320,
+                                          // width: 280,
+                                          decoration: const BoxDecoration(
+                                              color: Color.fromARGB(
+                                                  53, 226, 240, 253)),
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: TextFormField(
+                                              maxLines: null,
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: AppColors.primaryText),
+                                              controller: messageController,
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText: 'Message',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Center(
+                                          child: CustomButton(
+                                              buttonName: 'Send',
+                                              backgroundColorButton:
+                                                  AppColors.primaryButton,
+                                              borderColor: Colors.transparent,
+                                              textColor: Colors.white,
+                                              function: () async {
+                                                _progressDialog.show();
+                                                bool check = await API(context)
+                                                    .editAttendanceDetail(
+                                                        widget.studentID ?? '',
+                                                        widget.classes
+                                                                ?.classID ??
+                                                            '',
+                                                        widget.formID ?? '',
+                                                        topicController.text ??
+                                                            '',
+                                                        getConfirmStatus(
+                                                                selectedValue) ??
+                                                            'Deny attendance',
+                                                        messageController.text);
+                                                if (check) {
+                                                  await _progressDialog.hide();
+                                                  await showDialog(
+                                                      context: context,
+                                                      builder: (builder) =>
+                                                          AlertDialog(
+                                                            title: const Text(
+                                                                'Edit Attendance Detail'),
+                                                            content: Text(
+                                                                'Edit attendance ${widget.studentID} succcessfully'),
+                                                            actions: [
+                                                              TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                          'OK'))
+                                                            ],
+                                                          ));
+                                                } else {
+                                                  await _progressDialog.hide();
+                                                  await showDialog(
+                                                      context: context,
+                                                      builder: (builder) =>
+                                                          AlertDialog(
+                                                            title: const Text(
+                                                                'Edit Attendance Detail'),
+                                                            content: Text(
+                                                                'Failed edit attendance ${widget.studentID}'),
+                                                            actions: [
+                                                              TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                          'OK'))
+                                                            ],
+                                                          ));
+                                                }
+                                              },
+                                              height: 40,
+                                              width: 260,
+                                              fontSize: 15,
+                                              colorShadow: AppColors
+                                                  .primaryButton
+                                                  .withOpacity(0.7),
+                                              borderRadius: 5),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
                                         )
                                       ],
                                     ),
+                                  )),
+                            ),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                // mainAxisAlignment: ,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  historyEdition(),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  newReports(),
+                                  const SizedBox(
+                                    height: 50,
                                   )
                                 ],
                               ),
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-          : SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              ],
             ),
-    );
+          )
+        : SizedBox(
+            width: MediaQuery.of(context).size.width - 250,
+            height: MediaQuery.of(context).size.height,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
   }
 
   String getConfirmStatus(String confirmStatus) {
@@ -729,28 +704,11 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const CustomText(
-                    message: 'History Edition',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText),
-                CustomButton(
-                    buttonName: 'View All',
-                    backgroundColorButton:
-                        const Color.fromARGB(68, 190, 188, 188),
-                    borderColor: Colors.transparent,
-                    textColor: AppColors.primaryText,
-                    function: () {},
-                    height: 15,
-                    width: 45,
-                    fontSize: 8,
-                    colorShadow: Colors.transparent,
-                    borderRadius: 2)
-              ],
-            ),
+            const CustomText(
+                message: 'History Edition',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText),
             const SizedBox(
               height: 5,
             ),
@@ -804,7 +762,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
     return _studentAttendance!.report != null
         ? Container(
             width: 280,
-            height: 100,
+            // height: 100,
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
@@ -820,28 +778,11 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const CustomText(
-                          message: 'Reports',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryText),
-                      CustomButton(
-                          buttonName: 'View All',
-                          backgroundColorButton:
-                              const Color.fromARGB(68, 190, 188, 188),
-                          borderColor: Colors.transparent,
-                          textColor: AppColors.primaryText,
-                          function: () {},
-                          height: 15,
-                          width: 45,
-                          fontSize: 8,
-                          colorShadow: Colors.transparent,
-                          borderRadius: 2)
-                    ],
-                  ),
+                  const CustomText(
+                      message: 'Reports',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText),
                   const SizedBox(
                     height: 5,
                   ),
@@ -881,8 +822,17 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
           )
         : Container(
             width: 280,
-            height: 100,
-            color: Colors.white,
+            // height: 100,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                    color: AppColors.primaryText.withOpacity(0.1), width: 0.2),
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.primaryText.withOpacity(0.2),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1))
+                ]),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -896,18 +846,7 @@ class _EditAttendanceDetailState extends State<EditAttendanceDetail> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
-                      CustomButton(
-                          buttonName: 'View All',
-                          backgroundColorButton:
-                              const Color.fromARGB(68, 190, 188, 188),
-                          borderColor: Colors.transparent,
-                          textColor: AppColors.primaryText,
-                          function: () {},
-                          height: 15,
-                          width: 45,
-                          fontSize: 8,
-                          colorShadow: Colors.transparent,
-                          borderRadius: 2)
+                     
                     ],
                   ),
                   const SizedBox(

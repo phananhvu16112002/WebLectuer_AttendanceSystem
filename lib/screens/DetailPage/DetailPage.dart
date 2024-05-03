@@ -7,11 +7,14 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/main.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/StudentData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_detail_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
@@ -20,6 +23,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAtte
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/edit_attendance_form.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/widgets/app_bar_mobile_detail_page.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
@@ -237,7 +241,11 @@ class _DetailPageState extends State<DetailPage> {
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final teacherDataProvider =
         Provider.of<TeacherDataProvider>(context, listen: false);
-    int numberOfWeeks = classes.course!.totalWeeks; // course through provider
+    final selectedPageProvider = Provider.of<SelectedPageProvider>(context);
+    final editAttendanceDetailProvider =
+        Provider.of<EditAttendanceDetailProvider>(context);
+    int numberOfWeeks =
+        classes.course?.totalWeeks ?? 0; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
       const FixedColumnWidth(80),
@@ -283,11 +291,27 @@ class _DetailPageState extends State<DetailPage> {
             numberOfWeeks,
             listColumnWidthsMobile,
             studentClassesDataProvider,
-            attendanceFormProvider),
-        tablet: _bodyTablet(size, context, numberOfWeeks, listColumnWidths,
-            studentClassesDataProvider, attendanceFormProvider),
-        desktop: _bodyDesktop(context, size, numberOfWeeks, listColumnWidths,
-            studentClassesDataProvider, attendanceFormProvider),
+            attendanceFormProvider,
+            selectedPageProvider,
+            editAttendanceDetailProvider),
+        tablet: _bodyTablet(
+            size,
+            context,
+            numberOfWeeks,
+            listColumnWidths,
+            studentClassesDataProvider,
+            attendanceFormProvider,
+            selectedPageProvider,
+            editAttendanceDetailProvider),
+        desktop: _bodyDesktop(
+            context,
+            size,
+            numberOfWeeks,
+            listColumnWidths,
+            studentClassesDataProvider,
+            attendanceFormProvider,
+            selectedPageProvider,
+            editAttendanceDetailProvider),
       ),
     );
   }
@@ -298,7 +322,9 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       List<TableColumnWidth> listColumnWidthsMobile,
       StudentClassesDataProvider studentClassesDataProvider,
-      AttendanceFormDataProvider attendanceFormProvider) {
+      AttendanceFormDataProvider attendanceFormProvider,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     return SingleChildScrollView(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +332,9 @@ class _DetailPageState extends State<DetailPage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isCollapsedOpen ? 200 : 60,
-            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+            child: isCollapsedOpen
+                ? _leftHeader(context, selectedPageProvider)
+                : collapsedSideBar(),
           ),
           Expanded(
             flex: size.width <= 1200 ? 6 : 5,
@@ -320,7 +348,9 @@ class _DetailPageState extends State<DetailPage> {
                 newSetStateTable,
                 isSelectedSection,
                 size,
-                true),
+                true,
+                selectedPageProvider,
+                editAttendanceDetailProvider),
           ),
         ],
       ),
@@ -333,7 +363,9 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       List<TableColumnWidth> listColumnWidths,
       StudentClassesDataProvider studentClassesDataProvider,
-      AttendanceFormDataProvider attendanceFormProvider) {
+      AttendanceFormDataProvider attendanceFormProvider,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     if (size.width < 1080) {
       setState(() {
         isCollapsedOpen = false;
@@ -350,7 +382,9 @@ class _DetailPageState extends State<DetailPage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isCollapsedOpen ? 200 : 60,
-            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+            child: isCollapsedOpen
+                ? _leftHeader(context, selectedPageProvider)
+                : collapsedSideBar(),
           ),
           Expanded(
             flex: size.width <= 1200 ? 6 : 5,
@@ -364,7 +398,9 @@ class _DetailPageState extends State<DetailPage> {
                 newSetStateTable,
                 isSelectedSection,
                 size,
-                false),
+                false,
+                selectedPageProvider,
+                editAttendanceDetailProvider),
           ),
         ],
       ),
@@ -488,7 +524,9 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       List<TableColumnWidth> listColumnWidths,
       StudentClassesDataProvider studentClassesDataProvider,
-      AttendanceFormDataProvider attendanceFormProvider) {
+      AttendanceFormDataProvider attendanceFormProvider,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     return SingleChildScrollView(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -496,7 +534,9 @@ class _DetailPageState extends State<DetailPage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isCollapsedOpen ? 250 : 80,
-            child: isCollapsedOpen ? _leftHeader(context) : collapsedSideBar(),
+            child: isCollapsedOpen
+                ? _leftHeader(context, selectedPageProvider)
+                : collapsedSideBar(),
           ),
           Expanded(
             flex: size.width <= 1200 ? 6 : 5,
@@ -510,14 +550,17 @@ class _DetailPageState extends State<DetailPage> {
                 newSetStateTable,
                 isSelectedSection,
                 size,
-                false),
+                false,
+                selectedPageProvider,
+                editAttendanceDetailProvider),
           ),
         ],
       ),
     );
   }
 
-  Container _leftHeader(BuildContext context) {
+  Container _leftHeader(
+      BuildContext context, SelectedPageProvider selectedPageProvider) {
     return Container(
       width: 250,
       height: MediaQuery.of(context).size.height,
@@ -544,13 +587,20 @@ class _DetailPageState extends State<DetailPage> {
             Center(
                 child: InkWell(
               onTap: () {
-                setState(() {
-                  checkHome = false;
-                  checkNotification = false;
-                  checkReport = false;
-                  checkForm = false;
-                  checkAttendanceForm = true;
-                });
+                // setState(() {
+                // checkHome = false;
+                // checkNotification = false;
+                // checkReport = false;
+                // checkForm = false;
+                // checkAttendanceForm = true;
+
+                selectedPageProvider.setCheckAttendanceForm(true);
+                selectedPageProvider.setCheckHome(false);
+                selectedPageProvider.setCheckNoti(false);
+                selectedPageProvider.setCheckReport(false);
+                selectedPageProvider.setCheckForm(false);
+                selectedPageProvider.setCheckEditAttendanceForm(false);
+                // });
               },
               child: Container(
                   padding:
@@ -578,16 +628,22 @@ class _DetailPageState extends State<DetailPage> {
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondaryText),
-            itemHeader('Dashboard', const Icon(Icons.home_outlined), checkHome),
+            itemHeader('Dashboard', const Icon(Icons.home_outlined),
+                selectedPageProvider.getCheckHome, selectedPageProvider),
             const CustomText(
                 message: 'Manage',
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondaryText),
-            itemHeader('Notifications',
-                const Icon(Icons.notifications_outlined), checkNotification),
-            itemHeader('Reports', const Icon(Icons.book_outlined), checkReport),
-            itemHeader('Forms', const Icon(Icons.edit_document), checkForm),
+            itemHeader(
+                'Notifications',
+                const Icon(Icons.notifications_outlined),
+                selectedPageProvider.checkNoti,
+                selectedPageProvider),
+            itemHeader('Reports', const Icon(Icons.book_outlined),
+                selectedPageProvider.getCheckReport, selectedPageProvider),
+            itemHeader('Forms', const Icon(Icons.edit_document),
+                selectedPageProvider.checkForm, selectedPageProvider),
           ],
         ),
       ),
@@ -797,35 +853,55 @@ class _DetailPageState extends State<DetailPage> {
         child: icon);
   }
 
-  Widget itemHeader(String title, Icon icon, bool check) {
+  Widget itemHeader(String title, Icon icon, bool check,
+      SelectedPageProvider selectedPageProvider) {
     return InkWell(
       onTap: () {
         setState(() {
-          checkHome = false;
-          checkNotification = false;
-          checkReport = false;
-          checkForm = false;
-          checkViewAttendance = false;
+          // checkHome = false;
+          // checkNotification = false;
+          // checkReport = false;
+          // checkForm = false;
+          // checkViewAttendance = false;
+
+          selectedPageProvider.setCheckAttendanceForm(false);
+          selectedPageProvider.setCheckHome(false);
+          selectedPageProvider.setCheckNoti(false);
+          selectedPageProvider.setCheckReport(false);
+          selectedPageProvider.setCheckForm(false);
+          selectedPageProvider.setCheckEditAttendanceForm(false);
+
           if (title == 'Home') {
-            checkHome = true;
-            checkAttendanceForm = false;
-            checkViewAttendance = false;
+            // checkHome = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
+            selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckHome(true);
           } else if (title == 'Notifications') {
-            checkNotification = true;
-            checkAttendanceForm = false;
-            checkViewAttendance = false;
+            // checkNotification = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
+
+            selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckNoti(true);
           } else if (title == 'Reports') {
-            checkReport = true;
-            checkAttendanceForm = false;
-            checkViewAttendance = false;
+            // checkReport = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
+            selectedPageProvider.setCheckReport(true);
+            selectedPageProvider.setCheckAttendanceForm(false);
           } else if (title == 'Forms') {
-            checkForm = true;
-            checkAttendanceForm = false;
-            checkViewAttendance = false;
+            // checkForm = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
+            selectedPageProvider.setCheckForm(true);
+            selectedPageProvider.setCheckAttendanceForm(false);
           } else {
-            checkHome = true;
-            checkAttendanceForm = false;
-            checkViewAttendance = false;
+            selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckHome(true);
+            // checkHome = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
           }
         });
       },
@@ -868,8 +944,10 @@ class _DetailPageState extends State<DetailPage> {
       Function(String title) newSetStateTable,
       String isSelectedSection,
       Size size,
-      bool isMobile) {
-    if (checkHome) {
+      bool isMobile,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
+    if (selectedPageProvider.getCheckHome) {
       if (isMobile) {
         return homeMobile(
             numberOfWeeks,
@@ -880,7 +958,9 @@ class _DetailPageState extends State<DetailPage> {
             functionSearch,
             newSetStateTable,
             isSelectedSection,
-            size);
+            size,
+            selectedPageProvider,
+            editAttendanceDetailProvider);
       } else {
         return containerHome(
             numberOfWeeks,
@@ -891,22 +971,30 @@ class _DetailPageState extends State<DetailPage> {
             functionSearch,
             newSetStateTable,
             isSelectedSection,
-            size);
+            size,
+            selectedPageProvider,
+            editAttendanceDetailProvider);
       }
-    } else if (checkNotification) {
+    } else if (selectedPageProvider.getCheckNoti) {
       return const NotificationPage();
-    } else if (checkReport) {
+    } else if (selectedPageProvider.getCheckReport) {
       return const ReportPage();
-    } else if (checkForm) {
+    } else if (selectedPageProvider.getCheckForm) {
       return FormPage(
         classes: classes,
       );
-    } else if (checkAttendanceForm) {
+    } else if (selectedPageProvider.getCheckAttendanceForm) {
       return CreateAttendanceFormPage(
         classes: classes,
       );
-    } else if (checkViewAttendance) {
-      return Container();
+    } else if (selectedPageProvider.getCheckEditAttendanceForm) {
+      return EditAttendanceForm(classes: classes);
+    } else if (selectedPageProvider.getCheckAttendanceDetail) {
+      return EditAttendanceDetail(
+          studentID: editAttendanceDetailProvider.getStudentID,
+          formID: editAttendanceDetailProvider.getFormID,
+          studentName: editAttendanceDetailProvider.getStudentName,
+          classes: classes);
     } else {
       if (isMobile) {
         return homeMobile(
@@ -918,7 +1006,9 @@ class _DetailPageState extends State<DetailPage> {
             functionSearch,
             newSetStateTable,
             isSelectedSection,
-            size);
+            size,
+            selectedPageProvider,
+            editAttendanceDetailProvider);
       } else {
         return containerHome(
             numberOfWeeks,
@@ -929,7 +1019,9 @@ class _DetailPageState extends State<DetailPage> {
             functionSearch,
             newSetStateTable,
             isSelectedSection,
-            size);
+            size,
+            selectedPageProvider,
+            editAttendanceDetailProvider);
       }
     }
   }
@@ -946,7 +1038,9 @@ class _DetailPageState extends State<DetailPage> {
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
       String isSelectedSection,
-      Size size) {
+      Size size,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     return listData != null && listData.isNotEmpty
         ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
@@ -1164,7 +1258,13 @@ class _DetailPageState extends State<DetailPage> {
                     height: 10,
                   ),
                   tableStudent(
-                      listColumnWidth, numberOfWeeks, listData, size, false),
+                      listColumnWidth,
+                      numberOfWeeks,
+                      listData,
+                      size,
+                      false,
+                      selectedPageProvider,
+                      editAttendanceDetailProvider),
                 ],
               ),
             ),
@@ -1360,8 +1460,14 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  tableStudent(listColumnWidth, numberOfWeeks, listData ?? [],
-                      size, false),
+                  tableStudent(
+                      listColumnWidth,
+                      numberOfWeeks,
+                      listData ?? [],
+                      size,
+                      false,
+                      selectedPageProvider,
+                      editAttendanceDetailProvider),
                 ],
               ),
             ),
@@ -1377,7 +1483,9 @@ class _DetailPageState extends State<DetailPage> {
       Function(String querySearch) functionSearch,
       Function(String title) newSetStateTable,
       String isSelectedSection,
-      Size size) {
+      Size size,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     return listData != null && listData.isNotEmpty
         ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
@@ -1557,8 +1665,8 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  tableStudent(
-                      listColumnWidth, numberOfWeeks, listData, size, true),
+                  tableStudent(listColumnWidth, numberOfWeeks, listData, size,
+                      true, selectedPageProvider, editAttendanceDetailProvider),
                 ],
               ),
             ),
@@ -1743,16 +1851,28 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  tableStudent(listColumnWidth, numberOfWeeks, listData ?? [],
-                      size, true),
+                  tableStudent(
+                      listColumnWidth,
+                      numberOfWeeks,
+                      listData ?? [],
+                      size,
+                      true,
+                      selectedPageProvider,
+                      editAttendanceDetailProvider),
                 ],
               ),
             ),
           );
   }
 
-  Widget tableStudent(listColumnWidth, int numberOfWeeks,
-      List<StudentData> listData, Size size, bool isMobile) {
+  Widget tableStudent(
+      listColumnWidth,
+      int numberOfWeeks,
+      List<StudentData> listData,
+      Size size,
+      bool isMobile,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     final students = List.generate(
       listData.length,
       (index) => {
@@ -1790,8 +1910,13 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                               Expanded(
                                 flex: 2,
-                                child: tableCheckAttendance(numberOfWeeks,
-                                    paginatedStudents, listData, false),
+                                child: tableCheckAttendance(
+                                    numberOfWeeks,
+                                    paginatedStudents,
+                                    listData,
+                                    false,
+                                    selectedPageProvider,
+                                    editAttendanceDetailProvider),
                               ),
                               Expanded(
                                   child: tableTotal(
@@ -1808,8 +1933,13 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                               Expanded(
                                 flex: 2,
-                                child: tableCheckAttendance(numberOfWeeks,
-                                    paginatedStudents, listData, true),
+                                child: tableCheckAttendance(
+                                    numberOfWeeks,
+                                    paginatedStudents,
+                                    listData,
+                                    true,
+                                    selectedPageProvider,
+                                    editAttendanceDetailProvider),
                               ),
                               Expanded(
                                   child: tableTotal(
@@ -1964,7 +2094,9 @@ class _DetailPageState extends State<DetailPage> {
       int numberOfWeeks,
       List<Map<String, String>> paginatedStudents,
       List<StudentData> listData,
-      bool isMobile) {
+      bool isMobile,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceDetailProvider editAttendanceDetailProvider) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SizedBox(
@@ -2021,20 +2153,35 @@ class _DetailPageState extends State<DetailPage> {
                       child: Center(
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (builder) => EditAttendanceDetail(
-                                          studentID: listData[i].studentID,
-                                          classID: listData[i]
-                                              .attendancedetails[j]
-                                              .classDetail,
-                                          formID: listData[i]
-                                              .attendancedetails[j]
-                                              .attendanceForm,
-                                          studentName: listData[i].studentName,
-                                          classes: widget.classes!,
-                                        )));
+                            selectedPageProvider.setCheckAttendanceDetail(true);
+                            selectedPageProvider.setCheckHome(false);
+                            selectedPageProvider.setCheckNoti(false);
+                            selectedPageProvider.setCheckReport(false);
+                            selectedPageProvider.setCheckForm(false);
+                            selectedPageProvider
+                                .setCheckEditAttendanceForm(false);
+                            selectedPageProvider.setCheckAttendanceForm(false);
+                            editAttendanceDetailProvider
+                                .setStudentID(listData[i].studentID);
+                            editAttendanceDetailProvider.setFormID(listData[i]
+                                .attendancedetails[j]
+                                .attendanceForm);
+                            editAttendanceDetailProvider
+                                .setStudentName(listData[i].studentName);
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (builder) => EditAttendanceDetail(
+                            //               studentID: listData[i].studentID,
+                            //               // classID: listData[i]
+                            //               //     .attendancedetails[j]
+                            //               //     .classDetail,
+                            //               formID: listData[i]
+                            //                   .attendancedetails[j]
+                            //                   .attendanceForm,
+                            //               studentName: listData[i].studentName,
+                            //               classes: widget.classes,
+                            //             )));
                           },
                           child: Text(
                             j < listData[i].attendancedetails.length

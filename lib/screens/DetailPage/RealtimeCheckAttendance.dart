@@ -140,32 +140,31 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     // });
   }
 
-
-void updateData(dynamic data) {
-  String studentID = data['studentDetail'];
-  for (int i = 0; i < studentAttendance.length; i++) {
-    if (studentID.contains(studentAttendance[i].studentID)) {
-      if (data['result'] == '1') {
-        absent = absent - 1;
-        present = present + 1;
-        studentAttendance[i].result = data['result'];
-        studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-        presentAttendance.add(studentAttendance[i]);
-        absentAttendance.remove(studentAttendance[i]);
-      } else if (data['result'] == '0.5') {
-        late = late + 1;
-        absent = absent - 1;
-        studentAttendance[i].result = data['result'];
-        studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
-        lateAttendance.add(studentAttendance[i]);
-        absentAttendance.remove(studentAttendance[i]);
+  void updateData(dynamic data) {
+    String studentID = data['studentDetail'];
+    for (int i = 0; i < studentAttendance.length; i++) {
+      if (studentID.contains(studentAttendance[i].studentID)) {
+        if (data['result'] == '1') {
+          absent = absent - 1;
+          present = present + 1;
+          studentAttendance[i].result = data['result'];
+          studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+          presentAttendance.add(studentAttendance[i]);
+          absentAttendance.remove(studentAttendance[i]);
+        } else if (data['result'] == '0.5') {
+          late = late + 1;
+          absent = absent - 1;
+          studentAttendance[i].result = data['result'];
+          studentAttendance[i].dateAttendanced = data['dateTimeAttendance'];
+          lateAttendance.add(studentAttendance[i]);
+          absentAttendance.remove(studentAttendance[i]);
+        }
       }
     }
+    if (mounted) {
+      setState(() {});
+    }
   }
-  if (mounted) {
-    setState(() {});
-  }
-}
 
   void newAllListData() {
     setState(() {
@@ -224,6 +223,9 @@ void updateData(dynamic data) {
     List<AttendanceData> temp = listDataSearch(isSelectedSection);
     for (var element in temp) {
       if (element.studentID.contains(query) ||
+          element.studentID.toLowerCase().trim() ==
+              query.toLowerCase().trim() ||
+          element.studentName.contains(query) ||
           element.studentID.toLowerCase().trim() ==
               query.toLowerCase().trim()) {
         searchResult.add(element);
@@ -320,6 +322,7 @@ void updateData(dynamic data) {
                       width: MediaQuery.of(context).size.width - 250,
                       height: 40,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           customButtonDashBoard('Export'),
                           customButtonDashBoard('PDF'),
@@ -399,29 +402,33 @@ void updateData(dynamic data) {
                               ],
                             ),
                           )
-                        : Center(
-                            child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 50,
-                              ),
-                              SizedBox(
-                                width: 200,
-                                height: 200,
-                                child: Opacity(
-                                  opacity: 0.3,
-                                  child:
-                                      Image.asset('assets/images/nodata.png'),
+                        : SizedBox(
+                            width: MediaQuery.of(context).size.width - 250,
+                            child: Center(
+                                child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 50,
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              CustomText(
-                                  message: 'No Student Record',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: AppColors.primaryText.withOpacity(0.3))
-                            ],
-                          )),
+                                SizedBox(
+                                  width: 200,
+                                  height: 200,
+                                  child: Opacity(
+                                    opacity: 0.3,
+                                    child:
+                                        Image.asset('assets/images/nodata.png'),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                CustomText(
+                                    message: 'No Student Record',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color:
+                                        AppColors.primaryText.withOpacity(0.3))
+                              ],
+                            )),
+                          ),
                   ],
                 ),
               ),

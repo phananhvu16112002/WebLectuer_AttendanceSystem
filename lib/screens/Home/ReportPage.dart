@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomButton.dart';
@@ -131,320 +132,353 @@ class _ReportPageState extends State<ReportPage> {
                               height: 10,
                             ),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Container(
-                                  width: 300,
-                                  height: 600,
-                                  color: Colors.white,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 8.0),
-                                        child: CustomText(
-                                            message: 'Students',
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryText),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        width: 300,
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: Table(
-                                          columnWidths: const {
-                                            0: FixedColumnWidth(50),
-                                            1: FixedColumnWidth(70),
-                                            2: FixedColumnWidth(70),
-                                            3: FixedColumnWidth(90),
-                                          },
-                                          border: TableBorder.all(
-                                              color: AppColors.secondaryText),
-                                          children: [
-                                            TableRow(
-                                              children: [
-                                                TableCell(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    child: const Center(
-                                                      child: CustomText(
-                                                          message: 'ReportID',
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    child: const Center(
-                                                      child: CustomText(
-                                                          message: 'ID',
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    child: const Center(
-                                                      child: CustomText(
-                                                          message: 'Name',
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    ),
-                                                  ),
-                                                ),
-                                                TableCell(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    child: const Center(
-                                                      child: CustomText(
-                                                          message: 'Class',
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            for (var student in listReportData)
-                                              TableRow(
+                                Expanded(
+                                  child: Container(
+                                    // width: 300,
+                                    height: 400,
+                                    // padding: EdgeInsets.symmetric(vertical: 20),
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const CustomText(
+                                              message: 'Students',
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryText),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Table(
+                                                columnWidths: const {
+                                                  0: FixedColumnWidth(70),
+                                                  1: FixedColumnWidth(80),
+                                                  2: IntrinsicColumnWidth(),
+                                                  3: FixedColumnWidth(160),
+                                                },
+                                                border: TableBorder.all(
+                                                    color: AppColors
+                                                        .secondaryText),
                                                 children: [
-                                                  InkWell(
-                                                    mouseCursor:
-                                                        SystemMouseCursors
-                                                            .click,
-                                                    onTap: () {
-                                                      updateData(
-                                                          student.classID,
-                                                          student.reportID,
-                                                          student);
-                                                      print(
-                                                          'Tapped--------------------------');
-                                                    },
-                                                    child: TableCell(
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        child: CustomText(
-                                                            message: student
-                                                                .reportID
-                                                                .toString(),
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {},
-                                                    mouseCursor:
-                                                        SystemMouseCursors
-                                                            .click,
-                                                    child: TableCell(
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        child: CustomText(
-                                                            message: student
-                                                                .studentID,
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {},
-                                                    mouseCursor:
-                                                        SystemMouseCursors
-                                                            .click,
-                                                    child: TableCell(
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        child: CustomText(
-                                                            message: student
-                                                                .studentName,
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {},
-                                                    mouseCursor:
-                                                        SystemMouseCursors
-                                                            .click,
-                                                    child: TableCell(
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        child: cusTomText(
-                                                            student.courseName,
-                                                            11,
-                                                            FontWeight.normal,
-                                                            Colors.black),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                _attendanceReport != null
-                                    ? Container(
-                                        width: 390,
-                                        height: 600,
-                                        color: Colors.white,
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                  TableRow(
                                                     children: [
-                                                      const CustomText(
-                                                          message: 'Details',
-                                                          fontSize: 20,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: AppColors
-                                                              .primaryText),
-                                                      Row(
-                                                        children: [
-                                                          Container(
-                                                            width: 65,
-                                                            height: 20,
-                                                            decoration: BoxDecoration(
-                                                                color: _attendanceReport!
-                                                                        .isNew
-                                                                    ? AppColors
-                                                                        .textApproved
-                                                                    : AppColors
-                                                                        .primaryText,
-                                                                borderRadius:
-                                                                    const BorderRadius
-                                                                        .all(
-                                                                        Radius.circular(
-                                                                            5))),
-                                                            child: Center(
+                                                      TableCell(
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: const Center(
+                                                            child: CustomText(
+                                                                message:
+                                                                    'ReportID',
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: const Center(
+                                                            child: CustomText(
+                                                                message:
+                                                                    'StudentID',
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: const Center(
+                                                            child: CustomText(
+                                                                message: 'Name',
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: const Center(
+                                                            child: CustomText(
+                                                                message:
+                                                                    'Class',
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  for (var student
+                                                      in listReportData)
+                                                    TableRow(
+                                                      children: [
+                                                        InkWell(
+                                                          mouseCursor:
+                                                              SystemMouseCursors
+                                                                  .click,
+                                                          onTap: () {
+                                                            updateData(
+                                                                student.classID,
+                                                                student
+                                                                    .reportID,
+                                                                student);
+                                                          },
+                                                          child: TableCell(
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              child: Center(
+                                                                child: CustomText(
+                                                                    message: student
+                                                                        .reportID
+                                                                        .toString(),
+                                                                    fontSize:
+                                                                        11,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          mouseCursor:
+                                                              SystemMouseCursors
+                                                                  .click,
+                                                          child: TableCell(
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
                                                               child: CustomText(
-                                                                  message: _attendanceReport!
-                                                                          .isNew
-                                                                      ? 'New'
-                                                                      : 'Old',
-                                                                  fontSize: 12,
+                                                                  message: student
+                                                                      .studentID,
+                                                                  fontSize: 11,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .normal,
                                                                   color: Colors
-                                                                      .white),
+                                                                      .black),
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Container(
-                                                            width: 65,
-                                                            height: 20,
-                                                            decoration: const BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        113,
-                                                                        190,
-                                                                        188,
-                                                                        188),
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            5))),
-                                                            child: Center(
+                                                        ),
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          mouseCursor:
+                                                              SystemMouseCursors
+                                                                  .click,
+                                                          child: TableCell(
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
                                                               child: CustomText(
-                                                                  message:
-                                                                      'ID:${_attendanceReport!.reportID.toString()}',
-                                                                  fontSize: 12,
+                                                                  message: student
+                                                                      .studentName,
+                                                                  fontSize: 11,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .normal,
-                                                                  color: AppColors
-                                                                      .primaryText),
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
                                                           ),
-                                                        ],
-                                                      )
-                                                    ],
+                                                        ),
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          mouseCursor:
+                                                              SystemMouseCursors
+                                                                  .click,
+                                                          child: TableCell(
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              child: cusTomText(
+                                                                  student
+                                                                      .courseName,
+                                                                  11,
+                                                                  FontWeight
+                                                                      .normal,
+                                                                  Colors.black),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                _attendanceReport != null
+                                    ? Expanded(
+                                        child: Container(
+                                          // width: 390,
+                                          // height: 600,
+                                          color: Colors.white,
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        const CustomText(
+                                                            message: 'Details',
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: AppColors
+                                                                .primaryText),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              width: 65,
+                                                              height: 20,
+                                                              decoration: BoxDecoration(
+                                                                  color: _attendanceReport!.isNew
+                                                                      ? AppColors
+                                                                          .textApproved
+                                                                      : AppColors
+                                                                          .primaryText,
+                                                                  borderRadius:
+                                                                      const BorderRadius
+                                                                          .all(
+                                                                          Radius.circular(
+                                                                              5))),
+                                                              child: Center(
+                                                                child: CustomText(
+                                                                    message: _attendanceReport!
+                                                                            .isNew
+                                                                        ? 'New'
+                                                                        : 'Old',
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 5),
+                                                            Container(
+                                                              width: 65,
+                                                              height: 20,
+                                                              decoration: const BoxDecoration(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          113,
+                                                                          190,
+                                                                          188,
+                                                                          188),
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              5))),
+                                                              child: Center(
+                                                                child: CustomText(
+                                                                    message:
+                                                                        'ID:${_attendanceReport!.reportID.toString()}',
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    color: AppColors
+                                                                        .primaryText),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Container(
-                                                height: 50,
-                                                width: 390,
-                                                color: const Color(0xfff6f9ff),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: 8.0,
-                                                      right: 8.0,
-                                                      top: 20),
-                                                  child: CustomText(
-                                                      message: 'Basic Details',
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .primaryText),
+                                                const SizedBox(
+                                                  height: 5,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                height: 160,
-                                                width: 390,
-                                                child: SingleChildScrollView(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
+                                                Container(
+                                                  // height: 50,
+                                                  // width: 390,
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 20),
+                                                  color:
+                                                      const Color(0xfff6f9ff),
+                                                  child: const Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                    ),
+                                                    child: CustomText(
+                                                        message:
+                                                            'Basic Details',
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: AppColors
+                                                            .primaryText),
+                                                  ),
+                                                ),
+                                                SizedBox(
                                                   child: Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -453,135 +487,138 @@ class _ReportPageState extends State<ReportPage> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      SizedBox(
-                                                        width: 260,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  left: 10,
-                                                                  right: 10,
-                                                                  top: 20,
-                                                                  bottom: 20),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              customRichText(
-                                                                title: 'Name ',
-                                                                message:
-                                                                    _reportData!
-                                                                        .studentName,
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              customRichText(
-                                                                title:
-                                                                    'StudentID: ',
-                                                                message:
-                                                                    _reportData!
-                                                                        .studentID,
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              customRichText(
-                                                                title: 'Mail: ',
-                                                                message:
-                                                                    '${_reportData!.studentID}@student.tdtu.edu.vn',
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              customRichText(
-                                                                title:
-                                                                    'Class: ',
-                                                                message:
-                                                                    _reportData!
-                                                                        .courseName,
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              customRichText(
-                                                                title:
-                                                                    'Shift - Room:  ',
-                                                                message:
-                                                                    '${_reportData!.shiftNumber} - ${_reportData!.roomNumber}',
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              )
-                                                            ],
+                                                      Expanded(
+                                                        child: Container(
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 10,
+                                                                    right: 10,
+                                                                    top: 20,
+                                                                    bottom: 20),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                customRichText(
+                                                                  title:
+                                                                      'Name ',
+                                                                  message:
+                                                                      _reportData!
+                                                                          .studentName,
+                                                                  fontWeightTitle:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontWeightMessage:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  colorText: AppColors
+                                                                      .primaryText
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  fontSize: 12,
+                                                                  colorTextMessage:
+                                                                      AppColors
+                                                                          .primaryText,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                customRichText(
+                                                                  title:
+                                                                      'StudentID: ',
+                                                                  message:
+                                                                      _reportData!
+                                                                          .studentID,
+                                                                  fontWeightTitle:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontWeightMessage:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  colorText: AppColors
+                                                                      .primaryText
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  fontSize: 12,
+                                                                  colorTextMessage:
+                                                                      AppColors
+                                                                          .primaryText,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                customRichText(
+                                                                  title:
+                                                                      'Mail: ',
+                                                                  message:
+                                                                      '${_reportData!.studentID}@student.tdtu.edu.vn',
+                                                                  fontWeightTitle:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontWeightMessage:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  colorText: AppColors
+                                                                      .primaryText
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  fontSize: 12,
+                                                                  colorTextMessage:
+                                                                      AppColors
+                                                                          .primaryText,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                customRichText(
+                                                                  title:
+                                                                      'Class: ',
+                                                                  message:
+                                                                      _reportData!
+                                                                          .courseName,
+                                                                  fontWeightTitle:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontWeightMessage:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  colorText: AppColors
+                                                                      .primaryText
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  fontSize: 12,
+                                                                  colorTextMessage:
+                                                                      AppColors
+                                                                          .primaryText,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                customRichText(
+                                                                  title:
+                                                                      'Shift - Room:  ',
+                                                                  message:
+                                                                      '${_reportData!.shiftNumber} - ${_reportData!.roomNumber}',
+                                                                  fontWeightTitle:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontWeightMessage:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                  colorText: AppColors
+                                                                      .primaryText
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  fontSize: 12,
+                                                                  colorTextMessage:
+                                                                      AppColors
+                                                                          .primaryText,
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -622,28 +659,28 @@ class _ReportPageState extends State<ReportPage> {
                                                               const SizedBox(
                                                                 height: 10,
                                                               ),
-                                                              customRichText(
-                                                                title: 'Note: ',
-                                                                message:
-                                                                    ' ${_attendanceReport!.attendanceDetail.note}',
-                                                                fontWeightTitle:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontWeightMessage:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                colorText: AppColors
-                                                                    .primaryText
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                fontSize: 12,
-                                                                colorTextMessage:
-                                                                    AppColors
-                                                                        .primaryText,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 10,
-                                                              ),
+                                                              // customRichText(
+                                                              //   title: 'Note: ',
+                                                              //   message:
+                                                              //       ' ${_attendanceReport!.attendanceDetail.note}',
+                                                              //   fontWeightTitle:
+                                                              //       FontWeight
+                                                              //           .w600,
+                                                              //   fontWeightMessage:
+                                                              //       FontWeight
+                                                              //           .normal,
+                                                              //   colorText: AppColors
+                                                              //       .primaryText
+                                                              //       .withOpacity(
+                                                              //           0.3),
+                                                              //   fontSize: 12,
+                                                              //   colorTextMessage:
+                                                              //       AppColors
+                                                              //           .primaryText,
+                                                              // ),
+                                                              // const SizedBox(
+                                                              //   height: 10,
+                                                              // ),
                                                               customRichText(
                                                                 title:
                                                                     'Status Attendance: ',
@@ -674,17 +711,16 @@ class _ReportPageState extends State<ReportPage> {
                                                     ],
                                                   ),
                                                 ),
-                                              ),
-                                              Container(
-                                                height: 50,
-                                                width: 390,
-                                                color: const Color(0xfff6f9ff),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: 8.0,
-                                                      right: 8.0,
-                                                      top: 20),
-                                                  child: CustomText(
+                                                Container(
+                                                  // height: 50,
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 20,
+                                                      horizontal: 10),
+                                                  color:
+                                                      const Color(0xfff6f9ff),
+                                                  child: const CustomText(
                                                       message: 'About Report',
                                                       fontSize: 18,
                                                       fontWeight:
@@ -692,162 +728,156 @@ class _ReportPageState extends State<ReportPage> {
                                                       color: AppColors
                                                           .primaryText),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                  width: 390,
-                                                  height: 335,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 8.0,
-                                                            top: 8.0),
+                                                Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 10),
+                                                    // width: 390,
+                                                    // height: 335,
                                                     child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
-                                                        SizedBox(
-                                                          width: 195,
-                                                          height: 335,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const CustomText(
-                                                                  message:
-                                                                      'Description',
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color: AppColors
-                                                                      .primaryText),
-                                                              Container(
-                                                                width: 195,
-                                                                height: 300,
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: const BorderRadius
-                                                                        .all(
-                                                                        Radius.circular(
-                                                                            5)),
-                                                                    border: Border.all(
-                                                                        color: AppColors
-                                                                            .secondaryText)),
-                                                                child:
-                                                                    SingleChildScrollView(
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            8.0),
-                                                                    child: CustomText(
-                                                                        message:
-                                                                            ' ${_reportData!.message}',
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .normal,
-                                                                        color: AppColors
-                                                                            .primaryText),
-                                                                  ),
+                                                        Expanded(
+                                                          child: SizedBox(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const CustomText(
+                                                                    message:
+                                                                        'Description',
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: AppColors
+                                                                        .primaryText),
+                                                                const SizedBox(
+                                                                  height: 5,
                                                                 ),
-                                                              ),
-                                                            ],
+                                                                Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          10),
+                                                                  decoration: BoxDecoration(
+                                                                      borderRadius: const BorderRadius
+                                                                          .all(
+                                                                          Radius.circular(
+                                                                              5)),
+                                                                      border: Border.all(
+                                                                          color:
+                                                                              AppColors.secondaryText)),
+                                                                  child: CustomText(
+                                                                      message:
+                                                                          ' ${_reportData!.message}',
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color: AppColors
+                                                                          .primaryText),
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
                                                         const SizedBox(
                                                           width: 2,
                                                         ),
-                                                        SizedBox(
-                                                          width: 185,
-                                                          height: 340,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              const CustomText(
-                                                                  message:
-                                                                      'Evidence of the problem',
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color: AppColors
-                                                                      .primaryText),
-                                                              _attendanceReport!
-                                                                      .reportImages
-                                                                      .isNotEmpty
-                                                                  ? SingleChildScrollView(
-                                                                      scrollDirection:
-                                                                          Axis.horizontal,
-                                                                      child:
-                                                                          Row(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: _attendanceReport!
-                                                                            .reportImages
-                                                                            .map((e) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Padding(
-                                                                              padding: const EdgeInsets.all(8.0),
-                                                                              child: InkWell(
-                                                                                mouseCursor: SystemMouseCursors.click,
-                                                                                onTap: () {},
-                                                                                child: Image.network(
-                                                                                  e.imageURL,
-                                                                                  width: 185,
-                                                                                  height: 200,
-                                                                                  fit: BoxFit.cover,
+                                                        Expanded(
+                                                          child: SizedBox(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                const CustomText(
+                                                                    message:
+                                                                        'Evidence of the problem',
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: AppColors
+                                                                        .primaryText),
+                                                                _attendanceReport!
+                                                                        .reportImages
+                                                                        .isNotEmpty
+                                                                    ? SingleChildScrollView(
+                                                                        scrollDirection:
+                                                                            Axis.horizontal,
+                                                                        child:
+                                                                            Row(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: _attendanceReport!
+                                                                              .reportImages
+                                                                              .map((e) {
+                                                                            return Center(
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.all(8.0),
+                                                                                child: InkWell(
+                                                                                  mouseCursor: SystemMouseCursors.click,
+                                                                                  onTap: () {},
+                                                                                  child: Image.network(
+                                                                                    e.imageURL,
+                                                                                    width: 185,
+                                                                                    height: 200,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
                                                                                 ),
                                                                               ),
+                                                                            );
+                                                                          }).toList(),
+                                                                        ),
+                                                                      )
+                                                                    : Center(
+                                                                        child:
+                                                                            Column(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            Opacity(
+                                                                              opacity: 0.3,
+                                                                              child: Image.asset(
+                                                                                'assets/images/nodata.png',
+                                                                                width: 150,
+                                                                                height: 150,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
                                                                             ),
-                                                                          );
-                                                                        }).toList(),
-                                                                      ),
-                                                                    )
-                                                                  : Center(
-                                                                      child:
-                                                                          Column(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          Opacity(
-                                                                            opacity:
-                                                                                0.3,
-                                                                            child:
-                                                                                Image.asset(
-                                                                              'assets/images/nodata.png',
-                                                                              width: 150,
-                                                                              height: 150,
-                                                                              fit: BoxFit.cover,
+                                                                            const SizedBox(
+                                                                              height: 10,
                                                                             ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            height:
-                                                                                10,
-                                                                          ),
-                                                                          CustomText(
-                                                                              message: 'No data',
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w500,
-                                                                              color: AppColors.primaryText.withOpacity(0.3))
-                                                                        ],
-                                                                      ),
-                                                                    )
-                                                            ],
+                                                                            CustomText(
+                                                                                message: 'No data',
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                color: AppColors.primaryText.withOpacity(0.3))
+                                                                          ],
+                                                                        ),
+                                                                      )
+                                                              ],
+                                                            ),
                                                           ),
                                                         )
                                                       ],
-                                                    ),
-                                                  )),
-                                            ],
+                                                    )),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       )
@@ -858,6 +888,9 @@ class _ReportPageState extends State<ReportPage> {
                                         child: const Center(
                                             child: CircularProgressIndicator()),
                                       ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
                                 _attendanceReport != null &&
                                         _attendanceReport!.feedback != null
                                     ? widgetFeedback()
@@ -918,57 +951,276 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget sendFeedBack() {
-    return SizedBox(
-      width: 280,
-      height: 630,
+    return Expanded(
       child: Form(
         key: _formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-                width: 280,
-                height: 350,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CustomText(
+                    message: 'FeedBack',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 30,
+                    child: TextFormField(
+                      readOnly: true,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color.fromARGB(53, 226, 240, 253),
+                        disabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        label: customRichText(
+                          title: 'To: ',
+                          message: _reportData != null &&
+                                  _reportData!.studentName.isNotEmpty
+                              ? _reportData!.studentName
+                              : '',
+                          fontWeightTitle: FontWeight.normal,
+                          fontWeightMessage: FontWeight.normal,
+                          colorText: AppColors.primaryText.withOpacity(0.5),
+                          fontSize: 12,
+                          colorTextMessage:
+                              AppColors.primaryText.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: SingleChildScrollView(
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty || value == '') {
+                            return "This field cannot be empty";
+                          }
+                          return null;
+                        },
+                        controller: topicControllerNew,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.primaryText,
+                        ),
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Color.fromARGB(53, 226, 240, 253),
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent),
+                          ),
+                          hintText: 'Topic',
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 30,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color.fromARGB(53, 226, 240, 253),
+                    ),
+                    child: DropdownButton<String>(
+                      value: newSelectedValue,
+                      onChanged: (value) {
+                        setState(() {
+                          newSelectedValue = value!;
+                          selectedValueControllerNew.text = newSelectedValue;
+                        });
+                      },
+                      items: listTemp
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primaryText,
+                      ),
+                      underline: Container(),
+                      isExpanded: true,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 100,
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(53, 226, 240, 253),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: SingleChildScrollView(
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value!.isEmpty || value == '') {
+                              return "This field cannot be empty";
+                            }
+                            return null;
+                          },
+                          maxLines: null,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.primaryText,
+                          ),
+                          controller: messageControllerNew,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Message',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: CustomButton(
+                      buttonName: 'Send',
+                      backgroundColorButton: AppColors.primaryButton,
+                      borderColor: Colors.transparent,
+                      textColor: Colors.white,
+                      function: () async {
+                        if (_formKey.currentState!.validate()) {
+                          _progressDialog.show();
+                          print('selected: $newSelectedValue');
+                          bool check = await API(context).submitFeedback(
+                            _reportData?.reportID ?? 0,
+                            topicControllerNew.text ??
+                                'Topic ${DateTime.now()}',
+                            messageControllerNew.text,
+                            newSelectedValue,
+                          );
+                          await _progressDialog.hide();
+                          if (mounted) {
+                            await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  title: const Text('Successfully'),
+                                  content:
+                                      const Text('Send feedback to student'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          topicControllerNew.text = '';
+                                          messageControllerNew.text = '';
+                                          newSelectedValue = 'Present';
+                                        });
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        }
+                      },
+                      height: 40,
+                      width: 260,
+                      fontSize: 15,
+                      colorShadow: AppColors.primaryButton.withOpacity(0.5),
+                      borderRadius: 5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget widgetFeedback() {
+    selectedValue ??= _attendanceReport!.feedback!.confirmStatus;
+    if (_attendanceReport != null && _attendanceReport!.feedback != null) {
+      topicController.text = _attendanceReport!.feedback!.topic ?? '';
+      messageController.text = _attendanceReport!.feedback!.message ?? '';
+      selectedValueController.text =
+          _attendanceReport!.feedback!.confirmStatus ?? 'Absent';
+      return Expanded(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 10, right: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const CustomText(
-                          message: 'FeedBack',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryText),
+                        message: 'FeedBack',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       SizedBox(
                         height: 30,
                         child: TextFormField(
                           readOnly: true,
                           enabled: false,
                           decoration: InputDecoration(
-                              filled: true,
-                              fillColor:
-                                  const Color.fromARGB(53, 226, 240, 253),
-                              disabledBorder: const OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              label: customRichText(
-                                  title: 'To: ',
-                                  message: _reportData != null &&
-                                          _reportData!.studentName.isNotEmpty
-                                      ? _reportData!.studentName
-                                      : '',
-                                  fontWeightTitle: FontWeight.normal,
-                                  fontWeightMessage: FontWeight.normal,
-                                  colorText:
-                                      AppColors.primaryText.withOpacity(0.5),
-                                  fontSize: 12,
-                                  colorTextMessage:
-                                      AppColors.primaryText.withOpacity(0.5))),
+                            filled: true,
+                            fillColor: const Color.fromARGB(53, 226, 240, 253),
+                            disabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.transparent),
+                            ),
+                            label: customRichText(
+                              title: 'To: ',
+                              message: _reportData != null &&
+                                      _reportData!.studentName.isNotEmpty
+                                  ? _reportData!.studentName
+                                  : '',
+                              fontWeightTitle: FontWeight.normal,
+                              fontWeightMessage: FontWeight.normal,
+                              colorText: AppColors.primaryText.withOpacity(0.5),
+                              fontSize: 12,
+                              colorTextMessage:
+                                  AppColors.primaryText.withOpacity(0.5),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
+                      SizedBox(
+                        height: 10,
                       ),
                       SizedBox(
                         height: 50,
@@ -980,25 +1232,28 @@ class _ReportPageState extends State<ReportPage> {
                               }
                               return null;
                             },
-                            controller: topicControllerNew,
+                            controller: topicController,
                             style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.primaryText),
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: AppColors.primaryText,
+                            ),
                             maxLines: null,
                             decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                filled: true,
-                                fillColor: Color.fromARGB(53, 226, 240, 253),
-                                disabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.transparent)),
-                                hintText: 'Topic'),
+                              border: InputBorder.none,
+                              filled: true,
+                              fillColor: Color.fromARGB(53, 226, 240, 253),
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.transparent),
+                              ),
+                              hintText: 'Topic',
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
+                      SizedBox(
+                        height: 10,
                       ),
                       Container(
                         height: 30,
@@ -1008,12 +1263,11 @@ class _ReportPageState extends State<ReportPage> {
                           color: const Color.fromARGB(53, 226, 240, 253),
                         ),
                         child: DropdownButton<String>(
-                          value: newSelectedValue,
+                          value: selectedValue,
                           onChanged: (value) {
                             setState(() {
-                              newSelectedValue = value!;
-                              selectedValueControllerNew.text =
-                                  newSelectedValue;
+                              selectedValue = value!;
+                              selectedValueController.text = selectedValue!;
                             });
                           },
                           items: listTemp
@@ -1032,11 +1286,14 @@ class _ReportPageState extends State<ReportPage> {
                           isExpanded: true,
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Container(
-                        height: 100,
-                        // width: 280,
+                        // height: 100,
                         decoration: const BoxDecoration(
-                            color: Color.fromARGB(53, 226, 240, 253)),
+                          color: Color.fromARGB(53, 226, 240, 253),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 10),
                           child: SingleChildScrollView(
@@ -1049,10 +1306,11 @@ class _ReportPageState extends State<ReportPage> {
                               },
                               maxLines: null,
                               style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.normal,
-                                  color: AppColors.primaryText),
-                              controller: messageControllerNew,
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                                color: AppColors.primaryText,
+                              ),
+                              controller: messageController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Message',
@@ -1061,25 +1319,26 @@ class _ReportPageState extends State<ReportPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomButton(
-                          buttonName: 'Send',
+                      const SizedBox(height: 10),
+                      Center(
+                        child: CustomButton(
+                          buttonName: _attendanceReport!.isNew == true
+                              ? 'Send'
+                              : 'Edit',
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.transparent,
                           textColor: Colors.white,
                           function: () async {
                             if (_formKey.currentState!.validate()) {
-                              //send Feedback
-                              _progressDialog.show();
-                              print('selected: $newSelectedValue');
-                              bool check = await API(context).submitFeedback(
+                              if (_attendanceReport!.isNew == true) {
+                                //send Feedback
+                                _progressDialog.show();
+                                bool check = await API(context).submitFeedback(
                                   _reportData!.reportID,
-                                  topicControllerNew.text,
-                                  messageControllerNew.text,
-                                  newSelectedValue);
-                              if (check) {
+                                  topicController.text,
+                                  messageController.text,
+                                  selectedValue ?? 'Absent',
+                                );
                                 await _progressDialog.hide();
                                 if (mounted) {
                                   await showDialog(
@@ -1093,11 +1352,6 @@ class _ReportPageState extends State<ReportPage> {
                                         actions: [
                                           TextButton(
                                             onPressed: () {
-                                              setState(() {
-                                                topicControllerNew.text = '';
-                                                messageControllerNew.text = '';
-                                                newSelectedValue = 'Present';
-                                              });
                                               Navigator.of(context).pop();
                                             },
                                             child: const Text('OK'),
@@ -1108,6 +1362,17 @@ class _ReportPageState extends State<ReportPage> {
                                   );
                                 }
                               } else {
+                                //editFeedBack
+                                print('Edit');
+                                print('selectedPage: $selectedValue');
+
+                                _progressDialog.show();
+                                bool check = await API(context).editFeedback(
+                                  _reportData!.reportID,
+                                  topicController.text,
+                                  messageController.text,
+                                  selectedValue!,
+                                );
                                 await _progressDialog.hide();
                                 if (mounted) {
                                   await showDialog(
@@ -1117,7 +1382,7 @@ class _ReportPageState extends State<ReportPage> {
                                         backgroundColor: Colors.white,
                                         title: const Text('Successfully'),
                                         content: const Text(
-                                            'Send feedback to student'),
+                                            'Edit feedback to student'),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -1133,320 +1398,18 @@ class _ReportPageState extends State<ReportPage> {
                               }
                             }
                           },
-                          height: 35,
+                          height: 40,
                           width: 260,
                           fontSize: 15,
                           colorShadow: AppColors.primaryButton.withOpacity(0.5),
-                          borderRadius: 5)
+                          borderRadius: 5,
+                        ),
+                      ),
                     ],
                   ),
-                )),
-
-            const SizedBox(
-              height: 10,
-            ),
-            // widgetRecentFeedback(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget widgetFeedback() {
-    selectedValue ??= _attendanceReport!.feedback!.confirmStatus;
-    if (_attendanceReport != null && _attendanceReport!.feedback != null) {
-      topicController.text = _attendanceReport!.feedback!.topic ?? '';
-      messageController.text = _attendanceReport!.feedback!.message ?? '';
-      selectedValueController.text =
-          _attendanceReport!.feedback!.confirmStatus ?? 'Absent';
-      return SizedBox(
-        width: 280,
-        height: 630,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                  width: 280,
-                  height: 350,
-                  color: Colors.white,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 10, top: 10, right: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const CustomText(
-                            message: 'FeedBack',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText),
-                        SizedBox(
-                          height: 30,
-                          child: TextFormField(
-                            readOnly: true,
-                            enabled: false,
-                            decoration: InputDecoration(
-                                filled: true,
-                                fillColor:
-                                    const Color.fromARGB(53, 226, 240, 253),
-                                disabledBorder: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.transparent)),
-                                label: customRichText(
-                                    title: 'To: ',
-                                    message: _reportData != null &&
-                                            _reportData!.studentName.isNotEmpty
-                                        ? _reportData!.studentName
-                                        : '',
-                                    fontWeightTitle: FontWeight.normal,
-                                    fontWeightMessage: FontWeight.normal,
-                                    colorText:
-                                        AppColors.primaryText.withOpacity(0.5),
-                                    fontSize: 12,
-                                    colorTextMessage: AppColors.primaryText
-                                        .withOpacity(0.5))),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: SingleChildScrollView(
-                            child: TextFormField(
-                              validator: (value) {
-                                if (value!.isEmpty || value == '') {
-                                  return "This field cannot be empty";
-                                }
-                                return null;
-                              },
-                              controller: topicController,
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.normal,
-                                  color: AppColors.primaryText),
-                              maxLines: null,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  filled: true,
-                                  fillColor: Color.fromARGB(53, 226, 240, 253),
-                                  disabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.transparent)),
-                                  hintText: 'Topic'),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Container(
-                          height: 30,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: const Color.fromARGB(53, 226, 240, 253),
-                          ),
-                          child: DropdownButton<String>(
-                            value: selectedValue,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedValue = value!;
-                                selectedValueController.text = selectedValue!;
-                              });
-                            },
-                            items: listTemp
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                              color: AppColors.primaryText,
-                            ),
-                            underline: Container(),
-                            isExpanded: true,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Container(
-                          height: 100,
-                          // width: 280,
-                          decoration: const BoxDecoration(
-                              color: Color.fromARGB(53, 226, 240, 253)),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: SingleChildScrollView(
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value!.isEmpty || value == '') {
-                                    return "This field cannot be empty";
-                                  }
-                                  return null;
-                                },
-                                maxLines: null,
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.normal,
-                                    color: AppColors.primaryText),
-                                controller: messageController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Message',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        CustomButton(
-                            buttonName: _attendanceReport!.isNew == true
-                                ? 'Send'
-                                : 'Edit',
-                            backgroundColorButton: AppColors.primaryButton,
-                            borderColor: Colors.transparent,
-                            textColor: Colors.white,
-                            function: () async {
-                              if (_formKey.currentState!.validate()) {
-                                if (_attendanceReport!.isNew == true) {
-                                  //send Feedback
-                                  _progressDialog.show();
-                                  bool check =
-                                      await API(context).submitFeedback(
-                                          _reportData!.reportID,
-                                          topicController.text,
-                                          messageController.text,
-                                          // selectedValueController.text);
-                                          selectedValue ?? 'Absent');
-                                  if (check) {
-                                    await _progressDialog.hide();
-                                    if (mounted) {
-                                      await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text('Successfully'),
-                                            content: const Text(
-                                                'Send feedback to student'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  } else {
-                                    await _progressDialog.hide();
-                                    if (mounted) {
-                                      await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text('Error'),
-                                            content: const Text(
-                                                'Failed to send feedback'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  }
-                                } else {
-                                  //editFeedBack
-                                  print('Edit');
-                                  print('selectedPage: $selectedValue');
-
-                                  _progressDialog.show();
-                                  bool check = await API(context).editFeedback(
-                                      _reportData!.reportID,
-                                      topicController.text,
-                                      messageController.text,
-                                      selectedValue!);
-                                  if (check) {
-                                    await _progressDialog.hide();
-                                    if (mounted) {
-                                      await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text('Successfully'),
-                                            content: const Text(
-                                                'Edit feedback to student'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  } else {
-                                    await _progressDialog.hide();
-                                    if (mounted) {
-                                      await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text('Error'),
-                                            content: const Text(
-                                                'Failed to edit feedback'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            height: 35,
-                            width: 260,
-                            fontSize: 15,
-                            colorShadow:
-                                AppColors.primaryButton.withOpacity(0.5),
-                            borderRadius: 5)
-                      ],
-                    ),
-                  )),
-              const SizedBox(
-                height: 10,
+                ),
               ),
+              const SizedBox(height: 10),
               _attendanceReport!.historyReports.isNotEmpty
                   ? historyReports()
                   : Container() //note
@@ -1464,81 +1427,73 @@ class _ReportPageState extends State<ReportPage> {
   Widget historyReports() {
     print(listHistoryReport);
     return Container(
-      width: 280,
+      // width: 280,
       height: 270,
+      padding: EdgeInsets.symmetric(vertical: 10),
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const CustomText(
-                    message: 'Recent Feedbacks',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText),
-                CustomButton(
-                    buttonName: 'View All',
-                    backgroundColorButton:
-                        const Color.fromARGB(68, 190, 188, 188),
-                    borderColor: Colors.transparent,
-                    textColor: AppColors.primaryText,
-                    function: () {},
-                    height: 15,
-                    width: 45,
-                    fontSize: 8,
-                    colorShadow: Colors.transparent,
-                    borderRadius: 2)
-              ],
-            ),
+            const CustomText(
+                message: 'Recent Feedbacks',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryText),
             const SizedBox(
               height: 5,
             ),
             Expanded(
-                child: ListView.builder(
-                    itemCount: _attendanceReport!.historyReports.length,
-                    itemBuilder: (context, index) {
-                      HistoryReport historyReport =
-                          _attendanceReport!.historyReports[index];
-                      return InkWell(
-                        onTap: () {
-                          showHistoryReport(context, historyReport);
-                        },
-                        child: SizedBox(
-                          width: 280,
-                          height: 30,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              cusTomText(
-                                  '#${historyReport.historyReportID ?? ''} Responed to ${historyReport.topic ?? ''}',
-                                  12,
-                                  FontWeight.normal,
-                                  AppColors.primaryText),
-                              Container(
-                                width: 50,
-                                height: 15,
-                                decoration: BoxDecoration(
-                                    color: getColorForStatusReport(
-                                        historyReport.status ?? ''),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5))),
-                                child: Center(
-                                  child: Text(
-                                    historyReport.status ?? '',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 8),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                child: ListView.separated(
+              itemCount: _attendanceReport!.historyReports.length,
+              itemBuilder: (context, index) {
+                HistoryReport historyReport =
+                    _attendanceReport!.historyReports[index];
+                return InkWell(
+                  onTap: () {
+                    showHistoryReport(context, historyReport);
+                  },
+                  child: SizedBox(
+                    // width: 280,
+                    // height: 30,
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: cusTomText(
+                              '#${historyReport.historyReportID ?? ''} Responed to ${historyReport.topic ?? ''}',
+                              12,
+                              FontWeight.normal,
+                              AppColors.primaryText),
                         ),
-                      );
-                    }))
+                        Container(
+                          width: 50,
+                          height: 30,
+                          decoration: BoxDecoration(
+                              color: getColorForStatusReport(
+                                  historyReport.status ?? ''),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                            child: Text(
+                              historyReport.status ?? '',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 8),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  height: 10,
+                );
+              },
+            ))
           ],
         ),
       ),
@@ -1550,14 +1505,12 @@ class _ReportPageState extends State<ReportPage> {
       showDialog(
           context: context,
           builder: (context) {
-            print(
-                'alo alo: ${_attendanceReport!.attendanceDetail.classDetail}');
             print('asdsad: ${historyReport.historyReportID!}');
             return Dialog(
                 backgroundColor: Colors.white,
                 child: FutureBuilder(
                     future: API(context).getDetailHistoryReport(
-                        _attendanceReport!.attendanceDetail.classDetail,
+                        _attendanceReport?.attendanceDetail.classDetail ?? '',
                         historyReport.historyReportID!),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -1582,7 +1535,7 @@ class _ReportPageState extends State<ReportPage> {
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       historyDetailReports(historyReportDialog),
-                                      historyReportDialog!.historyFeedbacks !=
+                                      historyReportDialog?.historyFeedbacks !=
                                               null
                                           ? historyFeedbacks(
                                               historyReportDialog)
@@ -1595,7 +1548,10 @@ class _ReportPageState extends State<ReportPage> {
                                   width: 600,
                                   color: Colors.white,
                                   child: historyReportDialog
-                                          .historyReportImages!.isNotEmpty
+                                                  ?.historyReportImages !=
+                                              null &&
+                                          historyReportDialog!
+                                              .historyReportImages!.isNotEmpty
                                       ? Center(
                                           child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
