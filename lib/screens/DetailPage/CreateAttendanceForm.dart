@@ -511,7 +511,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                                     builder: (builder) =>
                                         AfterCreateAttendanceForm(
                                           attendanceForm: attendanceForm,
-                                          className: classes.course!.courseName,
+                                          className: classes.course?.courseName ?? '',
+                                          classes: widget.classes,
                                         )));
                           }
                         } else {

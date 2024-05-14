@@ -22,6 +22,8 @@ class customRichText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RichText(
+      maxLines: null,
+      
         text: TextSpan(children: [
       TextSpan(
         text: title,

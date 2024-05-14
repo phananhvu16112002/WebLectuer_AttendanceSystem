@@ -465,76 +465,22 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                   borderColor: Colors.white,
                   textColor: Colors.white,
                   function: () async {
-                    bool check = checkDuplicateTime();
-                    if (check) {
-                      bool attendanceForm = await API(context)
-                          .editAttendanceForm(
-                              classes.classID!,
-                              editAttendanceFormProvider.attendanceForm.formID,
-                              formatTimeOfDate(timeStart ?? TimeOfDay.now())
-                                  .toString(),
-                              formatTimeOfDate(timeEnd ?? TimeOfDay.now())
-                                  .toString(),
-                              selectedIndex,
-                              radius);
-                      if (attendanceForm) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.white,
-                              title: const Text('Success'),
-                              content: const Text('Form edited successfully'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                        selectedPageProvider.setCheckAttendanceDetail(false);
-                        selectedPageProvider.setCheckHome(true);
-                        selectedPageProvider.setCheckNoti(false);
-                        selectedPageProvider.setCheckReport(false);
-                        selectedPageProvider.setCheckForm(false);
-                        selectedPageProvider.setCheckEditAttendanceForm(false);
-                        selectedPageProvider.setCheckAttendanceForm(false);
-                      } else {
-                        ScaffoldMessenger.of(context)
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(SnackBar(
-                              duration: const Duration(milliseconds: 1000),
-                              backgroundColor: Colors.white,
-                              content: Container(
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffa8a8a8),
-                                    borderRadius: BorderRadius.circular(8)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                child: const Center(
-                                  child: Text(
-                                    'Edit form failed',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                ),
-                              )));
-                      }
-                    } else {
+                    bool attendanceForm = await API(context).editAttendanceForm(
+                        classes.classID!,
+                        editAttendanceFormProvider.attendanceForm.formID,
+                        formatTimeOfDate(timeStart ?? TimeOfDay.now())
+                            .toString(),
+                        formatTimeOfDate(timeEnd ?? TimeOfDay.now()).toString(),
+                        selectedIndex,
+                        radius);
+                    if (attendanceForm) {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
                             backgroundColor: Colors.white,
-                            title: const Text('Error'),
-                            content: const Text(
-                                'Please check startTime and endTime'),
+                            title: const Text('Success'),
+                            content: const Text('Form edited successfully'),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -546,6 +492,34 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                           );
                         },
                       );
+                      selectedPageProvider.setCheckAttendanceDetail(false);
+                      selectedPageProvider.setCheckHome(true);
+                      selectedPageProvider.setCheckNoti(false);
+                      selectedPageProvider.setCheckReport(false);
+                      selectedPageProvider.setCheckForm(false);
+                      selectedPageProvider.setCheckEditAttendanceForm(false);
+                      selectedPageProvider.setCheckAttendanceForm(false);
+                    } else {
+                      ScaffoldMessenger.of(context)
+                        ..removeCurrentSnackBar()
+                        ..showSnackBar(SnackBar(
+                            duration: const Duration(milliseconds: 1000),
+                            backgroundColor: Colors.white,
+                            content: Container(
+                              decoration: BoxDecoration(
+                                  color: const Color(0xffa8a8a8),
+                                  borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: const Center(
+                                child: Text(
+                                  'Edit form failed',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ),
+                            )));
                     }
                   },
                   height: 50,

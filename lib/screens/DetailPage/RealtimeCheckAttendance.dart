@@ -2,23 +2,31 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendance/AttendanceMode.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
 class RealtimeCheckAttendance extends StatefulWidget {
   const RealtimeCheckAttendance(
-      {super.key, required this.formID, required this.classes});
+      {super.key,
+      required this.formID,
+      required this.classes,
+      required this.classesData});
   // final AttendanceForm? attendanceForm;
   final String formID;
   final String classes;
+  final Class? classesData;
 
   @override
   State<RealtimeCheckAttendance> createState() =>
@@ -42,6 +50,10 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
   List<AttendanceData> absentAttendance = [];
   List<AttendanceData> lateAttendance = [];
   List<AttendanceData> searchResult = [];
+  String dateCreated = '';
+  AttendanceModel? attendanceSummary;
+  bool showQR = false;
+  String qrcode = '';
 
   @override
   void initState() {
@@ -100,11 +112,12 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
 
   void _fetchData() async {
     fetchData = API(context).getAttendanceDetailRealtime(widget.formID);
-    final attendanceSummary = await fetchData;
+    attendanceSummary = await fetchData;
     setState(() {
-      studentAttendance = attendanceSummary!.data;
+      studentAttendance = attendanceSummary?.data ?? [];
+      dateCreated = attendanceSummary?.stats.dateOpen ?? '';
       print('-----${studentAttendance.first.dateAttendanced}');
-      listTemp = attendanceSummary.data;
+      listTemp = attendanceSummary?.data ?? [];
       absentAttendance =
           studentAttendance.where((element) => element.result == '0').toList();
       lateAttendance = studentAttendance
@@ -112,10 +125,19 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
           .toList();
       presentAttendance =
           studentAttendance.where((element) => element.result == '1').toList();
-      all = attendanceSummary.stats.total;
-      present = attendanceSummary.stats.totalPresence;
-      absent = attendanceSummary.stats.totalAbsence;
-      late = attendanceSummary.stats.totalLate;
+      all = attendanceSummary?.stats.total ?? 0;
+      present = attendanceSummary?.stats.totalPresence ?? 0;
+      absent = attendanceSummary?.stats.totalAbsence ?? 0;
+      late = attendanceSummary?.stats.totalLate ?? 0;
+      var tempData = {
+        "formID": attendanceSummary?.stats.formID,
+        "classID": attendanceSummary?.stats.classID,
+        "startTime": attendanceSummary?.stats.startTime,
+        "endTime": attendanceSummary?.stats.endTime,
+        "dateOpen": attendanceSummary?.stats.dateOpen,
+        "typeAttendanced": attendanceSummary?.stats.type
+      };
+      qrcode = jsonEncode(tempData);
     });
     print('AttendanceSummary: $attendanceSummary');
 
@@ -259,183 +281,297 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          header(socketServerProvider),
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: Center(
-                child: Column(
+      body: attendanceSummary != null
+          ? SingleChildScrollView(
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const CustomText(
-                        message: 'Dashboard',
-                        fontSize: 25,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    header(socketServerProvider),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 250,
-                      height: 130,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          customBoxInformation(
-                              'All',
-                              'assets/icons/student.png',
-                              all,
-                              newSetStateTable,
-                              isSelectedSection),
-                          customBoxInformation(
-                              'Present',
-                              'assets/icons/present.png',
-                              present,
-                              newSetStateTable,
-                              isSelectedSection),
-                          customBoxInformation(
-                              'Absent',
-                              'assets/icons/absent.png',
-                              absent,
-                              newSetStateTable,
-                              isSelectedSection),
-                          customBoxInformation(
-                              'Late',
-                              'assets/icons/pending.png',
-                              late,
-                              newSetStateTable,
-                              isSelectedSection),
-                        ],
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              CustomText(
+                                  message:
+                                      '${widget.classesData?.course?.courseName ?? ''} - Attendance Form ${formatDate(dateCreated)}',
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primaryText),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              CustomText(
+                                  message:
+                                      'Group: ${widget.classesData?.group ?? ''} - Sub:${widget.classesData?.subGroup ?? ''} - Created: ${formatTime(dateCreated)} ',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryText),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 250,
+                                // height: 130,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    customBoxInformation(
+                                        'All',
+                                        'assets/icons/student.png',
+                                        all,
+                                        newSetStateTable,
+                                        isSelectedSection),
+                                    customBoxInformation(
+                                        'Present',
+                                        'assets/icons/present.png',
+                                        present,
+                                        newSetStateTable,
+                                        isSelectedSection),
+                                    customBoxInformation(
+                                        'Absent',
+                                        'assets/icons/absent.png',
+                                        absent,
+                                        newSetStateTable,
+                                        isSelectedSection),
+                                    customBoxInformation(
+                                        'Late',
+                                        'assets/icons/pending.png',
+                                        late,
+                                        newSetStateTable,
+                                        isSelectedSection),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 250,
+                                height: 40,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    customButtonDashBoard('Export'),
+                                    customButtonDashBoard('PDF'),
+                                    customButtonDashBoard('Excel'),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      width: 650,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.1),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2))
+                                          ],
+                                          border: Border.all(
+                                              color:
+                                                  Colors.black.withOpacity(0.2),
+                                              width: 0.5),
+                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(5))),
+                                      child: TextFormField(
+                                        onChanged: (value) {
+                                          searchTextChanged(value);
+                                        },
+                                        readOnly: false,
+                                        controller: searchInDashboardController,
+                                        keyboardType: TextInputType.text,
+                                        style: const TextStyle(
+                                            color: AppColors.primaryText,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 15),
+                                        obscureText: false,
+                                        decoration: InputDecoration(
+                                            contentPadding: const EdgeInsets
+                                                .all(20),
+                                            suffixIcon: Icon(
+                                              Icons.search,
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                            ),
+                                            hintText: 'Search Student',
+                                            hintStyle: const TextStyle(
+                                                fontSize: 12,
+                                                color: Color.fromARGB(
+                                                    73, 0, 0, 0)),
+                                            enabledBorder:
+                                                const OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(Radius
+                                                            .circular(5)),
+                                                    borderSide: BorderSide(
+                                                        width: 1,
+                                                        color: Colors
+                                                            .transparent)),
+                                            focusedBorder:
+                                                const OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5)),
+                                              borderSide: BorderSide(
+                                                  width: 1,
+                                                  color:
+                                                      AppColors.primaryButton),
+                                            )),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              listTemp.isNotEmpty
+                                  ? SizedBox(
+                                      width: MediaQuery.of(context).size.width -
+                                          250,
+                                      // height: 380,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          tableAttendance(
+                                              listTemp), // Truyen listData vao
+                                          const SizedBox(height: 20),
+                                          showPage(listTemp),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                showQR = !showQR;
+                                              });
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                CustomText(
+                                                    message:
+                                                        'Show QR Attendance',
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        AppColors.primaryText),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                showQR
+                                                    ? Icon(Icons.qr_code)
+                                                    : Icon(Icons
+                                                        .qr_code_2_outlined)
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          if (showQR)
+                                            Align(
+                                              child: InkWell(
+                                                mouseCursor:
+                                                    SystemMouseCursors.zoomIn,
+                                                onTap: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return Dialog(
+                                                            child: SizedBox(
+                                                          height: 300,
+                                                          width: 300,
+                                                          child: Center(
+                                                            child: QrImageView(
+                                                              version: 10,
+                                                              data: qrcode,
+                                                              size: 250,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(0),
+                                                              embeddedImage:
+                                                                  const AssetImage(
+                                                                      'assets/images/logo.png'),
+                                                              eyeStyle: const QrEyeStyle(
+                                                                  eyeShape:
+                                                                      QrEyeShape
+                                                                          .square,
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                          ),
+                                                        ));
+                                                      });
+                                                },
+                                                child: QrImageView(
+                                                  version: 10,
+                                                  data: qrcode,
+                                                  size: 180,
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  embeddedImage: const AssetImage(
+                                                      'assets/images/logo.png'),
+                                                  eyeStyle: const QrEyeStyle(
+                                                      eyeShape:
+                                                          QrEyeShape.square,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            )
+                                        ],
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      width: MediaQuery.of(context).size.width -
+                                          250,
+                                      child: Center(
+                                          child: Column(
+                                        children: [
+                                          const SizedBox(
+                                            height: 50,
+                                          ),
+                                          SizedBox(
+                                            width: 200,
+                                            height: 200,
+                                            child: Opacity(
+                                              opacity: 0.3,
+                                              child: Image.asset(
+                                                  'assets/images/nodata.png'),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          CustomText(
+                                              message: 'No Student Record',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.normal,
+                                              color: AppColors.primaryText
+                                                  .withOpacity(0.3))
+                                        ],
+                                      )),
+                                    ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 250,
-                      height: 40,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          customButtonDashBoard('Export'),
-                          customButtonDashBoard('PDF'),
-                          customButtonDashBoard('Excel'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                            width: 650,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2))
-                                ],
-                                border: Border.all(
-                                    color: Colors.black.withOpacity(0.2),
-                                    width: 0.5),
-                                color: Colors.white,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                            child: TextFormField(
-                              onChanged: (value) {
-                                searchTextChanged(value);
-                              },
-                              readOnly: false,
-                              controller: searchInDashboardController,
-                              keyboardType: TextInputType.text,
-                              style: const TextStyle(
-                                  color: AppColors.primaryText,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 15),
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.all(20),
-                                  suffixIcon: Icon(
-                                    Icons.search,
-                                    color: Colors.black.withOpacity(0.5),
-                                  ),
-                                  hintText: 'Search Student',
-                                  hintStyle: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color.fromARGB(73, 0, 0, 0)),
-                                  enabledBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                      borderSide: BorderSide(
-                                          width: 1, color: Colors.transparent)),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5)),
-                                    borderSide: BorderSide(
-                                        width: 1,
-                                        color: AppColors.primaryButton),
-                                  )),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    listTemp.isNotEmpty
-                        ? SizedBox(
-                            width: MediaQuery.of(context).size.width - 250,
-                            height: 380,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                tableAttendance(
-                                    listTemp), // Truyen listData vao
-                                const SizedBox(height: 20),
-                                showPage(listTemp),
-                              ],
-                            ),
-                          )
-                        : SizedBox(
-                            width: MediaQuery.of(context).size.width - 250,
-                            child: Center(
-                                child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 50,
-                                ),
-                                SizedBox(
-                                  width: 200,
-                                  height: 200,
-                                  child: Opacity(
-                                    opacity: 0.3,
-                                    child:
-                                        Image.asset('assets/images/nodata.png'),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                CustomText(
-                                    message: 'No Student Record',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
-                                    color:
-                                        AppColors.primaryText.withOpacity(0.3))
-                              ],
-                            )),
-                          ),
-                  ],
-                ),
-              ),
+                  ]),
+            )
+          : const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryButton),
             ),
-          ),
-        ]),
-      ),
     );
   }
 

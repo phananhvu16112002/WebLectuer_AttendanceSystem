@@ -22,7 +22,7 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final void Function()? function;
   final double height;
-  final double width;
+  final double? width;
   final double fontSize;
   final Color colorShadow;
   final double borderRadius;

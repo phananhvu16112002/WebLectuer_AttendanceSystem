@@ -5,9 +5,11 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.da
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceState.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceSummary.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/ChartPage/chart_data.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassModel.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/EditPage/StudentAttendance.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
@@ -16,6 +18,8 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/RealtimeAttendanc
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/AttendanceReport.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/report_pagi.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/home_page/class_data_home_page.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
@@ -105,39 +109,16 @@ class API {
     }
   }
 
-  Future<List<Class>> getClassForTeacher(int page) async {
-    String URL =
-        'http://$baseURL:8080/api/teacher/classes/page/$page'; //10.0.2.2
-
+  Future<ClassDataHomePage?> getClasses(int page) async {
+    String URL = 'http://$baseURL:8080/api/teacher/classes/page/$page';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
       final response = await http.get(Uri.parse(URL), headers: headers);
+      // print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         dynamic responseData = jsonDecode(response.body);
-        List<Class> data = [];
-
-        if (responseData is List) {
-          for (var temp in responseData) {
-            if (temp is Map<String, dynamic>) {
-              try {
-                data.add(Class.fromJson(temp));
-              } catch (e) {
-                print('Error parsing data: $e');
-              }
-            } else {
-              print('Invalid data type: $temp');
-            }
-          }
-        } else if (responseData is Map<String, dynamic>) {
-          try {
-            data.add(Class.fromJson(responseData));
-          } catch (e) {
-            print('Error parsing data: $e');
-          }
-        } else {
-          print('Unexpected data type: $responseData');
-        }
+        ClassDataHomePage data = ClassDataHomePage.fromJson(responseData);
         print('Data $data');
         return data;
       } else if (response.statusCode == 498 || response.statusCode == 401) {
@@ -148,49 +129,25 @@ class API {
           final retryResponse =
               await http.get(Uri.parse(URL), headers: headers);
           if (retryResponse.statusCode == 200) {
-            // print('-- RetryResponse.body ${retryResponse.body}');
-            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
             dynamic responseData = jsonDecode(retryResponse.body);
-            List<Class> data = [];
-
-            if (responseData is List) {
-              for (var temp in responseData) {
-                if (temp is Map<String, dynamic>) {
-                  try {
-                    data.add(Class.fromJson(temp));
-                  } catch (e) {
-                    print('Error parsing data: $e');
-                  }
-                } else {
-                  print('Invalid data type: $temp');
-                }
-              }
-            } else if (responseData is Map<String, dynamic>) {
-              try {
-                data.add(Class.fromJson(responseData));
-              } catch (e) {
-                print('Error parsing data: $e');
-              }
-            } else {
-              print('Unexpected data type: $responseData');
-            }
+            ClassDataHomePage data = ClassDataHomePage.fromJson(responseData);
 
             // print('Data $data');
             return data;
           } else {
-            return [];
+            return null;
           }
         } else {
           print('New Access Token is empty');
-          return [];
+          return null;
         }
       } else {
         print('Failed to load data. Status code: ${response.statusCode}');
-        return [];
+        return null;
       }
     } catch (e) {
       print('Error: $e');
-      return [];
+      return null;
     }
   }
 
@@ -207,38 +164,18 @@ class API {
     }
   }
 
-  Future<List<ReportData>> getReports() async {
-    String URL = 'http://$baseURL:8080/api/teacher/reports'; //10.0.2.2
+  Future<ReportPaginations?> getReportsWithPagi(int page) async {
+    String URL =
+        'http://$baseURL:8080/api/teacher/reports/page/$page'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
       final response = await http.get(Uri.parse(URL), headers: headers);
+      // print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         dynamic responseData = jsonDecode(response.body);
-        List<ReportData> data = [];
-
-        if (responseData is List) {
-          for (var temp in responseData) {
-            if (temp is Map<String, dynamic>) {
-              try {
-                data.add(ReportData.fromJson(temp));
-              } catch (e) {
-                print('Error parsing data: $e');
-              }
-            } else {
-              print('Invalid data type: $temp');
-            }
-          }
-        } else if (responseData is Map<String, dynamic>) {
-          try {
-            data.add(ReportData.fromJson(responseData));
-          } catch (e) {
-            print('Error parsing data: $e');
-          }
-        } else {
-          print('Unexpected data type: $responseData');
-        }
+        ReportPaginations data = ReportPaginations.fromJson(responseData);
         print('Data $data');
         return data;
       } else if (response.statusCode == 498 || response.statusCode == 401) {
@@ -249,50 +186,25 @@ class API {
           final retryResponse =
               await http.get(Uri.parse(URL), headers: headers);
           if (retryResponse.statusCode == 200) {
-            // print('-- RetryResponse.body ${retryResponse.body}');
-            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
             dynamic responseData = jsonDecode(retryResponse.body);
-            List<ReportData> data = [];
-
-            if (responseData is List) {
-              for (var temp in responseData) {
-                if (temp is Map<String, dynamic>) {
-                  try {
-                    data.add(ReportData.fromJson(temp));
-                  } catch (e) {
-                    print('Error parsing data: $e');
-                  }
-                } else {
-                  print('Invalid data type: $temp');
-                }
-              }
-            } else if (responseData is Map<String, dynamic>) {
-              try {
-                data.add(ReportData.fromJson(responseData));
-              } catch (e) {
-                print('Error parsing data: $e');
-              }
-            } else {
-              print('Unexpected data type: $responseData');
-            }
+            ReportPaginations data = ReportPaginations.fromJson(responseData);
 
             // print('Data $data');
             return data;
           } else {
-            return [];
+            return null;
           }
         } else {
           print('New Access Token is empty');
-          return [];
+          return null;
         }
       } else {
-        print(
-            'Failed to load reports data. Status code: ${response.statusCode}');
-        return [];
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return null;
       }
     } catch (e) {
       print('Error: $e');
-      return [];
+      return null;
     }
   }
 
@@ -1011,6 +923,46 @@ class API {
     } catch (e) {
       print('Error: $e');
       return false;
+    }
+  }
+
+  Future<ProgressModel?> getDataChart(String classID) async {
+    var URL = 'http://$baseURL:8080/api/teacher/classes/$classID/stats';
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(URL), headers: headers);
+      // print(jsonDecode(response.body));
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        ProgressModel data = ProgressModel.fromJson(responseData);
+        print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(URL), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            dynamic responseData = jsonDecode(retryResponse.body);
+            ProgressModel data = ProgressModel.fromJson(responseData);
+            return data;
+          } else {
+            return null;
+          }
+        } else {
+          print('New Access Token is empty');
+          return null;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 }

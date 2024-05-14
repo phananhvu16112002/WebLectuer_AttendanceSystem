@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'dart:html' as html;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/DetailPage/ClassData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/home_page/class_data_home_page.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_mobile.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/widgets/app_bar_tablet.dart';
@@ -847,8 +849,10 @@ class _HomePageState extends State<HomePage> {
   Widget selectedPage(ClassDataProvider classDataProvider, Size size,
       bool isMobile, SelectedPageProvider selectedPageProvider) {
     if (checkHome) {
+      // html.window.history.pushState({}, 'Notification', '/HomePage/123213');
       return containerHome(
           classDataProvider, size, isMobile, selectedPageProvider);
+      // return const ReportPage();
     } else if (checkNotification) {
       // html.window.history.pushState({}, 'Notification', '/Detail/Notification');
       return const NotificationPage();
@@ -1070,22 +1074,23 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               FutureBuilder(
-                future: API(context).getClassForTeacher(page),
+                future: API(context).getClasses(page),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data != null) {
-                      List<Class>? classes = snapshot.data;
-                      Future.delayed(Duration.zero, () {
-                        classDataProvider.setAttendanceFormData(classes!);
-                      });
+                      ClassDataHomePage? classesData = snapshot.data;
+                      // Future.delayed(Duration.zero, () {
+                      //   classDataProvider.setAttendanceFormData(classes!);
+                      // });
                       return !isMobile
                           ? Column(
                               children: [
-                                _gridViewData(size, classes),
+                                _gridViewData(size, classesData?.classes),
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                _buildPaginationButtons(),
+                                _buildPaginationButtons(
+                                    classesData?.totalPage ?? 1),
                               ],
                             )
                           : Column(
@@ -1093,9 +1098,10 @@ class _HomePageState extends State<HomePage> {
                                 ListView.separated(
                                   shrinkWrap: true,
                                   padding: EdgeInsets.zero,
-                                  itemCount: classes?.length ?? 0,
+                                  itemCount: classesData?.classes?.length ?? 0,
                                   itemBuilder: (context, index) {
-                                    Class data = classes?[index] ?? Class();
+                                    Class data =
+                                        classesData?.classes?[index] ?? Class();
                                     var randomBanner = Random().nextInt(2);
                                     return InkWell(
                                       onTap: () {
@@ -1122,12 +1128,12 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       mouseCursor: SystemMouseCursors.click,
                                       child: customClass(
-                                          data.course!.courseName,
-                                          data.classType!,
-                                          data.group!,
-                                          data.subGroup!,
-                                          data.shiftNumber!,
-                                          data.roomNumber!,
+                                          data.course?.courseName ?? '',
+                                          data.classType ?? '',
+                                          data.group ?? '',
+                                          data.subGroup ?? '',
+                                          data.shiftNumber ?? 0,
+                                          data.roomNumber ?? '',
                                           'assets/images/banner$randomBanner.jpg',
                                           150),
                                     );
@@ -1139,7 +1145,8 @@ class _HomePageState extends State<HomePage> {
                                     );
                                   },
                                 ),
-                                _buildPaginationButtons(),
+                                _buildPaginationButtons(
+                                    classesData?.totalPage ?? 1),
                               ],
                             );
                     }
@@ -1198,43 +1205,63 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Widget _buildPaginationButtons() {
+  Widget _buildPaginationButtons(int totalPage) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
-          onPressed: () {
-            if (page > 1) {
-              setState(() {
-                page--;
-              });
-            }
-          },
-          child: Text(
+          onPressed: page > 1
+              ? () {
+                  setState(() {
+                    page--;
+                  });
+                }
+              : null,
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return Colors.grey.withOpacity(0.2);
+                }
+                return null; // Màu mặc định khi không bị vô hiệu hóa
+              },
+            ),
+          ),
+          child: const Text(
             'Previous',
             style: TextStyle(
               fontSize: 12,
             ),
           ),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         CustomText(
-            message: '$page/3',
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.primaryText),
-        SizedBox(width: 10),
+          message: '$page/$totalPage',
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: AppColors.primaryText,
+        ),
+        const SizedBox(width: 10),
         ElevatedButton(
-          // style: const ButtonStyle(
-          //   backgroundColor: MaterialStatePropertyAll(Colors.white),
-          // ),
-          onPressed: () {
-            setState(() {
-              page++;
-            });
-          },
-          child: Text(
+          onPressed: page < totalPage
+              ? () {
+                  setState(() {
+                    page++;
+                  });
+                }
+              : null,
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return Colors.grey.withOpacity(0.2);
+                }
+                return null;
+              },
+            ),
+          ),
+          child: const Text(
             'Next',
             style: TextStyle(
               fontSize: 12,

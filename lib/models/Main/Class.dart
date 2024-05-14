@@ -2,16 +2,16 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/Course.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Teacher.dart';
 
 class Class {
-  final String? classID;
-  final String? roomNumber;
-  final int? shiftNumber;
-  final String? startTime;
-  final String? endTime;
-  final String? classType;
-  final String? group;
-  final String? subGroup;
-  final Teacher? teacher;
-  final Course? course;
+   String? classID;
+   String? roomNumber;
+   int? shiftNumber;
+   String? startTime;
+   String? endTime;
+   String? classType;
+   String? group;
+   String? subGroup;
+   Teacher? teacher;
+   Course? course;
 
   Class({
      this.classID = '',

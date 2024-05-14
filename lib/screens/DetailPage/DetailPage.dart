@@ -23,6 +23,7 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAtte
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/EditAttendanceDetail.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/chart_class_screen.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/edit_attendance_form.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/widgets/app_bar_mobile_detail_page.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
@@ -49,8 +50,8 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   TextEditingController searchController = TextEditingController();
   bool checkHome = true;
-  bool checkNotification = false;
-  bool checkReport = false;
+  // bool checkNotification = false;
+  // bool checkReport = false;
   bool checkForm = false;
   bool checkAttendanceForm = false;
   bool checkViewAttendance = false;
@@ -264,54 +265,68 @@ class _DetailPageState extends State<DetailPage> {
       listColumnWidthsMobile.add(const FlexColumnWidth(2));
     }
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        leading: const Icon(null),
-        backgroundColor: AppColors.colorHeader,
-        flexibleSpace: Padding(
-          padding:
-              const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-          child: Responsive(
-            mobile: AppBarMobileDetailPage(
-                socketServerProvider: socketServerProvider,
-                context: context,
-                teacherDataProvider: teacherDataProvider),
-            tablet: _appbarTablet(
-                socketServerProvider, context, size, teacherDataProvider),
-            desktop: _appbarDesktop(
-                socketServerProvider, teacherDataProvider, context),
+    return WillPopScope(
+      onWillPop: () async {
+        selectedPageProvider.setCheckAttendanceForm(false);
+        selectedPageProvider.setCheckHome(true);
+        selectedPageProvider.setCheckNoti(false);
+        selectedPageProvider.setCheckReport(false);
+        selectedPageProvider.setCheckForm(false);
+        selectedPageProvider.setCheckEditAttendanceForm(false);
+        selectedPageProvider.setCheckAttendanceDetail(false);
+        selectedPageProvider.setCheckChart(false);
+        socketServerProvider.disconnectSocketServer();
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        appBar: AppBar(
+          leading: const Icon(null),
+          backgroundColor: AppColors.colorHeader,
+          flexibleSpace: Padding(
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+            child: Responsive(
+              mobile: AppBarMobileDetailPage(
+                  socketServerProvider: socketServerProvider,
+                  context: context,
+                  teacherDataProvider: teacherDataProvider),
+              tablet: _appbarTablet(socketServerProvider, context, size,
+                  teacherDataProvider, selectedPageProvider),
+              desktop: _appbarDesktop(socketServerProvider, teacherDataProvider,
+                  context, selectedPageProvider),
+            ),
           ),
         ),
-      ),
-      body: Responsive(
-        mobile: _bodyMobile(
-            context,
-            size,
-            numberOfWeeks,
-            listColumnWidthsMobile,
-            studentClassesDataProvider,
-            attendanceFormProvider,
-            selectedPageProvider,
-            editAttendanceDetailProvider),
-        tablet: _bodyTablet(
-            size,
-            context,
-            numberOfWeeks,
-            listColumnWidths,
-            studentClassesDataProvider,
-            attendanceFormProvider,
-            selectedPageProvider,
-            editAttendanceDetailProvider),
-        desktop: _bodyDesktop(
-            context,
-            size,
-            numberOfWeeks,
-            listColumnWidths,
-            studentClassesDataProvider,
-            attendanceFormProvider,
-            selectedPageProvider,
-            editAttendanceDetailProvider),
+        body: Responsive(
+          mobile: _bodyMobile(
+              context,
+              size,
+              numberOfWeeks,
+              listColumnWidthsMobile,
+              studentClassesDataProvider,
+              attendanceFormProvider,
+              selectedPageProvider,
+              editAttendanceDetailProvider),
+          tablet: _bodyTablet(
+              size,
+              context,
+              numberOfWeeks,
+              listColumnWidths,
+              studentClassesDataProvider,
+              attendanceFormProvider,
+              selectedPageProvider,
+              editAttendanceDetailProvider),
+          desktop: _bodyDesktop(
+              context,
+              size,
+              numberOfWeeks,
+              listColumnWidths,
+              studentClassesDataProvider,
+              attendanceFormProvider,
+              selectedPageProvider,
+              editAttendanceDetailProvider),
+        ),
       ),
     );
   }
@@ -411,7 +426,8 @@ class _DetailPageState extends State<DetailPage> {
       SocketServerProvider socketServerProvider,
       BuildContext context,
       Size size,
-      TeacherDataProvider teacherDataProvider) {
+      TeacherDataProvider teacherDataProvider,
+      SelectedPageProvider selectedPageProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -600,6 +616,8 @@ class _DetailPageState extends State<DetailPage> {
                 selectedPageProvider.setCheckReport(false);
                 selectedPageProvider.setCheckForm(false);
                 selectedPageProvider.setCheckEditAttendanceForm(false);
+                selectedPageProvider.setCheckChart(false);
+
                 // });
               },
               child: Container(
@@ -635,23 +653,28 @@ class _DetailPageState extends State<DetailPage> {
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondaryText),
-            itemHeader(
-                'Notifications',
-                const Icon(Icons.notifications_outlined),
-                selectedPageProvider.checkNoti,
-                selectedPageProvider),
-            itemHeader('Reports', const Icon(Icons.book_outlined),
-                selectedPageProvider.getCheckReport, selectedPageProvider),
+            // itemHeader(
+            //     'Notifications',
+            //     const Icon(Icons.notifications_outlined),
+            //     selectedPageProvider.checkNoti,
+            //     selectedPageProvider),
+            // itemHeader('Reports', const Icon(Icons.book_outlined),
+            //     selectedPageProvider.getCheckReport, selectedPageProvider),
             itemHeader('Forms', const Icon(Icons.edit_document),
                 selectedPageProvider.checkForm, selectedPageProvider),
+            itemHeader('Charts', const Icon(Icons.bar_chart_rounded),
+                selectedPageProvider.checkChart, selectedPageProvider),
           ],
         ),
       ),
     );
   }
 
-  Row _appbarDesktop(SocketServerProvider socketServerProvider,
-      TeacherDataProvider teacherDataProvider, BuildContext context) {
+  Row _appbarDesktop(
+      SocketServerProvider socketServerProvider,
+      TeacherDataProvider teacherDataProvider,
+      BuildContext context,
+      SelectedPageProvider selectedPageProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -659,6 +682,13 @@ class _DetailPageState extends State<DetailPage> {
           children: [
             InkWell(
               onTap: () {
+                selectedPageProvider.setCheckAttendanceForm(false);
+                selectedPageProvider.setCheckHome(true);
+                selectedPageProvider.setCheckNoti(false);
+                selectedPageProvider.setCheckReport(false);
+                selectedPageProvider.setCheckForm(false);
+                selectedPageProvider.setCheckEditAttendanceForm(false);
+                selectedPageProvider.setCheckChart(false);
                 socketServerProvider.disconnectSocketServer();
                 Navigator.push(context,
                     MaterialPageRoute(builder: (builder) => const HomePage()));
@@ -770,8 +800,8 @@ class _DetailPageState extends State<DetailPage> {
             onTap: () {
               setState(() {
                 checkHome = false;
-                checkNotification = false;
-                checkReport = false;
+                // checkNotification = false;
+                // checkReport = false;
                 checkForm = false;
                 checkAttendanceForm = true;
               });
@@ -784,8 +814,8 @@ class _DetailPageState extends State<DetailPage> {
             onTap: () {
               setState(() {
                 checkHome = true;
-                checkNotification = false;
-                checkReport = false;
+                // checkNotification = false;
+                // checkReport = false;
                 checkForm = false;
               });
             },
@@ -793,40 +823,40 @@ class _DetailPageState extends State<DetailPage> {
                 iconCollapseSideBar(const Icon(Icons.home_outlined), checkHome),
           ),
           const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = true;
-                checkReport = false;
-                checkForm = false;
-              });
-            },
-            child: iconCollapseSideBar(
-              const Icon(Icons.notifications_outlined),
-              checkNotification,
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {
+          //     setState(() {
+          //       checkHome = false;
+          //       // checkNotification = true;
+          //       // checkReport = false;
+          //       checkForm = false;
+          //     });
+          //   },
+          //   child: iconCollapseSideBar(
+          //     const Icon(Icons.notifications_outlined),
+          //     checkNotification,
+          //   ),
+          // ),
+          const SizedBox(height: 20),
+          // InkWell(
+          //   onTap: () {
+          //     setState(() {
+          //       checkHome = false;
+          //       checkNotification = false;
+          //       checkReport = true;
+          //       checkForm = false;
+          //     });
+          //   },
+          //   child: iconCollapseSideBar(
+          //       const Icon(Icons.book_outlined), checkReport),
+          // ),
           const SizedBox(height: 20),
           InkWell(
             onTap: () {
               setState(() {
                 checkHome = false;
-                checkNotification = false;
-                checkReport = true;
-                checkForm = false;
-              });
-            },
-            child: iconCollapseSideBar(
-                const Icon(Icons.book_outlined), checkReport),
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              setState(() {
-                checkHome = false;
-                checkNotification = false;
-                checkReport = false;
+                // checkNotification = false;
+                // checkReport = false;
                 checkForm = true;
               });
             },
@@ -870,12 +900,15 @@ class _DetailPageState extends State<DetailPage> {
           selectedPageProvider.setCheckReport(false);
           selectedPageProvider.setCheckForm(false);
           selectedPageProvider.setCheckEditAttendanceForm(false);
+          selectedPageProvider.setCheckAttendanceDetail(false);
+          selectedPageProvider.setCheckChart(false);
 
           if (title == 'Home') {
             // checkHome = true;
             // checkAttendanceForm = false;
             // checkViewAttendance = false;
             selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckAttendanceDetail(false);
             selectedPageProvider.setCheckHome(true);
           } else if (title == 'Notifications') {
             // checkNotification = true;
@@ -883,6 +916,8 @@ class _DetailPageState extends State<DetailPage> {
             // checkViewAttendance = false;
 
             selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckAttendanceDetail(false);
+
             selectedPageProvider.setCheckNoti(true);
           } else if (title == 'Reports') {
             // checkReport = true;
@@ -896,8 +931,18 @@ class _DetailPageState extends State<DetailPage> {
             // checkViewAttendance = false;
             selectedPageProvider.setCheckForm(true);
             selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckAttendanceDetail(false);
+          } else if (title == 'Charts') {
+            // checkForm = true;
+            // checkAttendanceForm = false;
+            // checkViewAttendance = false;
+            selectedPageProvider.setCheckChart(true);
+            selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckAttendanceDetail(false);
           } else {
             selectedPageProvider.setCheckAttendanceForm(false);
+            selectedPageProvider.setCheckAttendanceDetail(false);
+
             selectedPageProvider.setCheckHome(true);
             // checkHome = true;
             // checkAttendanceForm = false;
@@ -995,6 +1040,10 @@ class _DetailPageState extends State<DetailPage> {
           formID: editAttendanceDetailProvider.getFormID,
           studentName: editAttendanceDetailProvider.getStudentName,
           classes: classes);
+    } else if (selectedPageProvider.getCheckChart) {
+      return ChartClassScreen(
+        classes: widget.classes,
+      );
     } else {
       if (isMobile) {
         return homeMobile(
@@ -1053,10 +1102,21 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const CustomText(
-                    message: 'Dashboard',
+                  CustomText(
+                    message:
+                        'Dashboard - ${widget.classes?.course?.courseName ?? ''}',
                     fontSize: 25,
                     fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CustomText(
+                    message:
+                        'Group: ${widget.classes?.group} - Sub:${widget.classes?.subGroup ?? ''}',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                     color: AppColors.primaryText,
                   ),
                   const SizedBox(
@@ -1155,9 +1215,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes!.course!.totalWeeks, false),
+                            widget.classes?.course?.totalWeeks ?? 0, false),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes!.course!.totalWeeks, false),
+                            widget.classes?.course?.totalWeeks ?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1225,27 +1285,38 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         CustomButton(
                             buttonName: 'View Attendance',
-                            backgroundColorButton: const Color(0xff2d71b1),
+                            backgroundColorButton:
+                                listData.last.attendancedetails.isNotEmpty &&
+                                        listData.last.attendancedetails.last
+                                            .attendanceForm.isNotEmpty
+                                    ? const Color(0xff2d71b1)
+                                    : Color(0xff2d71b1).withOpacity(0.5),
                             borderColor: Colors.transparent,
                             textColor: Colors.white,
-                            function: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) =>
-                                          RealtimeCheckAttendance(
-                                              formID:
-                                                  listData
+                            function: listData
+                                        .last.attendancedetails.isNotEmpty &&
+                                    listData.last.attendancedetails.last
+                                        .attendanceForm.isNotEmpty
+                                ? () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                RealtimeCheckAttendance(
+                                                  formID: listData
                                                       .last
                                                       .attendancedetails
                                                       .last
                                                       .attendanceForm,
-                                              classes: listData
-                                                  .last
-                                                  .attendancedetails
-                                                  .last
-                                                  .classDetail)));
-                            },
+                                                  classes: listData
+                                                      .last
+                                                      .attendancedetails
+                                                      .last
+                                                      .classDetail,
+                                                  classesData: widget.classes,
+                                                )));
+                                  }
+                                : null,
                             height: 50,
                             width: size.width <= 1180 ? 130 : 150,
                             fontSize: 12,
@@ -1356,9 +1427,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData ?? [],
-                            widget.classes!.course!.totalWeeks, false),
+                            widget.classes?.course?.totalWeeks ?? 0, false),
                         customButtonDashBoard('Excel', listData ?? [],
-                            widget.classes!.course!.totalWeeks, false),
+                            widget.classes?.course?.totalWeeks ?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1447,6 +1518,7 @@ class _DetailPageState extends State<DetailPage> {
                                                     .last
                                                     .classDetail ??
                                                 '',
+                                            classesData: widget.classes,
                                           )));
                             },
                             height: 50,
@@ -1563,9 +1635,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes!.course!.totalWeeks, true),
+                            widget.classes?.course?.totalWeeks ?? 0, true),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes!.course!.totalWeeks, true),
+                            widget.classes?.course?.totalWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
@@ -1652,7 +1724,8 @@ class _DetailPageState extends State<DetailPage> {
                                                   .last
                                                   .attendancedetails
                                                   .last
-                                                  .classDetail)));
+                                                  .classDetail,
+                                              classesData: widget.classes)));
                             },
                             height: 40,
                             width: size.width <= 440 ? 80 : 100,
@@ -1747,9 +1820,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData ?? [],
-                            widget.classes!.course!.totalWeeks, true),
+                            widget.classes?.course?.totalWeeks ?? 0, true),
                         customButtonDashBoard('Excel', listData ?? [],
-                            widget.classes!.course!.totalWeeks, true),
+                            widget.classes?.course?.totalWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
@@ -1838,7 +1911,8 @@ class _DetailPageState extends State<DetailPage> {
                                                       .attendancedetails
                                                       .last
                                                       .classDetail ??
-                                                  '')));
+                                                  '',
+                                              classesData: widget.classes)));
                             },
                             height: 40,
                             width: size.width <= 440 ? 80 : 100,
@@ -2108,39 +2182,55 @@ class _DetailPageState extends State<DetailPage> {
           },
           children: [
             TableRow(
-              children: List.generate(
-                numberOfWeeks,
-                (j) => TableCell(
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    color: Colors.grey.withOpacity(0.21),
-                    child: Center(
-                      child: Tooltip(
-                        // message: (j < listData.length)
-                        //     ? formatDate(listData[j]
-                        //         .attendancedetails[j]
-                        //         .createdAt
-                        //         .toString())
-                        //     : '',
-                        message: '',
-                        child: InkWell(
-                          onTap:
-                              () {}, // Navigator to view realtime check attendance through Day.
-                          mouseCursor: SystemMouseCursors.click,
-                          child: Text(
-                            'Day ${j + 1}',
-                            style: TextStyle(
-                              fontSize: isMobile ? 9 : 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+              children: [
+                for (int j = 0; j < numberOfWeeks; j++)
+                  TableCell(
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      color: Colors.grey.withOpacity(0.21),
+                      child: Center(
+                        child: Tooltip(
+                          message: listData[0].attendancedetails.length > j
+                              ? listData[0].attendancedetails[j].attendanceForm
+                              : '',
+                          child: InkWell(
+                            onTap: listData[0].attendancedetails.length > j &&
+                                    listData[0].attendancedetails.isNotEmpty &&
+                                    listData[0]
+                                        .attendancedetails[j]
+                                        .attendanceForm
+                                        .isNotEmpty
+                                ? () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                RealtimeCheckAttendance(
+                                                    formID: listData[0]
+                                                        .attendancedetails[j]
+                                                        .attendanceForm,
+                                                    classes: listData[0]
+                                                        .attendancedetails[j]
+                                                        .classDetail,
+                                                    classesData:
+                                                        widget.classes)));
+                                  }
+                                : null,
+                            mouseCursor: SystemMouseCursors.click,
+                            child: Text(
+                              'Day ${j + 1}',
+                              style: TextStyle(
+                                fontSize: isMobile ? 9 : 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
+              ],
             ),
             for (int i = 0; i < paginatedStudents.length; i++)
               TableRow(

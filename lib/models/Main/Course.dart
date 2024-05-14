@@ -1,16 +1,16 @@
 class Course {
-  final String courseID;
-  final String courseName;
-  final int totalWeeks;
-  final int requiredWeeks;
-  final int credit;
+   String? courseID;
+   String? courseName;
+   int? totalWeeks;
+   int? Weeks;
+   int? credit;
 
   Course({
-    required this.courseID,
-    required this.courseName,
-    required this.totalWeeks,
-    required this.requiredWeeks,
-    required this.credit,
+     this.courseID,
+     this.courseName,
+     this.totalWeeks,
+     this.Weeks,
+     this.credit,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -18,7 +18,7 @@ class Course {
         courseID: json['courseID'] ?? "",
         courseName: json['courseName'] ?? "",
         totalWeeks: json['totalWeeks'] ?? 0,
-        requiredWeeks: json['requiredWeeks'] ?? 0,
+        Weeks: json['Weeks'] ?? 0,
         credit: json['credit'] ?? 0);
   }
 }

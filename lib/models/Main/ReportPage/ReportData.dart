@@ -1,58 +1,58 @@
 class ReportData {
-  final String classID;
-  final String roomNumber;
-  final int shiftNumber;
-  final String startTime;
-  final String endTime;
-  final String classType;
-  final String group;
-  final String subGroup;
-  final String courseID;
-  final String teacherID;
-  final String courseName;
-  final int totalWeeks;
-  final int requiredWeeks;
-  final int credit;
-  final int reportID;
-  final String topic;
-  final String problem;
-  final String message;
-  final String status;
-  final String createdAt;
-  final int isNew;
-  final int isImportant;
-  final String studentID;
-  final String formID;
-  final String studentEmail;
-  final String studentName;
+  String? classID;
+  String? roomNumber;
+  int? shiftNumber;
+  String? startTime;
+  String? endTime;
+  String? classType;
+  String? group;
+  String? subGroup;
+  String? courseID;
+  String? teacherID;
+  String? courseName;
+  int? totalWeeks;
+  int? Weeks;
+  int? credit;
+  int? reportID;
+  String? topic;
+  String? problem;
+  String? message;
+  String? status;
+  String? createdAt;
+  int? isNew;
+  int? isImportant;
+  String? studentID;
+  String? formID;
+  String? studentEmail;
+  String? studentName;
 
   ReportData({
-    required this.classID,
-    required this.roomNumber,
-    required this.shiftNumber,
-    required this.startTime,
-    required this.endTime,
-    required this.classType,
-    required this.group,
-    required this.subGroup,
-    required this.courseID,
-    required this.teacherID,
-    required this.courseName,
-    required this.totalWeeks,
-    required this.requiredWeeks,
-    required this.credit,
-    required this.reportID,
-    required this.topic,
-    required this.problem,
-    required this.message,
-    required this.status,
-    required this.createdAt,
-    required this.isNew,
-    required this.isImportant,
-    required this.studentID,
-    required this.formID,
-    required this.studentEmail,
-    required this.studentName,
+    this.classID,
+    this.roomNumber,
+    this.shiftNumber,
+    this.startTime,
+    this.endTime,
+    this.classType,
+    this.group,
+    this.subGroup,
+    this.courseID,
+    this.teacherID,
+    this.courseName,
+    this.totalWeeks,
+    this.Weeks,
+    this.credit,
+    this.reportID,
+    this.topic,
+    this.problem,
+    this.message,
+    this.status,
+    this.createdAt,
+    this.isNew,
+    this.isImportant,
+    this.studentID,
+    this.formID,
+    this.studentEmail,
+    this.studentName,
   });
 
   factory ReportData.fromJson(Map<String, dynamic> json) {
@@ -69,7 +69,7 @@ class ReportData {
       teacherID: json['teacherID'],
       courseName: json['courseName'],
       totalWeeks: json['totalWeeks'],
-      requiredWeeks: json['requiredWeeks'],
+      Weeks: json['Weeks'],
       credit: json['credit'],
       reportID: json['reportID'],
       topic: json['topic'],

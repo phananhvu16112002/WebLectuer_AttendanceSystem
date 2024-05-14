@@ -10,6 +10,8 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomTextField.d
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/FormPage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/RealtimeCheckAttendance.dart';
@@ -17,9 +19,10 @@ import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
 class AfterCreateAttendanceForm extends StatefulWidget {
   const AfterCreateAttendanceForm(
-      {super.key, required this.attendanceForm, required this.className});
+      {super.key, required this.attendanceForm, required this.className, required this.classes});
   final AttendanceForm? attendanceForm;
   final String className;
+  final Class classes;
 
   @override
   State<AfterCreateAttendanceForm> createState() =>
@@ -56,13 +59,15 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
     print('String QRCODE: $qrcode');
     final socketServerProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
+    final selectedPageProvider =
+        Provider.of<SelectedPageProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            header(),
+            header(selectedPageProvider,socketServerProvider),
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -347,6 +352,21 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                       borderColor: AppColors.primaryButton,
                                       textColor: AppColors.primaryButton,
                                       function: () {
+                                        selectedPageProvider
+                                            .setCheckAttendanceForm(false);
+                                        selectedPageProvider.setCheckHome(true);
+                                        selectedPageProvider
+                                            .setCheckNoti(false);
+                                        selectedPageProvider
+                                            .setCheckReport(false);
+                                        selectedPageProvider
+                                            .setCheckForm(false);
+                                        selectedPageProvider
+                                            .setCheckEditAttendanceForm(false);
+                                        selectedPageProvider
+                                            .setCheckAttendanceDetail(false);
+                                        selectedPageProvider
+                                            .setCheckChart(false);
                                         socketServerProvider
                                             .disconnectSocketServer();
                                         Navigator.pushAndRemoveUntil(
@@ -382,6 +402,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                                                       classes: widget
                                                           .attendanceForm!
                                                           .classes,
+                                                    classesData: widget.classes,
                                                     )));
                                       },
                                       height: 40,
@@ -409,7 +430,7 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
     );
   }
 
-  Widget header() {
+  Widget header(SelectedPageProvider selectedPageProvider,SocketServerProvider socketServerProvider) {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 50,
@@ -428,6 +449,16 @@ class _AfterCreateAttendanceFormState extends State<AfterCreateAttendanceForm> {
                 children: [
                   InkWell(
                     onTap: () {
+                      selectedPageProvider.setCheckAttendanceForm(false);
+                      selectedPageProvider.setCheckHome(true);
+                      selectedPageProvider.setCheckNoti(false);
+                      selectedPageProvider.setCheckReport(false);
+                      selectedPageProvider.setCheckForm(false);
+                      selectedPageProvider.setCheckEditAttendanceForm(false);
+                      selectedPageProvider.setCheckAttendanceDetail(false);
+                      selectedPageProvider.setCheckChart(false);
+                         socketServerProvider
+                                            .disconnectSocketServer();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

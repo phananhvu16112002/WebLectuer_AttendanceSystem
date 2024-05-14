@@ -9,6 +9,7 @@ class SelectedPageProvider with ChangeNotifier {
   bool checkAttendanceForm = false;
   bool checkEditAttendanceForm = false;
   bool checkEditAttendanceDetail = false;
+  bool checkChart = false;
 
   bool get getCheckEditAttendanceForm => checkEditAttendanceForm;
   bool get getCheckHome => checkHome;
@@ -17,6 +18,7 @@ class SelectedPageProvider with ChangeNotifier {
   bool get getCheckForm => checkForm;
   bool get getCheckAttendanceForm => checkAttendanceForm;
   bool get getCheckAttendanceDetail => checkEditAttendanceDetail;
+  bool get getCheckChart => checkChart;
 
   void setCheckEditAttendanceForm(bool check) {
     checkEditAttendanceForm = check;
@@ -50,6 +52,11 @@ class SelectedPageProvider with ChangeNotifier {
 
   void setCheckAttendanceDetail(bool check) {
     checkEditAttendanceDetail = check;
+    notifyListeners();
+  }
+
+  void setCheckChart(bool check) {
+    checkChart = check;
     notifyListeners();
   }
 }
