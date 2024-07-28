@@ -175,9 +175,9 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
 
   String getStatus(int type) {
     if (type == 0) {
-      return 'Check in class';
-    } else if (type == 1) {
       return 'Scan face';
+    } else if (type == 1) {
+      return 'Check in class';
     } else {
       return 'Scan QR';
     }

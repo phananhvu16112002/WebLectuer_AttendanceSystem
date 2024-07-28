@@ -8,6 +8,7 @@ import 'package:weblectuer_attendancesystem_nodejs/common/base/CustomText.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/activate_form_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/socketServer_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/AfterCreateAttendanceForm.dart';
@@ -15,7 +16,10 @@ import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/GetLocation.dart';
 
 class CreateAttendanceFormPage extends StatefulWidget {
-  const CreateAttendanceFormPage({super.key, required this.classes});
+  const CreateAttendanceFormPage({
+    super.key,
+    required this.classes,
+  });
   final Class classes;
 
   @override
@@ -166,6 +170,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final socketServerProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
+    final activateFormDataProvider =
+        Provider.of<ActivateFormDataProvider>(context, listen: false);
     return SizedBox(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -176,8 +182,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: infoForm(
-                    context, attendanceFormDataProvider, socketServerProvider),
+                child: infoForm(context, attendanceFormDataProvider,
+                    socketServerProvider, activateFormDataProvider),
               ),
               const SizedBox(
                 width: 10,
@@ -191,7 +197,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   Widget infoForm(
       BuildContext context,
       AttendanceFormDataProvider attendanceFormDataProvider,
-      SocketServerProvider socketServerProvider) {
+      SocketServerProvider socketServerProvider,
+      ActivateFormDataProvider activateFormDataProvider) {
     return Expanded(
       child: Container(
         width: (MediaQuery.of(context).size.width - 250) / 2 - 20,
@@ -281,8 +288,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                                     items,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color:
-                                          AppColors.primaryText.withOpacity(0.5),
+                                      color: AppColors.primaryText
+                                          .withOpacity(0.5),
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
@@ -379,8 +386,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                             timeStart != null
                                 ? formatTime(
                                     formatTimeOfDate(timeStart!).toString())
-                                : formatTime(
-                                    formatTimeOfDate(TimeOfDay.now()).toString()),
+                                : formatTime(formatTimeOfDate(TimeOfDay.now())
+                                    .toString()),
                             true,
                           ),
                         ],
@@ -415,8 +422,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                             timeEnd != null
                                 ? formatTime(
                                     formatTimeOfDate(timeEnd!).toString())
-                                : formatTime(
-                                    formatTimeOfDate(TimeOfDay.now()).toString()),
+                                : formatTime(formatTimeOfDate(TimeOfDay.now())
+                                    .toString()),
                             true,
                           ),
                         ],
@@ -484,7 +491,6 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                       function: () async {
                         bool check = checkDuplicateTime();
                         if (check) {
-                          print('Longtitude: $longtitude');
                           AttendanceForm? attendanceForm = await API(context)
                               .createFormAttendance(
                                   classes.classID!,
@@ -494,8 +500,9 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                                   myLocation,
                                   latitude,
                                   longtitude,
-                                  radius);
-          
+                                  radius,
+                                  activateFormDataProvider.formId);
+
                           final currentContext = context;
                           Future.delayed(Duration.zero, () {
                             attendanceFormDataProvider
@@ -511,7 +518,8 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
                                     builder: (builder) =>
                                         AfterCreateAttendanceForm(
                                           attendanceForm: attendanceForm,
-                                          className: classes.course?.courseName ?? '',
+                                          className:
+                                              classes.course?.courseName ?? '',
                                           classes: widget.classes,
                                         )));
                           }

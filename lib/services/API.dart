@@ -19,6 +19,7 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/Attend
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/DialogHistoryReport/HistoryReportDialog.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/ReportData.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/ReportPage/report_pagi.dart';
+import 'package:weblectuer_attendancesystem_nodejs/models/Main/home_page/Semester.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/home_page/class_data_home_page.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
@@ -109,8 +110,8 @@ class API {
     }
   }
 
-  Future<ClassDataHomePage?> getClasses(int page) async {
-    String URL = 'http://$baseURL:8080/api/teacher/classes/page/$page';
+  Future<ClassDataHomePage?> getClasses(int page, int? semesterID) async {
+    String URL = 'http://$baseURL:8080/api/teacher/classes/page/$page?semester=$semesterID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -696,7 +697,8 @@ class API {
       String location,
       double latitude,
       double longtitude,
-      double radius) async {
+      double radius,
+      String formId) async {
     String url = 'http://$baseURL:8080/api/teacher/form/submit';
     var accessToken = await getAccessToken();
     var request = {
@@ -707,7 +709,8 @@ class API {
       'location': location,
       'latitude': latitude,
       'longitude': longtitude,
-      'radius': radius
+      'radius': radius,
+      'formID': formId
     };
     var body = json.encode(request);
     var headers = {
@@ -926,6 +929,61 @@ class API {
     }
   }
 
+  Future<bool> editStatusForm(
+      String classID, String formID, bool status) async {
+    final url =
+        'http://$baseURL:8080/api/teacher/editstatus/attendanceform/$classID/$formID';
+    var accessToken = await getAccessToken();
+    var request = {
+      'status': status,
+    };
+    var body = json.encode(request);
+    var headers = {
+      'authorization': accessToken,
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    try {
+      print('body:$body');
+      final response =
+          await http.put(Uri.parse(url), headers: headers, body: body);
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        String message = responseData['message'];
+        print('message: $message');
+        return true;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            String message = responseData['message'];
+            print('message retry: $message');
+            // print('Data $data');
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          print('New Access Token is empty');
+          return false;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
   Future<ProgressModel?> getDataChart(String classID) async {
     var URL = 'http://$baseURL:8080/api/teacher/classes/$classID/stats';
     var accessToken = await getAccessToken();
@@ -963,6 +1021,96 @@ class API {
     } catch (e) {
       print('Error: $e');
       return null;
+    }
+  }
+
+
+  Future<List<Semester>> getSemester() async {
+    var URL = 'http://$baseURL:8080/api/teacher/semester';
+
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(URL), headers: headers);
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        List<Semester> data = [];
+
+        if (responseData is List) {
+          for (var temp in responseData) {
+            if (temp is Map<String, dynamic>) {
+              try {
+                data.add(Semester.fromJson(temp));
+              } catch (e) {
+                print('Error parsing data: $e');
+              }
+            } else {
+              print('Invalid data type: $temp');
+            }
+          }
+        } else if (responseData is Map<String, dynamic>) {
+          try {
+            data.add(Semester.fromJson(responseData));
+          } catch (e) {
+            print('Error parsing data: $e');
+          }
+        } else {
+          print('Unexpected data type: $responseData');
+        }
+        // print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(URL), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            List<Semester> data = [];
+
+            if (responseData is List) {
+              for (var temp in responseData) {
+                if (temp is Map<String, dynamic>) {
+                  try {
+                    data.add(Semester.fromJson(temp));
+                  } catch (e) {
+                    print('Error parsing data: $e');
+                  }
+                } else {
+                  print('Invalid data type: $temp');
+                }
+              }
+            } else if (responseData is Map<String, dynamic>) {
+              try {
+                data.add(Semester.fromJson(responseData));
+              } catch (e) {
+                print('Error parsing data: $e');
+              }
+            } else {
+              print('Unexpected data type: $responseData');
+            }
+
+            // print('Data $data');
+            return data;
+          } else {
+            return [];
+          }
+        } else {
+          print('New Access Token is empty');
+          return [];
+        }
+      } else {
+        print(
+            'Failed to load reports data. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
     }
   }
 }

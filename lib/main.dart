@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/activate_form_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/attendanceForm_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/class_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_detail_provider.dart';
@@ -25,6 +26,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => SelectedPageProvider()),
     ChangeNotifierProvider(create: (_) => EditAttendanceDetailProvider()),
     ChangeNotifierProvider(create: (_) => EditAttendanceFormProvider()),
+    ChangeNotifierProvider(create: (_) => ActivateFormDataProvider()),
   ], child: const MyApp()));
 }
 

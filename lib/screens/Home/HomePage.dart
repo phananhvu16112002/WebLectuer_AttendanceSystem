@@ -28,6 +28,8 @@ import 'package:weblectuer_attendancesystem_nodejs/services/Responsive.dart';
 
 import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 
+import '../../models/Main/home_page/Semester.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -50,10 +52,26 @@ class _HomePageState extends State<HomePage> {
 
   bool isCollapsedOpen = true;
   late String name;
+  int? selectedSemesterID;
+   List<Semester> semesters = [];
+  String dropdownvalue = '';
+  late Future<List<Semester>> _fetchSemester;
 
   void toggleDrawer() {
     setState(() {
       isCollapsedOpen = !isCollapsedOpen;
+    });
+  }
+
+
+  void fetchSemester() async {
+    _fetchSemester = API(context).getSemester();
+    _fetchSemester.then((value) {
+      setState(() {
+        semesters = value;
+        dropdownvalue = semesters.first.semesterName ?? '';
+        selectedSemesterID = semesters.first.semesterID;
+      });
     });
   }
 
@@ -76,6 +94,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadToken();
+    fetchSemester();
   }
 
   @override
@@ -983,6 +1002,33 @@ class _HomePageState extends State<HomePage> {
                         PopupMenuItem(
                           value: '/repository',
                           child: Text("Repository"),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Confirm Repository'),
+                                  content: Text(
+                                      'Are you sure you want to repository this class?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        // Perform your deactivation logic here
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         ),
                         PopupMenuItem(
                           value: '/delete',
@@ -1073,8 +1119,52 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 10,
               ),
+              Row(
+                  children: [
+                    CustomText(
+                        message: 'Select semester',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryText),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: AppColors.primaryText.withOpacity(0.2))),
+                      child: DropdownButton<String>(
+                        focusColor: Colors.transparent,
+                        underline: Container(),
+                        value: dropdownvalue,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            dropdownvalue = newValue!;
+                          });
+                          selectedSemesterID = semesters
+                              .firstWhere((semester) =>
+                                  semester.semesterName == newValue)
+                              .semesterID;
+                        },
+                        iconSize: 15,
+                        menuMaxHeight: 150,
+                        style: TextStyle(fontSize: 15),
+                        items: semesters
+                            .map<DropdownMenuItem<String>>((Semester value) {
+                          return DropdownMenuItem<String>(
+                            value: value.semesterName,
+                            child: Text(value.semesterName ?? ''),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
               FutureBuilder(
-                future: API(context).getClasses(page),
+                future: API(context).getClasses(page,selectedSemesterID),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data != null) {
@@ -1152,10 +1242,32 @@ class _HomePageState extends State<HomePage> {
                     }
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(
                         child: CircularProgressIndicator(
                             color: AppColors.primaryButton));
+                  } else {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Opacity(
+                              opacity: 0.3,
+                              child: Image.asset(
+                                'assets/images/nodata.png',
+                                width: 200,
+                                height: 200,
+                              )),
+                          const SizedBox(height: 5),
+                          CustomText(
+                              message: 'No Class',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryText.withOpacity(0.3))
+                        ],
+                      ),
+                    );
                   }
                   return const Center(child: Text('Data is not available'));
                 },

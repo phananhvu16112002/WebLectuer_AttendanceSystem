@@ -10,8 +10,10 @@ import 'package:weblectuer_attendancesystem_nodejs/main.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Class.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/FormPage/FormData.dart';
+import 'package:weblectuer_attendancesystem_nodejs/provider/activate_form_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/edit_attendance_form_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/selected_page_provider.dart';
+import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/CreateAttendanceForm.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/DetailPage/edit_attendance_form.dart';
 import 'package:weblectuer_attendancesystem_nodejs/services/API.dart';
 
@@ -49,6 +51,7 @@ class _RepositoryClassPageState extends State<FormPage> {
     final selectedPage = Provider.of<SelectedPageProvider>(context);
     final editAttendanceFormProvider =
         Provider.of<EditAttendanceFormProvider>(context);
+    final activateFormProvider = Provider.of<ActivateFormDataProvider>(context);
     return Container(
       width: MediaQuery.of(context).size.width - 250,
       height: MediaQuery.of(context).size.height,
@@ -80,8 +83,8 @@ class _RepositoryClassPageState extends State<FormPage> {
                     itemCount: listData.length,
                     itemBuilder: (context, index) {
                       final form = listData[index];
-                      return _customBox(
-                          form, selectedPage, editAttendanceFormProvider);
+                      return _customBox(form, selectedPage,
+                          editAttendanceFormProvider, activateFormProvider);
                     })),
           ],
         ),
@@ -89,8 +92,21 @@ class _RepositoryClassPageState extends State<FormPage> {
     );
   }
 
-  Container _customBox(FormData form, SelectedPageProvider selectedPageProvider,
-      EditAttendanceFormProvider editAttendanceFormProvider) {
+  String getTypeForm(int type){
+    if (type == 0){
+      return 'Scan face';
+    }
+    else if (type == 1){
+      return 'Check in class';
+    }
+    return 'Scan QR';
+  }
+
+  Container _customBox(
+      FormData form,
+      SelectedPageProvider selectedPageProvider,
+      EditAttendanceFormProvider editAttendanceFormProvider,
+      ActivateFormDataProvider activateFormDataProvider) {
     return Container(
       width: 380,
       // height: 370,
@@ -110,157 +126,307 @@ class _RepositoryClassPageState extends State<FormPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    width: 340,
-                    child: cusTomText('FormID: ${form.formID}', 15,
-                        FontWeight.w500, AppColors.primaryText)),
+                  // width: 340,
+                  child: Center(
+                    child: customRichText(
+                        title: '',
+                        message: formatDate(form.dateOpen),
+                        fontWeightTitle: FontWeight.w600,
+                        fontWeightMessage: FontWeight.w400,
+                        colorText: AppColors.primaryText,
+                        fontSize: 15,
+                        colorTextMessage: AppColors.primaryText),
+                  ),
+                ),
               ],
             ),
             Divider(
               color: AppColors.primaryText.withOpacity(0.2),
               thickness: 0.5,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  height: 8,
-                ),
-                customRichText(
-                    title: 'Date: ',
-                    message: formatDate(form.dateOpen),
-                    fontWeightTitle: FontWeight.w600,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 15,
-                    colorTextMessage: AppColors.primaryText),
-                const SizedBox(
-                  height: 15,
-                ),
-                customRichText(
-                    title: 'Type: ',
-                    message: form.type == 1 ? 'Scan face' : 'Check in class',
-                    fontWeightTitle: FontWeight.w600,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 15,
-                    colorTextMessage: AppColors.primaryText),
-                const SizedBox(
-                  height: 15,
-                ),
-                customRichText(
-                    title: 'Radius: ',
-                    message: form.radius.toString(),
-                    fontWeightTitle: FontWeight.w600,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 15,
-                    colorTextMessage: AppColors.primaryText),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    customRichText(
-                        title: 'Latitude: ',
-                        message: form.latitude.toString(),
-                        fontWeightTitle: FontWeight.w600,
-                        fontWeightMessage: FontWeight.w400,
-                        colorText: AppColors.primaryText,
-                        fontSize: 15,
-                        colorTextMessage: AppColors.primaryText),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    customRichText(
-                        title: 'Longitude: ',
-                        message: form.longitude.toString(),
-                        fontWeightTitle: FontWeight.w600,
-                        fontWeightMessage: FontWeight.w400,
-                        colorText: AppColors.primaryText,
-                        fontSize: 15,
-                        colorTextMessage: AppColors.primaryText),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    customRichText(
-                        title: 'StartTime: ',
-                        message: formatTime(form.startTime),
-                        fontWeightTitle: FontWeight.w600,
-                        fontWeightMessage: FontWeight.w400,
-                        colorText: AppColors.primaryText,
-                        fontSize: 15,
-                        colorTextMessage: AppColors.primaryText),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    customRichText(
-                        title: 'EndTime: ',
-                        message: formatTime(form.endTime),
-                        fontWeightTitle: FontWeight.w600,
-                        fontWeightMessage: FontWeight.w400,
-                        colorText: AppColors.primaryText,
-                        fontSize: 15,
-                        colorTextMessage: AppColors.primaryText),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                const customRichText(
-                    title: 'Push notification to everyone: ',
-                    message: 'ON',
-                    fontWeightTitle: FontWeight.w600,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 15,
-                    colorTextMessage: AppColors.primaryText),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: CustomButton(
-                      buttonName: 'Edit',
-                      backgroundColorButton:
-                          AppColors.primaryButton.withOpacity(0.7),
-                      borderColor: Colors.white,
-                      textColor: Colors.white,
-                      function: () {
-                        selectedPageProvider.setCheckEditAttendanceForm(true);
-                        selectedPageProvider.setCheckAttendanceForm(false);
-                        selectedPageProvider.setCheckHome(false);
-                        selectedPageProvider.setCheckNoti(false);
-                        selectedPageProvider.setCheckReport(false);
-                        selectedPageProvider.setCheckForm(false);
-                        editAttendanceFormProvider.setAttendanceForm(
-                            AttendanceForm(
-                                formID: form.formID,
-                                classes: classes.classID ?? '',
-                                startTime: form.startTime,
-                                endTime: form.endTime,
-                                dateOpen: form.dateOpen,
-                                status: form.status,
-                                typeAttendance: form.type,
-                                location: '',
-                                latitude: form.latitude,
-                                longtitude: form.longitude,
-                                radius: double.parse(form.radius.toString())));
-                      },
-                      height: 40,
-                      width: 185,
-                      fontSize: 12,
-                      colorShadow: Colors.transparent,
-                      borderRadius: 5),
-                )
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      customRichText(
+                          title: 'Type: ',
+                          message:
+                              getTypeForm(form.type),
+                          fontWeightTitle: FontWeight.w600,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 15,
+                          colorTextMessage: AppColors.primaryText),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      customRichText(
+                          title: 'Radius: ',
+                          message: form.radius.toString(),
+                          fontWeightTitle: FontWeight.w600,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 15,
+                          colorTextMessage: AppColors.primaryText),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        children: [
+                          customRichText(
+                              title: 'Latitude: ',
+                              message: form.latitude.toString(),
+                              fontWeightTitle: FontWeight.w600,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 15,
+                              colorTextMessage: AppColors.primaryText),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          customRichText(
+                              title: 'Longitude: ',
+                              message: form.longitude.toString(),
+                              fontWeightTitle: FontWeight.w600,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 15,
+                              colorTextMessage: AppColors.primaryText),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        children: [
+                          customRichText(
+                              title: 'StartTime: ',
+                              message: formatTime(form.startTime),
+                              fontWeightTitle: FontWeight.w600,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 15,
+                              colorTextMessage: AppColors.primaryText),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          customRichText(
+                              title: 'EndTime: ',
+                              message: formatTime(form.endTime),
+                              fontWeightTitle: FontWeight.w600,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 15,
+                              colorTextMessage: AppColors.primaryText),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const customRichText(
+                          title: 'Push notification to everyone: ',
+                          message: 'ON',
+                          fontWeightTitle: FontWeight.w600,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 15,
+                          colorTextMessage: AppColors.primaryText),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: CustomButton(
+                                  buttonName:
+                                      form.status ? "Deactivate" : 'Activate',
+                                  backgroundColorButton: form.status
+                                      ? AppColors.secondaryText
+                                      : AppColors.primaryButton
+                                          .withOpacity(0.7),
+                                  borderColor: Colors.white,
+                                  textColor: Colors.white,
+                                  function: form.status
+                                      ? () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Confirm Deactivation'),
+                                                content: Text(
+                                                    'Are you sure you want to deactivate this form?'),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: Text('Cancel'),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: Text('Deactivate'),
+                                                    onPressed: () async {
+                                                      bool checkEdit = await API(
+                                                              context)
+                                                          .editStatusForm(
+                                                              classes.classID ??
+                                                                  '',
+                                                              form.formID,
+                                                              false);
+                                                      if (checkEdit) {
+                                                        Navigator.pop(context);
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title:
+                                                                  Text('Form'),
+                                                              content: Text(
+                                                                  'Deactivate successfully'),
+                                                              actions: <Widget>[
+                                                                TextButton(
+                                                                  child: Text(
+                                                                      'OK'),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      } else {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title:
+                                                                  Text('Form'),
+                                                              content: Text(
+                                                                  'Deactivate fail'),
+                                                              actions: <Widget>[
+                                                                TextButton(
+                                                                  child: Text(
+                                                                      'OK'),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                      : () {
+                                          activateFormDataProvider
+                                              .setFormId(form.formID);
+                                          activateFormDataProvider
+                                              .setClassData(classes);
+                                          selectedPageProvider
+                                              .setCheckEditAttendanceForm(
+                                                  false);
+                                          selectedPageProvider
+                                              .setCheckAttendanceForm(true);
+                                          selectedPageProvider
+                                              .setCheckHome(false);
+                                          selectedPageProvider
+                                              .setCheckNoti(false);
+                                          selectedPageProvider
+                                              .setCheckReport(false);
+                                          selectedPageProvider
+                                              .setCheckForm(false);
+                                        },
+                                  height: 40,
+                                  width: null,
+                                  fontSize: 12,
+                                  colorShadow: Colors.transparent,
+                                  borderRadius: 5),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: CustomButton(
+                                  buttonName: 'Edit',
+                                  backgroundColorButton: form.status == false
+                                      ? AppColors.secondaryText
+                                      : AppColors.primaryButton
+                                          .withOpacity(0.7),
+                                  borderColor: Colors.white,
+                                  textColor: Colors.white,
+                                  function: form.status == false
+                                      ? null
+                                      : () {
+                                          selectedPageProvider
+                                              .setCheckEditAttendanceForm(true);
+                                          selectedPageProvider
+                                              .setCheckAttendanceForm(false);
+                                          selectedPageProvider
+                                              .setCheckHome(false);
+                                          selectedPageProvider
+                                              .setCheckNoti(false);
+                                          selectedPageProvider
+                                              .setCheckReport(false);
+                                          selectedPageProvider
+                                              .setCheckForm(false);
+                                          editAttendanceFormProvider
+                                              .setAttendanceForm(AttendanceForm(
+                                                  formID: form.formID,
+                                                  classes:
+                                                      classes.classID ?? '',
+                                                  startTime: form.startTime,
+                                                  endTime: form.endTime,
+                                                  dateOpen: form.dateOpen,
+                                                  status: form.status,
+                                                  typeAttendance: form.type,
+                                                  location: '',
+                                                  latitude: form.latitude,
+                                                  longtitude: form.longitude,
+                                                  radius: double.parse(
+                                                      form.radius.toString())));
+                                        },
+                                  height: 40,
+                                  width: null,
+                                  fontSize: 12,
+                                  colorShadow: Colors.transparent,
+                                  borderRadius: 5),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
             )
           ],
         ),

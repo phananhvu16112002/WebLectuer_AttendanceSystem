@@ -3,18 +3,20 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/Course.dart';
 import 'package:weblectuer_attendancesystem_nodejs/models/Main/Teacher.dart';
 
 class ClassData {
-  Class classes;
-  int total;
-  int pass;
-  int ban;
-  int warning;
+  Class? classes;
+  int? total;
+  int? pass;
+  int? ban;
+  int? warning;
+  int? totalWeeks;
 
   ClassData({
-    required this.classes,
-    required this.total,
-    required this.pass,
-    required this.ban,
-    required this.warning,
+     this.classes,
+     this.total,
+     this.pass,
+     this.ban,
+     this.warning,
+     this.totalWeeks,
   });
 
   factory ClassData.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class ClassData {
       pass: json['pass'],
       ban: json['ban'],
       warning: json['warning'],
+      totalWeeks: json['totalWeeks']
     );
   }
 }

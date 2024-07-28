@@ -76,6 +76,7 @@ class _DetailPageState extends State<DetailPage> {
   int itemsPerPage = 10;
   int itemsRecent = 0;
   int lengthList = 0;
+  int numberOfWeeks = 0;
 
   late Future<ClassModel?> fetchData;
   late Class classes;
@@ -117,6 +118,7 @@ class _DetailPageState extends State<DetailPage> {
         numberPassStudent = value?.classData.pass ?? 0;
         numberBanStudent = value?.classData.ban ?? 0;
         numberWarningStudent = value?.classData.warning ?? 0;
+        numberOfWeeks = value?.classData.totalWeeks ?? 0;
       });
     });
     print('FetchData-----');
@@ -245,8 +247,6 @@ class _DetailPageState extends State<DetailPage> {
     final selectedPageProvider = Provider.of<SelectedPageProvider>(context);
     final editAttendanceDetailProvider =
         Provider.of<EditAttendanceDetailProvider>(context);
-    int numberOfWeeks =
-        classes.course?.totalWeeks ?? 0; // course through provider
     List<TableColumnWidth> listColumnWidths = [
       const FixedColumnWidth(10),
       const FixedColumnWidth(80),
@@ -600,47 +600,47 @@ class _DetailPageState extends State<DetailPage> {
             const SizedBox(
               height: 10,
             ),
-            Center(
-                child: InkWell(
-              onTap: () {
-                // setState(() {
-                // checkHome = false;
-                // checkNotification = false;
-                // checkReport = false;
-                // checkForm = false;
-                // checkAttendanceForm = true;
+            // Center(
+            //     child: InkWell(
+            //   onTap: () {
+            //     // setState(() {
+            //     // checkHome = false;
+            //     // checkNotification = false;
+            //     // checkReport = false;
+            //     // checkForm = false;
+            //     // checkAttendanceForm = true;
 
-                selectedPageProvider.setCheckAttendanceForm(true);
-                selectedPageProvider.setCheckHome(false);
-                selectedPageProvider.setCheckNoti(false);
-                selectedPageProvider.setCheckReport(false);
-                selectedPageProvider.setCheckForm(false);
-                selectedPageProvider.setCheckEditAttendanceForm(false);
-                selectedPageProvider.setCheckChart(false);
+            //     selectedPageProvider.setCheckAttendanceForm(true);
+            //     selectedPageProvider.setCheckHome(false);
+            //     selectedPageProvider.setCheckNoti(false);
+            //     selectedPageProvider.setCheckReport(false);
+            //     selectedPageProvider.setCheckForm(false);
+            //     selectedPageProvider.setCheckEditAttendanceForm(false);
+            //     selectedPageProvider.setCheckChart(false);
 
-                // });
-              },
-              child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 32),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.primaryText),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Center(
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      'Create Attendance Form',
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryText),
-                    ),
-                  )),
-            )),
-            const SizedBox(
-              height: 5,
-            ),
+            //     // });
+            //   },
+            //   child: Container(
+            //       padding:
+            //           const EdgeInsets.symmetric(vertical: 15, horizontal: 32),
+            //       decoration: BoxDecoration(
+            //           color: Colors.white,
+            //           border: Border.all(color: AppColors.primaryText),
+            //           borderRadius: BorderRadius.circular(8)),
+            //       child: const Center(
+            //         child: Text(
+            //           textAlign: TextAlign.center,
+            //           'Create Attendance Form',
+            //           style: TextStyle(
+            //               fontSize: 12,
+            //               fontWeight: FontWeight.bold,
+            //               color: AppColors.primaryText),
+            //         ),
+            //       )),
+            // )),
+            // const SizedBox(
+            //   height: 5,
+            // ),
             const CustomText(
                 message: 'Analyze',
                 fontSize: 12,
@@ -942,7 +942,6 @@ class _DetailPageState extends State<DetailPage> {
           } else {
             selectedPageProvider.setCheckAttendanceForm(false);
             selectedPageProvider.setCheckAttendanceDetail(false);
-
             selectedPageProvider.setCheckHome(true);
             // checkHome = true;
             // checkAttendanceForm = false;
@@ -1031,7 +1030,7 @@ class _DetailPageState extends State<DetailPage> {
     } else if (selectedPageProvider.getCheckAttendanceForm) {
       return CreateAttendanceFormPage(
         classes: classes,
-      );
+      ); //test
     } else if (selectedPageProvider.getCheckEditAttendanceForm) {
       return EditAttendanceForm(classes: classes);
     } else if (selectedPageProvider.getCheckAttendanceDetail) {
@@ -1351,8 +1350,8 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const CustomText(
-                    message: 'Dashboard',
+                   CustomText(
+                    message: 'Dashboard - ${widget.classes?.course?.courseName ?? ''}',
                     fontSize: 25,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryText,
@@ -1360,62 +1359,98 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
+                  CustomText(
+                    message:
+                        'Group: ${widget.classes?.group} - Sub:${widget.classes?.subGroup ?? ''}',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryText,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 250,
+                    width: MediaQuery.of(context).size.width,
                     height: 130,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: customBoxInformation(
-                              'All',
-                              'assets/icons/student.png',
-                              numberAllStudent,
-                              newSetStateTable,
-                              isSelectedSection,
-                              size,
-                              false),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: customBoxInformation(
-                              'Pass',
-                              'assets/icons/present.png',
-                              numberPassStudent,
-                              newSetStateTable,
-                              isSelectedSection,
-                              size,
-                              false),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: customBoxInformation(
-                              'Ban',
-                              'assets/icons/absent.png',
-                              numberBanStudent,
-                              newSetStateTable,
-                              isSelectedSection,
-                              size,
-                              false),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: customBoxInformation(
-                              'Warning',
-                              'assets/icons/pending.png',
-                              numberWarningStudent,
-                              newSetStateTable,
-                              isSelectedSection,
-                              size,
-                              false),
-                        ),
-                      ],
-                    ),
+                    child: size.width > 900
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              customBoxInformation(
+                                  'All',
+                                  'assets/icons/student.png',
+                                  numberAllStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Pass',
+                                  'assets/icons/present.png',
+                                  numberPassStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Ban',
+                                  'assets/icons/absent.png',
+                                  numberBanStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Warning',
+                                  'assets/icons/pending.png',
+                                  numberWarningStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                            ],
+                          )
+                        : GridView.count(
+                            padding: EdgeInsets.zero,
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                            childAspectRatio: 30 / 20,
+                            children: [
+                              customBoxInformation(
+                                  'All',
+                                  'assets/icons/student.png',
+                                  numberAllStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Pass',
+                                  'assets/icons/present.png',
+                                  numberPassStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Ban',
+                                  'assets/icons/absent.png',
+                                  numberBanStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                              customBoxInformation(
+                                  'Warning',
+                                  'assets/icons/pending.png',
+                                  numberWarningStudent,
+                                  newSetStateTable,
+                                  isSelectedSection,
+                                  size,
+                                  false),
+                            ],
+                          ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -1992,7 +2027,7 @@ class _DetailPageState extends State<DetailPage> {
                                     selectedPageProvider,
                                     editAttendanceDetailProvider),
                               ),
-                              Expanded(
+                              Expanded(       
                                   child: tableTotal(
                                       paginatedStudents, listData, false)),
                             ],
@@ -2164,6 +2199,18 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  double getNumberOfWeeks(int numberOfweeks){
+    if (numberOfWeeks == 2){
+      return 250;
+    }
+    else if (numberOfWeeks == 4){
+      return 120;
+    }
+    else {
+      return 60;
+    }
+  }
+
   Widget tableCheckAttendance(
       int numberOfWeeks,
       List<Map<String, String>> paginatedStudents,
@@ -2178,7 +2225,8 @@ class _DetailPageState extends State<DetailPage> {
           border: TableBorder.all(color: Colors.grey),
           columnWidths: {
             for (int i = 0; i < numberOfWeeks; i++)
-              i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
+              // i: FixedColumnWidth(numberOfWeeks <= 13 ? 60 : 60),
+              i: FixedColumnWidth(getNumberOfWeeks(numberOfWeeks))
           },
           children: [
             TableRow(
@@ -2258,20 +2306,6 @@ class _DetailPageState extends State<DetailPage> {
                                 .attendanceForm);
                             editAttendanceDetailProvider
                                 .setStudentName(listData[i].studentName);
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (builder) => EditAttendanceDetail(
-                            //               studentID: listData[i].studentID,
-                            //               // classID: listData[i]
-                            //               //     .attendancedetails[j]
-                            //               //     .classDetail,
-                            //               formID: listData[i]
-                            //                   .attendancedetails[j]
-                            //                   .attendanceForm,
-                            //               studentName: listData[i].studentName,
-                            //               classes: widget.classes,
-                            //             )));
                           },
                           child: Text(
                             j < listData[i].attendancedetails.length
@@ -2363,7 +2397,7 @@ class _DetailPageState extends State<DetailPage> {
                 color: const Color(0xff1770f0).withOpacity(0.5),
                 child: Center(
                   child: Text(
-                    'STT',
+                    'No',
                     style: TextStyle(
                       fontSize: isMobile ? 9 : 11,
                       fontWeight: FontWeight.bold,

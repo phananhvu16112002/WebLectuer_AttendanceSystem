@@ -68,7 +68,7 @@ class ReportData {
       courseID: json['courseID'],
       teacherID: json['teacherID'],
       courseName: json['courseName'],
-      totalWeeks: json['totalWeeks'],
+      totalWeeks: int.parse(json['totalWeeks'].toString()),
       Weeks: json['Weeks'],
       credit: json['credit'],
       reportID: json['reportID'],
