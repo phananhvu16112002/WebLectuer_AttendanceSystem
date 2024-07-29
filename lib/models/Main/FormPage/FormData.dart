@@ -1,13 +1,13 @@
 class FormData {
-  final String formID;
-  final String startTime;
-  final String endTime;
-  final bool status;
-  final String dateOpen;
-  final int type;
-  final double latitude;
-  final double longitude;
-  final int radius;
+   String formID;
+   String startTime;
+   String endTime;
+   bool status;
+   String dateOpen;
+   int type;
+   double latitude;
+   double longitude;
+   int radius;
 
   FormData({
     required this.formID,

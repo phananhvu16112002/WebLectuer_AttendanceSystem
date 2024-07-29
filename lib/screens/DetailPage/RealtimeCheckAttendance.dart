@@ -116,7 +116,6 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     setState(() {
       studentAttendance = attendanceSummary?.data ?? [];
       dateCreated = attendanceSummary?.stats.dateOpen ?? '';
-      print('-----${studentAttendance.first.dateAttendanced}');
       listTemp = attendanceSummary?.data ?? [];
       absentAttendance =
           studentAttendance.where((element) => element.result == '0').toList();

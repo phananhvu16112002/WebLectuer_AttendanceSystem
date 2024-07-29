@@ -110,8 +110,10 @@ class API {
     }
   }
 
-  Future<ClassDataHomePage?> getClasses(int page, int? semesterID) async {
-    String URL = 'http://$baseURL:8080/api/teacher/classes/page/$page?semester=$semesterID';
+  Future<ClassDataHomePage?> getClasses(
+      int page, int? semesterID, bool archived) async {
+    String URL =
+        'http://$baseURL:8080/api/teacher/classes/page/$page?semester=$semesterID&archived=$archived';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -1024,7 +1026,6 @@ class API {
     }
   }
 
-
   Future<List<Semester>> getSemester() async {
     var URL = 'http://$baseURL:8080/api/teacher/semester';
 
@@ -1111,6 +1112,59 @@ class API {
     } catch (e) {
       print('Error: $e');
       return [];
+    }
+  }
+
+  Future<bool> repositoryClassbyID(String classID, bool archived) async {
+    final url = 'http://$baseURL:8080/api/teacher/classes/archives/$classID';
+    var accessToken = await getAccessToken();
+    var request = {
+      'archive': archived,
+    };
+    var body = json.encode(request);
+    var headers = {
+      'authorization': accessToken,
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    try {
+      print('body:$body');
+      final response =
+          await http.put(Uri.parse(url), headers: headers, body: body);
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        String message = responseData['message'];
+        print('message: $message');
+        return true;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            // dynamic responseData = jsonDecode(retryResponse.body);
+            // String message = responseData['message'];
+            // print('message retry: $message');
+            // print('Data $data');
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          print('New Access Token is empty');
+          return false;
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
     }
   }
 }

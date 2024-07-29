@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   bool isCollapsedOpen = true;
   late String name;
   int? selectedSemesterID;
-   List<Semester> semesters = [];
+  List<Semester> semesters = [];
   String dropdownvalue = '';
   late Future<List<Semester>> _fetchSemester;
 
@@ -63,14 +63,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   void fetchSemester() async {
     _fetchSemester = API(context).getSemester();
     _fetchSemester.then((value) {
       setState(() {
         semesters = value;
-        dropdownvalue = semesters.first.semesterName ?? '';
-        selectedSemesterID = semesters.first.semesterID;
+        if (semesters.isNotEmpty) {
+          dropdownvalue = semesters.first.semesterName ?? '';
+          selectedSemesterID = semesters.first.semesterID;
+        }
       });
     });
   }
@@ -533,6 +534,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+
   Container _collapsedSideBar(BuildContext context) {
     return Container(
       width: 80,
@@ -890,6 +892,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget customClass(
+    List<Class>? classes,
+    String classID,
     String className,
     String typeClass,
     String group,
@@ -1019,9 +1023,25 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     TextButton(
                                       child: Text('OK'),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         // Perform your deactivation logic here
-                                        Navigator.of(context).pop();
+                                        bool result = await API(context)
+                                            .repositoryClassbyID(classID, true);
+                                        if (result) {
+                                          Navigator.of(context).pop();
+                                          _customDialog(
+                                              'Class $className',
+                                              'You changed repository successfully',
+                                              classID,
+                                              classes);
+                                        } else {
+                                          Navigator.of(context).pop();
+                                          _customDialog(
+                                              'Class $className',
+                                              'Transfer to repository failed',
+                                              classID,
+                                              classes);
+                                        }
                                       },
                                     ),
                                   ],
@@ -1057,6 +1077,31 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
+    );
+  }
+
+  Future<dynamic> _customDialog(
+      String title, String subTitle, String classID, List<Class>? classes) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(subTitle),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () async {
+                // Perform your deactivation logic here
+                setState(() {
+                  
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1120,51 +1165,52 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               Row(
-                  children: [
-                    CustomText(
-                        message: 'Select semester',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      width: 10,
+                children: [
+                  CustomText(
+                      message: 'Select semester',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryText),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.primaryText.withOpacity(0.2))),
+                    child: DropdownButton<String>(
+                      focusColor: Colors.transparent,
+                      underline: Container(),
+                      value: dropdownvalue,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownvalue = newValue!;
+                        });
+                        selectedSemesterID = semesters
+                            .firstWhere(
+                                (semester) => semester.semesterName == newValue)
+                            .semesterID;
+                      },
+                      iconSize: 15,
+                      menuMaxHeight: 150,
+                      style: TextStyle(fontSize: 15),
+                      items: semesters
+                          .map<DropdownMenuItem<String>>((Semester value) {
+                        return DropdownMenuItem<String>(
+                          value: value.semesterName,
+                          child: Text(value.semesterName ?? ''),
+                        );
+                      }).toList(),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: AppColors.primaryText.withOpacity(0.2))),
-                      child: DropdownButton<String>(
-                        focusColor: Colors.transparent,
-                        underline: Container(),
-                        value: dropdownvalue,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownvalue = newValue!;
-                          });
-                          selectedSemesterID = semesters
-                              .firstWhere((semester) =>
-                                  semester.semesterName == newValue)
-                              .semesterID;
-                        },
-                        iconSize: 15,
-                        menuMaxHeight: 150,
-                        style: TextStyle(fontSize: 15),
-                        items: semesters
-                            .map<DropdownMenuItem<String>>((Semester value) {
-                          return DropdownMenuItem<String>(
-                            value: value.semesterName,
-                            child: Text(value.semesterName ?? ''),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               FutureBuilder(
-                future: API(context).getClasses(page,selectedSemesterID),
+                future:
+                    API(context).getClasses(page, selectedSemesterID, false),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data != null) {
@@ -1218,6 +1264,8 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       mouseCursor: SystemMouseCursors.click,
                                       child: customClass(
+                                          classesData?.classes ?? [],
+                                          data.classID ?? '',
                                           data.course?.courseName ?? '',
                                           data.classType ?? '',
                                           data.group ?? '',
@@ -1304,6 +1352,8 @@ class _HomePageState extends State<HomePage> {
             mouseCursor: SystemMouseCursors.click,
             child: Container(
               child: customClass(
+                  classes,
+                  data.classID ?? '',
                   data.course?.courseName ?? '',
                   data.classType ?? '',
                   data.group ?? '',

@@ -92,11 +92,10 @@ class _RepositoryClassPageState extends State<FormPage> {
     );
   }
 
-  String getTypeForm(int type){
-    if (type == 0){
+  String getTypeForm(int type) {
+    if (type == 0) {
       return 'Scan face';
-    }
-    else if (type == 1){
+    } else if (type == 1) {
       return 'Check in class';
     }
     return 'Scan QR';
@@ -158,8 +157,7 @@ class _RepositoryClassPageState extends State<FormPage> {
                     children: [
                       customRichText(
                           title: 'Type: ',
-                          message:
-                              getTypeForm(form.type),
+                          message: getTypeForm(form.type),
                           fontWeightTitle: FontWeight.w600,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
@@ -302,6 +300,10 @@ class _RepositoryClassPageState extends State<FormPage> {
                                                                       'OK'),
                                                                   onPressed:
                                                                       () {
+                                                                    setState(
+                                                                        () {
+                                                                          form.status = false;
+                                                                        });
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
