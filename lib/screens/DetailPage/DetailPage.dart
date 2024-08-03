@@ -236,6 +236,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('Detail Page');
     final studentClassesDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
     final socketServerProvider =
@@ -991,6 +992,8 @@ class _DetailPageState extends State<DetailPage> {
       bool isMobile,
       SelectedPageProvider selectedPageProvider,
       EditAttendanceDetailProvider editAttendanceDetailProvider) {
+    print('selected Page------');
+    
     if (selectedPageProvider.getCheckHome) {
       if (isMobile) {
         return homeMobile(
@@ -1089,6 +1092,9 @@ class _DetailPageState extends State<DetailPage> {
       Size size,
       SelectedPageProvider selectedPageProvider,
       EditAttendanceDetailProvider editAttendanceDetailProvider) {
+        // print('err ${listData!.last.attendancedetails}');
+        // print('form ${listData!.last.attendancedetails.last.attendanceForm}');
+      print('err ${listData == []}');
     return listData != null && listData.isNotEmpty
         ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
@@ -1284,10 +1290,10 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         CustomButton(
                             buttonName: 'View Attendance',
-                            backgroundColorButton:
+                            backgroundColorButton: 
                                 listData.last.attendancedetails.isNotEmpty &&
                                         listData.last.attendancedetails.last
-                                            .attendanceForm.isNotEmpty
+                                            .attendanceForm.isNotEmpty 
                                     ? const Color(0xff2d71b1)
                                     : Color(0xff2d71b1).withOpacity(0.5),
                             borderColor: Colors.transparent,
@@ -1296,6 +1302,7 @@ class _DetailPageState extends State<DetailPage> {
                                         .last.attendancedetails.isNotEmpty &&
                                     listData.last.attendancedetails.last
                                         .attendanceForm.isNotEmpty
+                                        && listData.isNotEmpty
                                 ? () {
                                     Navigator.push(
                                         context,

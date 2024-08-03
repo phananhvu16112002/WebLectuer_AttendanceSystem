@@ -27,6 +27,7 @@ class Responsive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('responsive build=---====');
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1100) {

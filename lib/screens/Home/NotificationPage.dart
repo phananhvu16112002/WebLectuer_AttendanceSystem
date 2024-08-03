@@ -21,43 +21,6 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   late Future<NotificationsData?> futureNotifications;
   NotificationsData? notificationsData;
-  List<NotificationDetail> notificationList = [
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-    NotificationDetail(
-        title:
-            'Student ABC from the cross platform programming has sent you a report',
-        role: 'Student',
-        dateSend: '8/11/2023'),
-  ];
 
   void fetchData() async {
     futureNotifications = API(context).getNotifications();

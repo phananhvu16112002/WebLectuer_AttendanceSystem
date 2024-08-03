@@ -60,7 +60,7 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
   void getLocation() async {
     Position position = await GetLocation().determinePosition();
     String tempAddress = await GetLocation().getAddressFromLatLong(position);
-
+    if (!mounted) return;
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
       // _currentLocation = const LatLng( 10.7312784,106.6990618);
@@ -162,6 +162,11 @@ class _CreateAttendanceFormPageState extends State<CreateAttendanceFormPage> {
     super.initState();
     getLocation();
     classes = widget.classes;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

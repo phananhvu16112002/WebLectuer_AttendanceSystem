@@ -132,8 +132,12 @@ class _RepositoryClassPageState extends State<FormPage> {
                   // width: 340,
                   child: Center(
                     child: customRichText(
-                        title: '',
-                        message: formatDate(form.dateOpen),
+                        title: form.periodDateTime != 'null' ? 'Date Open: ' : '',
+                        message: form.periodDateTime != 'null' &&
+                                form.periodDateTime != null &&
+                                form.periodDateTime != ""
+                            ? formatDate(form.periodDateTime ?? '')
+                            : 'undefined',
                         fontWeightTitle: FontWeight.w600,
                         fontWeightMessage: FontWeight.w400,
                         colorText: AppColors.primaryText,
@@ -157,7 +161,7 @@ class _RepositoryClassPageState extends State<FormPage> {
                     children: [
                       customRichText(
                           title: 'Type: ',
-                          message: getTypeForm(form.type),
+                          message: getTypeForm(form.type ?? 0),
                           fontWeightTitle: FontWeight.w600,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
@@ -281,7 +285,7 @@ class _RepositoryClassPageState extends State<FormPage> {
                                                           .editStatusForm(
                                                               classes.classID ??
                                                                   '',
-                                                              form.formID,
+                                                              form.formID ?? '',
                                                               false);
                                                       if (checkEdit) {
                                                         Navigator.pop(context);
@@ -302,8 +306,9 @@ class _RepositoryClassPageState extends State<FormPage> {
                                                                       () {
                                                                     setState(
                                                                         () {
-                                                                          form.status = false;
-                                                                        });
+                                                                      form.status =
+                                                                          false;
+                                                                    });
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
@@ -350,7 +355,7 @@ class _RepositoryClassPageState extends State<FormPage> {
                                         }
                                       : () {
                                           activateFormDataProvider
-                                              .setFormId(form.formID);
+                                              .setFormId(form.formID ?? '');
                                           activateFormDataProvider
                                               .setClassData(classes);
                                           selectedPageProvider
@@ -402,17 +407,19 @@ class _RepositoryClassPageState extends State<FormPage> {
                                               .setCheckForm(false);
                                           editAttendanceFormProvider
                                               .setAttendanceForm(AttendanceForm(
-                                                  formID: form.formID,
+                                                  formID: form.formID ?? '',
                                                   classes:
                                                       classes.classID ?? '',
                                                   startTime: form.startTime,
                                                   endTime: form.endTime,
                                                   dateOpen: form.dateOpen,
                                                   status: form.status,
-                                                  typeAttendance: form.type,
+                                                  typeAttendance:
+                                                      form.type ?? 0,
                                                   location: '',
-                                                  latitude: form.latitude,
-                                                  longtitude: form.longitude,
+                                                  latitude: form.latitude ?? 0,
+                                                  longtitude:
+                                                      form.longitude ?? 0,
                                                   radius: double.parse(
                                                       form.radius.toString())));
                                         },
@@ -438,8 +445,8 @@ class _RepositoryClassPageState extends State<FormPage> {
 }
 
 String formatDate(String? date) {
-  if (date != null || date != '') {
-    DateTime serverDateTime = DateTime.parse(date!).toLocal();
+  if (date != null && date != "" && date != 'null') {
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
@@ -447,7 +454,7 @@ String formatDate(String? date) {
 }
 
 String formatTime(String? time) {
-  if (time != null || time != "") {
+  if (time != null && time != "" && time != 'null') {
     DateTime serverDateTime = DateTime.parse(time!).toLocal();
     String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;

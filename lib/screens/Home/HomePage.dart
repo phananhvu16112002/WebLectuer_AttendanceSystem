@@ -56,10 +56,21 @@ class _HomePageState extends State<HomePage> {
   List<Semester> semesters = [];
   String dropdownvalue = '';
   late Future<List<Semester>> _fetchSemester;
+  late Future<ClassDataHomePage?> _fetchData;
+  ClassDataHomePage? classesData;
 
   void toggleDrawer() {
     setState(() {
       isCollapsedOpen = !isCollapsedOpen;
+    });
+  }
+
+  void fetchClasses(int semesterID, bool archived) {
+    _fetchData = API(context).getClasses(page, semesterID, archived);
+    _fetchData.then((value) {
+      setState(() {
+        classesData = value!;
+      });
     });
   }
 
@@ -71,6 +82,7 @@ class _HomePageState extends State<HomePage> {
         if (semesters.isNotEmpty) {
           dropdownvalue = semesters.first.semesterName ?? '';
           selectedSemesterID = semesters.first.semesterID;
+          fetchClasses(selectedSemesterID ?? 0, false);
         }
       });
     });
@@ -534,7 +546,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   Container _collapsedSideBar(BuildContext context) {
     return Container(
       width: 80,
@@ -813,9 +824,10 @@ class _HomePageState extends State<HomePage> {
         child: icon);
   }
 
-  Widget itemHeader(String title, Icon icon, bool check) {
+  Widget itemHeader(String title, Icon icon, bool check)  {
     return InkWell(
-      onTap: () {
+      onTap: () async  {
+        ClassDataHomePage? data = await API(context).getClasses(page, selectedSemesterID, false);
         setState(() {
           checkHome = false;
           checkNotification = false;
@@ -823,8 +835,9 @@ class _HomePageState extends State<HomePage> {
           checkRepository = false;
           checkCalendar = false;
           checkSettings = false;
-          if (title == 'Home') {
+          if (title == 'Home')  {
             checkHome = true;
+            classesData = data;
           } else if (title == 'Notifications') {
             checkNotification = true;
           } else if (title == 'Reports') {
@@ -1093,8 +1106,10 @@ class _HomePageState extends State<HomePage> {
               child: Text('OK'),
               onPressed: () async {
                 // Perform your deactivation logic here
+                ClassDataHomePage? data = await API(context)
+                    .getClasses(page, selectedSemesterID, false);
                 setState(() {
-                  
+                  classesData = data;
                 });
                 Navigator.of(context).pop();
               },
@@ -1184,14 +1199,17 @@ class _HomePageState extends State<HomePage> {
                       focusColor: Colors.transparent,
                       underline: Container(),
                       value: dropdownvalue,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownvalue = newValue!;
-                        });
+                      onChanged: (String? newValue) async {
                         selectedSemesterID = semesters
                             .firstWhere(
                                 (semester) => semester.semesterName == newValue)
                             .semesterID;
+                        ClassDataHomePage? data = await API(context)
+                            .getClasses(page, selectedSemesterID, false);
+                        setState(() {
+                          dropdownvalue = newValue!;
+                          classesData = data;
+                        });
                       },
                       iconSize: 15,
                       menuMaxHeight: 150,
@@ -1208,121 +1226,213 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SizedBox(height: 10),
-              FutureBuilder(
-                future:
-                    API(context).getClasses(page, selectedSemesterID, false),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data != null) {
-                      ClassDataHomePage? classesData = snapshot.data;
-                      // Future.delayed(Duration.zero, () {
-                      //   classDataProvider.setAttendanceFormData(classes!);
-                      // });
-                      return !isMobile
-                          ? Column(
-                              children: [
-                                _gridViewData(size, classesData?.classes),
-                                const SizedBox(
+              // FutureBuilder(
+              //   future:
+              //       API(context).getClasses(page, selectedSemesterID, false),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       if (snapshot.data != null) {
+              //         ClassDataHomePage? classesData = snapshot.data;
+              //         // Future.delayed(Duration.zero, () {
+              //         //   classDataProvider.setAttendanceFormData(classes!);
+              //         // });
+              //         return !isMobile
+              //             ? Column(
+              //                 children: [
+              //                   _gridViewData(size, classesData?.classes),
+              //                   const SizedBox(
+              //                     height: 10,
+              //                   ),
+              //                   _buildPaginationButtons(
+              //                       classesData?.totalPage ?? 1),
+              //                 ],
+              //               )
+              //             : Column(
+              //                 children: [
+              //                   ListView.separated(
+              //                     shrinkWrap: true,
+              //                     padding: EdgeInsets.zero,
+              //                     itemCount: classesData?.classes?.length ?? 0,
+              //                     itemBuilder: (context, index) {
+              //                       Class data =
+              //                           classesData?.classes?[index] ?? Class();
+              //                       var randomBanner = Random().nextInt(2);
+              //                       return InkWell(
+              //                         onTap: () {
+              //                           selectedPageProvider
+              //                               .setCheckAttendanceDetail(false);
+              //                           selectedPageProvider.setCheckHome(true);
+              //                           selectedPageProvider
+              //                               .setCheckNoti(false);
+              //                           selectedPageProvider
+              //                               .setCheckReport(false);
+              //                           selectedPageProvider
+              //                               .setCheckForm(false);
+              //                           selectedPageProvider
+              //                               .setCheckEditAttendanceForm(false);
+              //                           selectedPageProvider
+              //                               .setCheckAttendanceForm(false);
+              //                           Navigator.pushReplacement(
+              //                               context,
+              //                               MaterialPageRoute(
+              //                                   builder: (builder) =>
+              //                                       DetailPage(
+              //                                         classes: data,
+              //                                       )));
+              //                         },
+              //                         mouseCursor: SystemMouseCursors.click,
+              //                         child: customClass(
+              //                             classesData?.classes ?? [],
+              //                             data.classID ?? '',
+              //                             data.course?.courseName ?? '',
+              //                             data.classType ?? '',
+              //                             data.group ?? '',
+              //                             data.subGroup ?? '',
+              //                             data.shiftNumber ?? 0,
+              //                             data.roomNumber ?? '',
+              //                             'assets/images/banner$randomBanner.jpg',
+              //                             150),
+              //                       );
+              //                     },
+              //                     separatorBuilder:
+              //                         (BuildContext context, int index) {
+              //                       return const SizedBox(
+              //                         height: 10,
+              //                       );
+              //                     },
+              //                   ),
+              //                   _buildPaginationButtons(
+              //                       classesData?.totalPage ?? 1),
+              //                 ],
+              //               );
+              //       }
+              //     } else if (snapshot.hasError) {
+              //       return Center(child: Text('Error: ${snapshot.error}'));
+              //     } else if (snapshot.connectionState ==
+              //         ConnectionState.waiting) {
+              //       return const Center(
+              //           child: CircularProgressIndicator(
+              //               color: AppColors.primaryButton));
+              //     } else {
+              //       return Center(
+              //         child: Column(
+              //           mainAxisAlignment: MainAxisAlignment.center,
+              //           children: [
+              //             Opacity(
+              //                 opacity: 0.3,
+              //                 child: Image.asset(
+              //                   'assets/images/nodata.png',
+              //                   width: 200,
+              //                   height: 200,
+              //                 )),
+              //             const SizedBox(height: 5),
+              //             CustomText(
+              //                 message: 'No Class',
+              //                 fontSize: 12,
+              //                 fontWeight: FontWeight.w600,
+              //                 color: AppColors.primaryText.withOpacity(0.3))
+              //           ],
+              //         ),
+              //       );
+              //     }
+              //     return const Center(child: Text('Data is not available'));
+              //   },
+              // ),
+              !isMobile
+                  ? classesData != null
+                      ? Column(
+                          children: [
+                            _gridViewData(size, classesData?.classes),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            _buildPaginationButtons(
+                                classesData?.totalPage ?? 1),
+                          ],
+                        )
+                      : _noData()
+                  : classesData != null
+                      ? Column(
+                          children: [
+                            ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: classesData?.classes?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                Class data =
+                                    classesData?.classes?[index] ?? Class();
+                                var randomBanner = Random().nextInt(2);
+                                return InkWell(
+                                  onTap: () {
+                                    selectedPageProvider
+                                        .setCheckAttendanceDetail(false);
+                                    selectedPageProvider.setCheckHome(true);
+                                    selectedPageProvider.setCheckNoti(false);
+                                    selectedPageProvider.setCheckReport(false);
+                                    selectedPageProvider.setCheckForm(false);
+                                    selectedPageProvider
+                                        .setCheckEditAttendanceForm(false);
+                                    selectedPageProvider
+                                        .setCheckAttendanceForm(false);
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) => DetailPage(
+                                                  classes: data,
+                                                )));
+                                  },
+                                  mouseCursor: SystemMouseCursors.click,
+                                  child: customClass(
+                                      classesData?.classes ?? [],
+                                      data.classID ?? '',
+                                      data.course?.courseName ?? '',
+                                      data.classType ?? '',
+                                      data.group ?? '',
+                                      data.subGroup ?? '',
+                                      data.shiftNumber ?? 0,
+                                      data.roomNumber ?? '',
+                                      'assets/images/banner$randomBanner.jpg',
+                                      150),
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const SizedBox(
                                   height: 10,
-                                ),
-                                _buildPaginationButtons(
-                                    classesData?.totalPage ?? 1),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  padding: EdgeInsets.zero,
-                                  itemCount: classesData?.classes?.length ?? 0,
-                                  itemBuilder: (context, index) {
-                                    Class data =
-                                        classesData?.classes?[index] ?? Class();
-                                    var randomBanner = Random().nextInt(2);
-                                    return InkWell(
-                                      onTap: () {
-                                        selectedPageProvider
-                                            .setCheckAttendanceDetail(false);
-                                        selectedPageProvider.setCheckHome(true);
-                                        selectedPageProvider
-                                            .setCheckNoti(false);
-                                        selectedPageProvider
-                                            .setCheckReport(false);
-                                        selectedPageProvider
-                                            .setCheckForm(false);
-                                        selectedPageProvider
-                                            .setCheckEditAttendanceForm(false);
-                                        selectedPageProvider
-                                            .setCheckAttendanceForm(false);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (builder) =>
-                                                    DetailPage(
-                                                      classes: data,
-                                                    )));
-                                      },
-                                      mouseCursor: SystemMouseCursors.click,
-                                      child: customClass(
-                                          classesData?.classes ?? [],
-                                          data.classID ?? '',
-                                          data.course?.courseName ?? '',
-                                          data.classType ?? '',
-                                          data.group ?? '',
-                                          data.subGroup ?? '',
-                                          data.shiftNumber ?? 0,
-                                          data.roomNumber ?? '',
-                                          'assets/images/banner$randomBanner.jpg',
-                                          150),
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int index) {
-                                    return const SizedBox(
-                                      height: 10,
-                                    );
-                                  },
-                                ),
-                                _buildPaginationButtons(
-                                    classesData?.totalPage ?? 1),
-                              ],
-                            );
-                    }
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryButton));
-                  } else {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Opacity(
-                              opacity: 0.3,
-                              child: Image.asset(
-                                'assets/images/nodata.png',
-                                width: 200,
-                                height: 200,
-                              )),
-                          const SizedBox(height: 5),
-                          CustomText(
-                              message: 'No Class',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryText.withOpacity(0.3))
-                        ],
-                      ),
-                    );
-                  }
-                  return const Center(child: Text('Data is not available'));
-                },
-              ),
+                                );
+                              },
+                            ),
+                            _buildPaginationButtons(
+                                classesData?.totalPage ?? 1),
+                          ],
+                        )
+                      : _noData()
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Center _noData() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Opacity(
+              opacity: 0.3,
+              child: Image.asset(
+                'assets/images/nodata.png',
+                width: 200,
+                height: 200,
+              )),
+          const SizedBox(height: 5),
+          CustomText(
+              message: 'No Class',
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryText.withOpacity(0.3))
+        ],
       ),
     );
   }
@@ -1374,9 +1484,14 @@ class _HomePageState extends State<HomePage> {
       children: [
         ElevatedButton(
           onPressed: page > 1
-              ? () {
+              ? () async {
                   setState(() {
                     page--;
+                  });
+                  ClassDataHomePage? data = await API(context)
+                      .getClasses(page, selectedSemesterID, false);
+                  setState(() {
+                    classesData = data;
                   });
                 }
               : null,
@@ -1407,9 +1522,14 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 10),
         ElevatedButton(
           onPressed: page < totalPage
-              ? () {
+              ? () async {
                   setState(() {
                     page++;
+                  });
+                  ClassDataHomePage? data = await API(context)
+                      .getClasses(page, selectedSemesterID, false);
+                  setState(() {
+                    classesData = data;
                   });
                 }
               : null,
