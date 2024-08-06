@@ -32,9 +32,9 @@ class AttendanceStats {
   });
 
   factory AttendanceStats.fromJson(Map<String, dynamic> json) {
-    print(json['latitude'].runtimeType);
-    print(json['longitude'].runtimeType);
-    print(json['radius'].runtimeType);
+    // print(json['latitude'].runtimeType);
+    // print(json['longitude'].runtimeType);
+    // print(json['radius'].runtimeType);
 
     return AttendanceStats(
       formID: json['formID'],

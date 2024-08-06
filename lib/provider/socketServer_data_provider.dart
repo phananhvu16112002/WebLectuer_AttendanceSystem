@@ -192,8 +192,8 @@ class SocketServerProvider with ChangeNotifier {
   void joinClassRoom(data) {
     var jsonData = {'classRoom': data};
     var jsonString = jsonEncode(jsonData);
-    print('---jsonStringJoin $jsonString');
-    print("Sending joinClassRoom event with data: $jsonString");
+    // print('---jsonStringJoin $jsonString');
+    // print("Sending joinClassRoom event with data: $jsonString");
     _socket.emit('joinClassRoom', jsonString);
   }
 

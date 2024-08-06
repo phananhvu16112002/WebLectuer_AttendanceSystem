@@ -30,7 +30,7 @@ class AttendanceForm {
   }
 
   factory AttendanceForm.fromJson(Map<String, dynamic> json) {
-    print('AttendanceForm.fromJson: $json');
+    // print('AttendanceForm.fromJson: $json');
     return AttendanceForm(
         formID: json['formID'] ?? '',
         classes: json['classes'] ?? '',

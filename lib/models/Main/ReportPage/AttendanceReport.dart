@@ -32,7 +32,7 @@ class AttendanceReport {
       required this.reportImages});
 
   factory AttendanceReport.fromJson(Map<String, dynamic> json) {
-    print('Feedback: ${json['feedback'].runtimeType}');
+    // print('Feedback: ${json['feedback'].runtimeType}');
     List<dynamic> imageJsonList = json['reportImage'];
     List<ReportImage> images = imageJsonList
         .map((imageJson) => ReportImage.fromJson(imageJson))

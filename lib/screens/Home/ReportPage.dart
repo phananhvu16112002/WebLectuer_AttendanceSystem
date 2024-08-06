@@ -1017,6 +1017,9 @@ class _ReportPageState extends State<ReportPage> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
+                                    setState(() {
+                                      
+                                    });
                                     Navigator.of(context).pop();
                                   },
                                   child: const Text('OK'),
@@ -1037,6 +1040,9 @@ class _ReportPageState extends State<ReportPage> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
+                                    setState(() {
+                                      
+                                    });
                                     Navigator.of(context).pop();
                                   },
                                   child: const Text('OK'),
@@ -1237,6 +1243,8 @@ class _ReportPageState extends State<ReportPage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
+                                      setState(() {
+                                      });
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('OK'),
@@ -1257,6 +1265,9 @@ class _ReportPageState extends State<ReportPage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
+                                      setState(() {
+                                        
+                                      });
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('OK'),

@@ -1220,9 +1220,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes?.course?.totalWeeks ?? 0, false),
+                           numberOfWeeks ?? 0, false),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes?.course?.totalWeeks ?? 0, false),
+                            numberOfWeeks?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1469,9 +1469,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData ?? [],
-                            widget.classes?.course?.totalWeeks ?? 0, false),
+                            numberOfWeeks ?? 0, false),
                         customButtonDashBoard('Excel', listData ?? [],
-                            widget.classes?.course?.totalWeeks ?? 0, false),
+                            numberOfWeeks ?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1677,9 +1677,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData,
-                            widget.classes?.course?.totalWeeks ?? 0, true),
+                            numberOfWeeks ?? 0, true),
                         customButtonDashBoard('Excel', listData,
-                            widget.classes?.course?.totalWeeks ?? 0, true),
+                            numberOfWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
@@ -1862,9 +1862,9 @@ class _DetailPageState extends State<DetailPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customButtonDashBoard('Export', listData ?? [],
-                            widget.classes?.course?.totalWeeks ?? 0, true),
+                            numberOfWeeks?? 0, true),
                         customButtonDashBoard('Excel', listData ?? [],
-                            widget.classes?.course?.totalWeeks ?? 0, true),
+                            numberOfWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
