@@ -4,7 +4,7 @@ import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
 
 class Authenticate {
-  String baseURL = Constants.baseURL;
+  String? baseURL = Constants.baseURL;
   Future<String> registerUser(
       String userName, String email, String password) async {
     String URL = 'http://$baseURL:8080/api/teacher/register';

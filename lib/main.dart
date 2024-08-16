@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/common/colors/color.dart';
 import 'package:weblectuer_attendancesystem_nodejs/provider/activate_form_data_provider.dart';
@@ -14,9 +15,9 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await dotenv.load();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
     ChangeNotifierProvider(create: (_) => SocketServerProvider()),

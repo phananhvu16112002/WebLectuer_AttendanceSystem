@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class Constants{
-  static const String baseURL = 'localhost';
+  static String? baseURL = dotenv.env['BASE_URL'];
 }

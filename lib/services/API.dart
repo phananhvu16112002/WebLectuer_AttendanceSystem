@@ -26,7 +26,7 @@ import 'package:weblectuer_attendancesystem_nodejs/services/SecureStorage.dart';
 import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
 
 class API {
-  String baseURL = Constants.baseURL;
+  String? baseURL = Constants.baseURL;
   BuildContext context;
   API(this.context);
 

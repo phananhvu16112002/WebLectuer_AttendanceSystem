@@ -136,7 +136,7 @@ import 'package:weblectuer_attendancesystem_nodejs/models/Main/AttendanceForm.da
 import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
 
 class SocketServerProvider with ChangeNotifier {
-  String baseURL = Constants.baseURL;
+  String? baseURL = Constants.baseURL;
   late IO.Socket _socket;
   bool _isConnected = false;
 
