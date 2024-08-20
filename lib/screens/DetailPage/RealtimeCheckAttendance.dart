@@ -291,9 +291,10 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
                       height: MediaQuery.of(context).size.height,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Center(
+                        child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const SizedBox(
                                 height: 10,
@@ -578,7 +579,6 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
     int startIndex = currentPage * studentsPerPage;
     int endIndex =
         min((currentPage + 1) * studentsPerPage, studentAttendance.length);
-    print('---${studentAttendance.first.dateAttendanced}');
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1),

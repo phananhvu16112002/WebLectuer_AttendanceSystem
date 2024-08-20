@@ -15,9 +15,9 @@ import 'package:weblectuer_attendancesystem_nodejs/provider/studentClasses_data_
 import 'package:weblectuer_attendancesystem_nodejs/provider/teacher_data_provider.dart';
 import 'package:weblectuer_attendancesystem_nodejs/screens/Home/HomePage.dart';
 
-Future main() async {
+void main()  {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
+  // await dotenv.load();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
     ChangeNotifierProvider(create: (_) => SocketServerProvider()),

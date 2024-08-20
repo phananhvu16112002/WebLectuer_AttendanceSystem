@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
     _fetchData = API(context).getClasses(page, semesterID, archived);
     _fetchData.then((value) {
       setState(() {
-        classesData = value!;
+        classesData = value;
       });
     });
   }

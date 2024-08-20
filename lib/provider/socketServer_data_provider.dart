@@ -137,6 +137,7 @@ import 'package:weblectuer_attendancesystem_nodejs/utils/constants.dart';
 
 class SocketServerProvider with ChangeNotifier {
   String? baseURL = Constants.baseURL;
+  String? socketURL = Constants.urlForSocket;
   late IO.Socket _socket;
   bool _isConnected = false;
 
@@ -156,7 +157,7 @@ class SocketServerProvider with ChangeNotifier {
     //   'headers': {'Content-Type': 'application/json'},
     // });
 
-    _socket = IO.io('http://$baseURL:9000', 
+    _socket = IO.io('$socketURL', 
     OptionBuilder()
       .setTransports(['websocket']) // for Flutter or Dart VM
       .disableAutoConnect()  // disable auto-connection

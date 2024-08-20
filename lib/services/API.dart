@@ -39,7 +39,7 @@ class API {
 
   Future<String> refreshAccessToken(String refreshToken) async {
     String url =
-        'http://$baseURL:8080/api/token/refreshAccessToken'; // 10.0.2.2
+        '$baseURL/api/token/refreshAccessToken'; // 10.0.2.2
     var headers = {'authorization': refreshToken};
 
     try {
@@ -113,7 +113,7 @@ class API {
   Future<ClassDataHomePage?> getClasses(
       int page, int? semesterID, bool archived) async {
     String URL =
-        'http://$baseURL:8080/api/teacher/classes/page/$page?semester=$semesterID&archived=$archived';
+        '$baseURL/api/teacher/classes/page/$page?semester=$semesterID&archived=$archived';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -155,7 +155,7 @@ class API {
   }
 
   Future<void> uploadFileExcel(File file) async {
-    String URL = 'http://$baseURL:8080/';
+    String URL = '$baseURL/';
     var request = http.MultipartRequest('POST', Uri.parse(URL));
     var multipartFile = await http.MultipartFile.fromPath('excel', file.path);
     request.files.add(multipartFile);
@@ -169,7 +169,7 @@ class API {
 
   Future<ReportPaginations?> getReportsWithPagi(int page) async {
     String URL =
-        'http://$baseURL:8080/api/teacher/reports/page/$page'; //10.0.2.2
+        '$baseURL/api/teacher/reports/page/$page'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
@@ -214,7 +214,7 @@ class API {
   Future<HistoryReportDialog?> getDetailHistoryReport(
       String classID, int historyReports) async {
     final url =
-        'http://$baseURL:8080/api/teacher/historyreports/detail/$historyReports/$classID';
+        '$baseURL/api/teacher/historyreports/detail/$historyReports/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -261,7 +261,7 @@ class API {
   Future<AttendanceReport?> getReportStudentClass(
       String classID, int reportID) async {
     final url =
-        'http://$baseURL:8080/api/teacher/reports/detail/$reportID/$classID';
+        '$baseURL/api/teacher/reports/detail/$reportID/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -305,7 +305,7 @@ class API {
   }
 
   Future<AttendanceModel?> getAttendanceDetailRealtime(String formID) async {
-    final url = 'http://$baseURL:8080/api/teacher/attendance/detail/$formID';
+    final url = '$baseURL/api/teacher/attendance/detail/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     print(
@@ -353,7 +353,7 @@ class API {
 
   Future<bool> submitFeedback(
       int reportID, String topic, String message, String status) async {
-    String url = 'http://$baseURL:8080/api/teacher/feedback/submit';
+    String url = '$baseURL/api/teacher/feedback/submit';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
@@ -411,7 +411,7 @@ class API {
 
   Future<bool> editFeedback(
       int reportID, String topic, String message, String confirmStatus) async {
-    final url = 'http://$baseURL:8080/api/teacher/feedback/edit/$reportID';
+    final url = '$baseURL/api/teacher/feedback/edit/$reportID';
     var accessToken = await getAccessToken();
     var request = {
       'reportID': reportID,
@@ -469,7 +469,7 @@ class API {
 
   Future<List<FormData>> getFormForTeacher(String classID) async {
     final URL =
-        'http://$baseURL:8080/api/teacher/classes/detail/$classID/forms'; //10.0.2.2
+        '$baseURL/api/teacher/classes/detail/$classID/forms'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {
@@ -560,7 +560,7 @@ class API {
 
   Future<ClassModel?> getStudentsWithAllAttendanceDetails(
       String classID) async {
-    final url = 'http://$baseURL:8080/api/teacher/classes/detail/$classID';
+    final url = '$baseURL/api/teacher/classes/detail/$classID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -606,7 +606,7 @@ class API {
   Future<StudentAttendanceEdit?> getAttendanceDetailStudent(
       String classID, String studentID, String formID) async {
     final url =
-        'http://$baseURL:8080/api/teacher/attendancedetail/$classID/$studentID/$formID';
+        '$baseURL/api/teacher/attendancedetail/$classID/$studentID/$formID';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -652,7 +652,7 @@ class API {
   }
 
   Future<NotificationsData?> getNotifications() async {
-    String url = 'http://$baseURL:8080/api/teacher/notifications';
+    String url = '$baseURL/api/teacher/notifications';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -701,7 +701,7 @@ class API {
       double longtitude,
       double radius,
       String formId) async {
-    String url = 'http://$baseURL:8080/api/teacher/form/submit';
+    String url = '$baseURL/api/teacher/form/submit';
     var accessToken = await getAccessToken();
     var request = {
       'classID': classID,
@@ -763,7 +763,7 @@ class API {
 
   Future<AttendanceDetailResponseStudent>
       getStudentClassAttendanceDetail() async {
-    String url = 'http://$baseURL:8080/test/api/getStudentFakeAPI';
+    String url = '$baseURL/test/api/getStudentFakeAPI';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -791,7 +791,7 @@ class API {
 
   Future<AttendanceSummary> getAttendanceSummary() async {
     String url =
-        'http://$baseURL:8080/test/api/fakeAttendanceDetailsRecordWith7PresenceAnd2Late';
+        '$baseURL/test/api/fakeAttendanceDetailsRecordWith7PresenceAnd2Late';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -817,7 +817,7 @@ class API {
   Future<bool> editAttendanceDetail(String studentID, String classID,
       String formID, String topic, String confirmStatus, String message) async {
     final url =
-        'http://$baseURL:8080/api/teacher/attendancedetail/edit/$classID/$studentID/$formID';
+        '$baseURL/api/teacher/attendancedetail/edit/$classID/$studentID/$formID';
     var accessToken = await getAccessToken();
     var request = {
       'topic': topic,
@@ -875,7 +875,7 @@ class API {
   Future<bool> editAttendanceForm(String classID, String formID,
       String startTime, String endTime, int type, double radius) async {
     final url =
-        'http://$baseURL:8080/api/teacher/edit/attendanceform/$classID/$formID';
+        '$baseURL/api/teacher/edit/attendanceform/$classID/$formID';
     var accessToken = await getAccessToken();
     var request = {
       'startTime': startTime,
@@ -934,7 +934,7 @@ class API {
   Future<bool> editStatusForm(
       String classID, String formID, bool status) async {
     final url =
-        'http://$baseURL:8080/api/teacher/editstatus/attendanceform/$classID/$formID';
+        '$baseURL/api/teacher/editstatus/attendanceform/$classID/$formID';
     var accessToken = await getAccessToken();
     var request = {
       'status': status,
@@ -987,7 +987,7 @@ class API {
   }
 
   Future<ProgressModel?> getDataChart(String classID) async {
-    var URL = 'http://$baseURL:8080/api/teacher/classes/$classID/stats';
+    var URL = '$baseURL/api/teacher/classes/$classID/stats';
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
@@ -1027,7 +1027,7 @@ class API {
   }
 
   Future<List<Semester>> getSemester() async {
-    var URL = 'http://$baseURL:8080/api/teacher/semester';
+    var URL = '$baseURL/api/teacher/semester';
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
@@ -1116,7 +1116,7 @@ class API {
   }
 
   Future<bool> repositoryClassbyID(String classID, bool archived) async {
-    final url = 'http://$baseURL:8080/api/teacher/classes/archives/$classID';
+    final url = '$baseURL/api/teacher/classes/archives/$classID';
     var accessToken = await getAccessToken();
     var request = {
       'archive': archived,
