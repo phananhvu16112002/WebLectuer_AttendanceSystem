@@ -47,6 +47,12 @@ class _RepositoryClassPageState extends State<FormPage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final selectedPage = Provider.of<SelectedPageProvider>(context);
     final editAttendanceFormProvider =
@@ -446,7 +452,7 @@ class _RepositoryClassPageState extends State<FormPage> {
 
 String formatDate(String? date) {
   if (date != null && date != "" && date != 'null') {
-    DateTime serverDateTime = DateTime.parse(date).toLocal();
+    DateTime serverDateTime = DateTime.parse(date);
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
@@ -455,7 +461,7 @@ String formatDate(String? date) {
 
 String formatTime(String? time) {
   if (time != null && time != "" && time != 'null') {
-    DateTime serverDateTime = DateTime.parse(time!).toLocal();
+    DateTime serverDateTime = DateTime.parse(time!);
     String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;
   }

@@ -111,6 +111,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<ClassDataProvider>(context, listen: false);

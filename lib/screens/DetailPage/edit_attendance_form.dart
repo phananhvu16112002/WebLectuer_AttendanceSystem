@@ -74,13 +74,13 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
 
   Future<void> selectTimeStart(BuildContext context) async {
     final TimeOfDay? time = await showTimePicker(
+        initialEntryMode: TimePickerEntryMode.input,
         barrierColor: Colors.black.withOpacity(0.2),
         helpText: 'Select Start Time For Attendance',
         builder: (context, child) {
           return Theme(
-            data: ThemeData(
-              dialogBackgroundColor: AppColors.primaryButton,
-            ),
+            data: ThemeData.light(useMaterial3: false)
+                .copyWith(primaryColor: Colors.white),
             child: child!,
           );
         },
@@ -98,13 +98,13 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
 
   Future<void> selectTimeEnd(BuildContext context) async {
     final TimeOfDay? time = await showTimePicker(
+        initialEntryMode: TimePickerEntryMode.input,
         barrierColor: Colors.black.withOpacity(0.2),
         helpText: 'Select Start Time For Attendance',
         builder: (context, child) {
           return Theme(
-            data: ThemeData(
-              dialogBackgroundColor: AppColors.primaryButton,
-            ),
+            data: ThemeData.light(useMaterial3: false)
+                .copyWith(primaryColor: Colors.white),
             child: child!,
           );
         },
@@ -184,7 +184,7 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
   }
 
   TimeOfDay convertTimeOfDay(String time) {
-    DateTime dateTime = DateTime.parse(time).toLocal();
+    DateTime dateTime = DateTime.parse(time);
     TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
     return timeOfDay;
   }
@@ -246,10 +246,10 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(
-              height: 5,
+              height: 10,
             ),
             customTextField(
-                560,
+                double.infinity,
                 40,
                 true,
                 typeAttendanceController,
@@ -258,7 +258,7 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                 '${classes.course?.courseName},${classes.teacher?.teacherName} ,Shift:${classes.shiftNumber}, Room: ${classes.roomNumber}',
                 false),
             const SizedBox(
-              height: 5,
+              height: 10,
             ),
             const CustomText(
                 message: 'Type',
@@ -266,58 +266,64 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
             const SizedBox(
-              height: 5,
+              height: 10,
             ),
             Container(
-              width: 560,
+              width: double.infinity,
               height: 40,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 border: Border.all(
                     width: 1, color: AppColors.primaryText.withOpacity(0.2)),
               ),
-              child: DropdownButton(
-                underline: Container(),
-                value: dropdownvalue,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: AppColors.primaryText.withOpacity(0.5),
-                ),
-                items: items.map((String items) {
-                  return DropdownMenuItem(
-                      value: items,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: SizedBox(
-                          width: 380,
-                          child: Text(
-                            items,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.primaryText.withOpacity(0.5),
-                                fontWeight: FontWeight.normal),
-                          ),
-                        ),
-                      ));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedIndex = items.indexOf(newValue!);
-                    dropdownvalue = newValue;
-                  });
-                  print("Selected index: $selectedIndex");
-                },
+              child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: DropdownButton(
+                      underline: Container(),
+                      value: dropdownvalue,
+                      icon: const Icon(null),
+                      items: items.map((String items) {
+                        return DropdownMenuItem(
+                            value: items,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20, right: 20),
+                              child: SizedBox(
+                                width: 380,
+                                child: Text(
+                                  items,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primaryText.withOpacity(0.5),
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              ),
+                            ));
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedIndex = items.indexOf(newValue!);
+                          dropdownvalue = newValue;
+                        });
+                        print("Selected index: $selectedIndex");
+                      },
+                    ),
+                  ),
+                        const Icon(Icons.keyboard_arrow_down_outlined),
+
+                ],
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             const CustomText(
                 message: 'Date',
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: AppColors.primaryText),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             customTextField(
-                560,
+                double.infinity,
                 40,
                 true,
                 typeAttendanceController,
@@ -327,7 +333,7 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                     icon: const Icon(Icons.calendar_month_rounded)),
                 formatDate(date.toString()),
                 false),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             CustomText(
                 message: 'Distance: ${radius.ceil()}m',
                 fontSize: 14,
@@ -347,67 +353,71 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
                   });
                 }),
             const SizedBox(
-              height: 5,
+              height: 10,
             ),
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CustomText(
-                        message: "Start Time ",
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customTextField(
-                        150,
-                        40,
-                        true,
-                        startTimeController,
-                        TextInputType.datetime,
-                        IconButton(
-                            onPressed: () => selectTimeStart(context),
-                            icon: const Icon(Icons.watch_later_outlined)),
-                        timeStart != null
-                            ? formatTime(
-                                formatTimeOfDate(timeStart!).toString())
-                            : formatTime(
-                                formatTimeOfDate(TimeOfDay.now()).toString()),
-                        true),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CustomText(
+                          message: "Start Time ",
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      customTextField(
+                          200,
+                          40,
+                          true,
+                          startTimeController,
+                          TextInputType.datetime,
+                          IconButton(
+                              onPressed: () => selectTimeStart(context),
+                              icon: const Icon(Icons.watch_later_outlined)),
+                          timeStart != null
+                              ? formatTime(
+                                  formatTimeOfDate(timeStart!).toString())
+                              : formatTime(
+                                  formatTimeOfDate(TimeOfDay.now()).toString()),
+                          true),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   width: 50,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CustomText(
-                        message: "End Time ",
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primaryText),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customTextField(
-                        150,
-                        40,
-                        true,
-                        startTimeController,
-                        TextInputType.datetime,
-                        IconButton(
-                            onPressed: () => selectTimeEnd(context),
-                            icon: const Icon(Icons.watch_later_outlined)),
-                        timeEnd != null
-                            ? formatTime(formatTimeOfDate(timeEnd!).toString())
-                            : formatTime(
-                                formatTimeOfDate(TimeOfDay.now()).toString()),
-                        true),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CustomText(
+                          message: "End Time ",
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      customTextField(
+                          200,
+                          40,
+                          true,
+                          startTimeController,
+                          TextInputType.datetime,
+                          IconButton(
+                              onPressed: () => selectTimeEnd(context),
+                              icon: const Icon(Icons.watch_later_outlined)),
+                          timeEnd != null
+                              ? formatTime(formatTimeOfDate(timeEnd!).toString())
+                              : formatTime(
+                                  formatTimeOfDate(TimeOfDay.now()).toString()),
+                          true),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -460,7 +470,7 @@ class _EditAttendanceFormState extends State<EditAttendanceForm> {
             ),
             Center(
               child: CustomButton(
-                  buttonName: "Edit AttendanceForm",
+                  buttonName: "Edit Form",
                   backgroundColorButton: AppColors.primaryButton,
                   borderColor: Colors.white,
                   textColor: Colors.white,
