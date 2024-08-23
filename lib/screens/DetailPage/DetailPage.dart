@@ -98,8 +98,6 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
     classes = widget.classes!;
     _fetchData();
-    print("-------------------------------------");
-    print("socker is connect to server");
     Future.delayed(Duration.zero, () {
       var socketServerProvider =
           Provider.of<SocketServerProvider>(context, listen: false);
@@ -236,7 +234,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('Detail Page');
+    print('Detail Page ${classes.teacher!.teacherID}');
     final studentClassesDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
     final socketServerProvider =
@@ -993,7 +991,7 @@ class _DetailPageState extends State<DetailPage> {
       SelectedPageProvider selectedPageProvider,
       EditAttendanceDetailProvider editAttendanceDetailProvider) {
     print('selected Page------');
-    
+
     if (selectedPageProvider.getCheckHome) {
       if (isMobile) {
         return homeMobile(
@@ -1092,9 +1090,8 @@ class _DetailPageState extends State<DetailPage> {
       Size size,
       SelectedPageProvider selectedPageProvider,
       EditAttendanceDetailProvider editAttendanceDetailProvider) {
-        // print('err ${listData!.last.attendancedetails}');
-        // print('form ${listData!.last.attendancedetails.last.attendanceForm}');
-      print('err ${listData == []}');
+    // print('err ${listData!.last.attendancedetails}');
+    // print('form ${listData!.last.attendancedetails.last.attendanceForm}');
     return listData != null && listData.isNotEmpty
         ? SizedBox(
             width: MediaQuery.of(context).size.width - 250,
@@ -1219,10 +1216,10 @@ class _DetailPageState extends State<DetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customButtonDashBoard('Export', listData,
-                           numberOfWeeks ?? 0, false),
-                        customButtonDashBoard('Excel', listData,
-                            numberOfWeeks?? 0, false),
+                        customButtonDashBoard(
+                            'Export', listData, numberOfWeeks ?? 0, false),
+                        customButtonDashBoard(
+                            'Excel', listData, numberOfWeeks ?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1290,19 +1287,19 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         CustomButton(
                             buttonName: 'View Attendance',
-                            backgroundColorButton: 
-                                listData.last.attendancedetails.isNotEmpty &&
-                                        listData.last.attendancedetails.last
-                                            .attendanceForm.isNotEmpty 
-                                    ? const Color(0xff2d71b1)
-                                    : Color(0xff2d71b1).withOpacity(0.5),
+                            backgroundColorButton: listData
+                                        .last.attendancedetails.isNotEmpty &&
+                                    listData.last.attendancedetails.last
+                                        .attendanceForm.isNotEmpty
+                                ? const Color(0xff2d71b1)
+                                : Color(0xff2d71b1).withOpacity(0.5),
                             borderColor: Colors.transparent,
                             textColor: Colors.white,
                             function: listData
                                         .last.attendancedetails.isNotEmpty &&
                                     listData.last.attendancedetails.last
-                                        .attendanceForm.isNotEmpty
-                                        && listData.isNotEmpty
+                                        .attendanceForm.isNotEmpty &&
+                                    listData.isNotEmpty
                                 ? () {
                                     Navigator.push(
                                         context,
@@ -1357,8 +1354,9 @@ class _DetailPageState extends State<DetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                   CustomText(
-                    message: 'Dashboard - ${widget.classes?.course?.courseName ?? ''}',
+                  CustomText(
+                    message:
+                        'Dashboard - ${widget.classes?.course?.courseName ?? ''}',
                     fontSize: 25,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryText,
@@ -1470,8 +1468,8 @@ class _DetailPageState extends State<DetailPage> {
                       children: [
                         customButtonDashBoard('Export', listData ?? [],
                             numberOfWeeks ?? 0, false),
-                        customButtonDashBoard('Excel', listData ?? [],
-                            numberOfWeeks ?? 0, false),
+                        customButtonDashBoard(
+                            'Excel', listData ?? [], numberOfWeeks ?? 0, false),
                         const SizedBox(
                           width: 20,
                         ),
@@ -1676,10 +1674,10 @@ class _DetailPageState extends State<DetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customButtonDashBoard('Export', listData,
-                            numberOfWeeks ?? 0, true),
-                        customButtonDashBoard('Excel', listData,
-                            numberOfWeeks ?? 0, true),
+                        customButtonDashBoard(
+                            'Export', listData, numberOfWeeks ?? 0, true),
+                        customButtonDashBoard(
+                            'Excel', listData, numberOfWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
@@ -1861,10 +1859,10 @@ class _DetailPageState extends State<DetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customButtonDashBoard('Export', listData ?? [],
-                            numberOfWeeks?? 0, true),
-                        customButtonDashBoard('Excel', listData ?? [],
-                            numberOfWeeks ?? 0, true),
+                        customButtonDashBoard(
+                            'Export', listData ?? [], numberOfWeeks ?? 0, true),
+                        customButtonDashBoard(
+                            'Excel', listData ?? [], numberOfWeeks ?? 0, true),
                         const SizedBox(
                           width: 10,
                         ),
@@ -2034,7 +2032,7 @@ class _DetailPageState extends State<DetailPage> {
                                     selectedPageProvider,
                                     editAttendanceDetailProvider),
                               ),
-                              Expanded(       
+                              Expanded(
                                   child: tableTotal(
                                       paginatedStudents, listData, false)),
                             ],
@@ -2206,14 +2204,12 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  double getNumberOfWeeks(int numberOfweeks){
-    if (numberOfWeeks == 2){
+  double getNumberOfWeeks(int numberOfweeks) {
+    if (numberOfWeeks == 2) {
       return 250;
-    }
-    else if (numberOfWeeks == 4){
+    } else if (numberOfWeeks == 4) {
       return 120;
-    }
-    else {
+    } else {
       return 60;
     }
   }
@@ -2561,7 +2557,9 @@ class _DetailPageState extends State<DetailPage> {
       sheet.setColumnAutoFit(i);
     }
     // Save the Excel file
-    excel1.save(fileName: 'My_Excel_File_Name.xlsx');
+    excel1.save(
+        fileName:
+            '${widget.classes?.classID} - ${widget.classes?.course?.courseName}.xlsx');
   }
 
   String statusStudent(String status) {

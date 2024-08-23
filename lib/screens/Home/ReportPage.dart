@@ -556,7 +556,7 @@ class _ReportPageState extends State<ReportPage> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 10),
                                         child: const CustomText(
-                                            message: 'Basic Details',
+                                            message: 'Details',
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.primaryText),
@@ -768,6 +768,115 @@ class _ReportPageState extends State<ReportPage> {
                                             ),
                                           )
                                         ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+                                    Container(
+                                      width: double.infinity,
+                                      color: const Color(0xfff6f9ff),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: const CustomText(
+                                            message: 'Detail Report',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryText),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+                                    Container(
+                                      color: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Container(
+                                        child: Padding(
+                                          padding: const EdgeInsets
+                                              .symmetric(
+                                              horizontal: 20),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment
+                                                    .start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  customRichText(
+                                                    title: 'Topic: ',
+                                                    message: _reportData
+                                                            ?.topic ??
+                                                        '',
+                                                    fontWeightTitle:
+                                                        FontWeight.w600,
+                                                    fontWeightMessage:
+                                                        FontWeight
+                                                            .normal,
+                                                    colorText: AppColors
+                                                        .primaryText
+                                                        .withOpacity(
+                                                            0.3),
+                                                    fontSize: 12,
+                                                    colorTextMessage:
+                                                        AppColors
+                                                            .primaryText,
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              customRichText(
+                                                title:
+                                                    'Message: ',
+                                                message: _reportData
+                                                        ?.message ??
+                                                    '',
+                                                fontWeightTitle:
+                                                    FontWeight.w600,
+                                                fontWeightMessage:
+                                                    FontWeight
+                                                        .normal,
+                                                colorText: AppColors
+                                                    .primaryText
+                                                    .withOpacity(
+                                                        0.3),
+                                                fontSize: 12,
+                                                colorTextMessage:
+                                                    AppColors
+                                                        .primaryText,
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              customRichText(
+                                                title:
+                                                    'Reason: ',
+                                                message: _reportData
+                                                        ?.problem ??
+                                                    '',
+                                                fontWeightTitle:
+                                                    FontWeight.w600,
+                                                fontWeightMessage:
+                                                    FontWeight
+                                                        .normal,
+                                                colorText: AppColors
+                                                    .primaryText
+                                                    .withOpacity(
+                                                        0.3),
+                                                fontSize: 12,
+                                                colorTextMessage:
+                                                    AppColors
+                                                        .primaryText,
+                                              ),
+                                              
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -1024,10 +1133,11 @@ class _ReportPageState extends State<ReportPage> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    setState(() {
+                                   
+                                    Navigator.of(context).pop();
+                                     setState(() {
                                       
                                     });
-                                    Navigator.of(context).pop();
                                   },
                                   child: const Text('OK'),
                                 ),
@@ -1047,10 +1157,11 @@ class _ReportPageState extends State<ReportPage> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
+                                    
+                                    Navigator.of(context).pop();
                                     setState(() {
                                       
                                     });
-                                    Navigator.of(context).pop();
                                   },
                                   child: const Text('OK'),
                                 ),
@@ -1250,9 +1361,10 @@ class _ReportPageState extends State<ReportPage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      setState(() {
-                                      });
+                                     
                                       Navigator.of(context).pop();
+                                       setState(() {
+                                      });
                                     },
                                     child: const Text('OK'),
                                   ),
@@ -1272,10 +1384,10 @@ class _ReportPageState extends State<ReportPage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      setState(() {
-                                        
-                                      });
+                                     
                                       Navigator.of(context).pop();
+                                      setState(() {
+                                      });
                                     },
                                     child: const Text('OK'),
                                   ),

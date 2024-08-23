@@ -830,10 +830,11 @@ class _HomePageState extends State<HomePage> {
         child: icon);
   }
 
-  Widget itemHeader(String title, Icon icon, bool check)  {
+  Widget itemHeader(String title, Icon icon, bool check) {
     return InkWell(
-      onTap: () async  {
-        ClassDataHomePage? data = await API(context).getClasses(page, selectedSemesterID, false);
+      onTap: () async {
+        ClassDataHomePage? data =
+            await API(context).getClasses(page, selectedSemesterID, false);
         setState(() {
           checkHome = false;
           checkNotification = false;
@@ -841,7 +842,7 @@ class _HomePageState extends State<HomePage> {
           checkRepository = false;
           checkCalendar = false;
           checkSettings = false;
-          if (title == 'Home')  {
+          if (title == 'Home') {
             checkHome = true;
             classesData = data;
           } else if (title == 'Notifications') {
