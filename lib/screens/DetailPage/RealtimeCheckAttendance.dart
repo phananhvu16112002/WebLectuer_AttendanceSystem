@@ -968,7 +968,7 @@ class _RealtimeCheckAttendanceState extends State<RealtimeCheckAttendance> {
 
   String formatTime(String time) {
     if (time != '') {
-      DateTime serverDateTime = DateTime.parse(time).toLocal();
+      DateTime serverDateTime = DateTime.parse(time);
       String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
       return formattedTime;
     }
