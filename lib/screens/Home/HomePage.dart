@@ -68,23 +68,27 @@ class _HomePageState extends State<HomePage> {
   void fetchClasses(int semesterID, bool archived) {
     _fetchData = API(context).getClasses(page, semesterID, archived);
     _fetchData.then((value) {
-      setState(() {
-        classesData = value;
-      });
+      if (mounted) {
+        setState(() {
+          classesData = value;
+        });
+      }
     });
   }
 
   void fetchSemester() async {
     _fetchSemester = API(context).getSemester();
     _fetchSemester.then((value) {
-      setState(() {
-        semesters = value;
-        if (semesters.isNotEmpty) {
-          dropdownvalue = semesters.first.semesterName ?? '';
-          selectedSemesterID = semesters.first.semesterID;
-          fetchClasses(selectedSemesterID ?? 0, false);
-        }
-      });
+      if (mounted) {
+        setState(() {
+          semesters = value;
+          if (semesters.isNotEmpty) {
+            dropdownvalue = semesters.first.semesterName ?? '';
+            selectedSemesterID = semesters.first.semesterID;
+            fetchClasses(selectedSemesterID ?? 0, false);
+          }
+        });
+      }
     });
   }
 
@@ -782,7 +786,9 @@ class _HomePageState extends State<HomePage> {
                     child: Text("My Profile"),
                   ),
                   PopupMenuItem(
-                    onTap: () {
+                    onTap: () async {
+                      await SecureStorage().deleteSecureData('accessToken');
+                      await SecureStorage().deleteSecureData('refreshToken');
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
