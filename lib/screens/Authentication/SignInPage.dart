@@ -28,7 +28,7 @@ class _SignInPageState extends State<SignInPage> {
   late ProgressDialog _progressDialog;
 
   String textDesciption =
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged';
+      'The automated attendance support system streamlines and enhances the attendance process for large classes, offering a seamless and efficient experience. Built on advanced technology, the system ensures fast and accurate data handling, robust stability, and effortless scalability. It is designed to meet the demands of modern educational environments, providing a reliable solution that adapts to growing needs.';
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
